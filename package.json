@@ -20,7 +20,9 @@
     "audit:reach": "node tests/audit-reach.mjs",
     "probe:firstrun": "node tests/probe-firstrun.mjs",
     "cycle": "node tests/cycle.mjs",
-    "cycle:watch": "node tests/cycle.mjs --watch"
+    "cycle:watch": "node tests/cycle.mjs --watch",
+    "audit:functions": "node tests/audit-functions.mjs",
+    "jargon": "node tests/tools/harvest-jargon.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.62.1"

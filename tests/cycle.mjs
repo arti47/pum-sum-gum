@@ -12,7 +12,7 @@
 //                                        change, until one cycle comes back clean
 //   node tests/cycle.mjs --repeat 4      re-run up to 4 cycles, stopping at the
 //                                        first clean one (catches flakiness)
-//   node tests/cycle.mjs --only unit,novice
+//   node tests/cycle.mjs --only unit,reach
 //
 // Every pass keeps running even after an earlier one fails. A runner that
 // stops at the first failure hides how much is broken, and hiding that is how
@@ -27,7 +27,7 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 // Cheapest and most diagnostic first, so a broken parse is reported in two
-// seconds rather than after four minutes of browser work.
+// seconds rather than after twenty minutes of browser work.
 const PASSES = [
   { id: "unit", label: "data, engine and glossary invariants", cmd: ["node", "tests/harness.mjs"] },
   { id: "deadcode", label: "rules extracted and never called", cmd: ["node", "tests/deadcode.mjs"] },
@@ -38,6 +38,7 @@ const PASSES = [
   { id: "novice", label: "could a stranger tell what it is for", cmd: ["node", "tests/audit-novice.mjs"] },
   { id: "reach", label: "reachability + naming, three states", cmd: ["node", "tests/audit-reach.mjs"] },
   { id: "guide", label: "the guide against what the app renders", cmd: ["node", "tests/audit-guide.mjs"] },
+  { id: "functions", label: "every function, reached by clicking", cmd: ["node", "tests/audit-functions.mjs"] },
   { id: "firstrun", label: "a stranger, cold open to a played scene", cmd: ["node", "tests/probe-firstrun.mjs"], probe: true },
   { id: "flow", label: "the book's loop, without the tab bar", cmd: ["node", "tests/probe-flow.mjs"], probe: true },
   { id: "layout", label: "measured layout at 320/360/390", cmd: ["node", "tests/probe-layout.mjs"], probe: true },
@@ -68,12 +69,6 @@ function run(pass) {
     child.stdout.on("data", (d) => { out += d; });
     child.stderr.on("data", (d) => { out += d; });
     child.on("close", (code) => {
-      // A probe prints and never asserts, so its exit code says nothing. Read
-      // its own report line instead — otherwise the two probes would be
-      // decoration inside a runner whose whole job is to decide "clean or not".
-      // Match each probe's own one-line verdict, never words that also appear
-      // in its column headers — that mistake makes a runner report a finding
-      // against a table that says "none" in every row.
       // Probes print and never assert, so their exit code says nothing. Each
       // ends with a one-line verdict; read that, and never a word that also
       // appears in a column header — matching "overflow" in the layout probe's

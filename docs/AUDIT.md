@@ -936,3 +936,88 @@ cannot detect jargon nobody thought to add — there is no external dictionary o
 beginner would not know". That direction stays a human judgement, and the contract is written
 at the top of the glossary: put a word on a screen, put it in the glossary.
 
+---
+
+## Cycle 7 — every function, reached by clicking
+
+Two questions the twelve existing passes could not answer, both asked directly:
+*is anything in this app unreachable?* and *is anything on screen a word a beginner would not
+know?* Each needed a new instrument.
+
+### The jargon harvest
+
+`tests/tools/harvest-jargon.mjs` — a tool, not a pass, because the judgement at the end of it
+is human. It renders every route, opens every fold and every dialog, harvests the strings the
+app actually puts on screen, then subtracts four things: the commonest English words, UI
+furniture, every alias already in the glossary, the books' own table rows (a rolled result is
+fiction, not the app's voice), and the fixture's own plot nodes (those are the *player's*
+words). What is left is the app speaking in its own voice, ranked by frequency.
+
+Three real gaps, all now in the glossary — 38 terms to 41:
+
+**F-35 · The act names.** Every plot track is divided into *Exposition · Confrontation ·
+Resolution*, or the five-act *Rising · Climax · Falling*. "Exposition" alone is on screen 34
+times, on the busiest surface in the app, and nothing anywhere said what it meant — or, more
+usefully, that crossing from one into the next changes nothing mechanically. Story-structure
+vocabulary a first-time player has no reason to have met.
+
+**F-36 · ABCD tables.** Named on the beat card whenever a prompt lands on one; defined nowhere.
+
+**F-37 · "No lines and veils, no X-card, no debrief."** Settings named three safety tools in
+one breath in order to say the books ship none. To a reader who has never played, that sentence
+carries no information at all: it lists three things they cannot picture. Now the sentence says
+what safety tools *are* before saying these books do not have them, and the glossary defines
+them — including the half that still applies to someone playing alone.
+
+The harvest also caught a defect in itself: `x-card` tokenises to `x` and `card`, so a
+hyphenated word already in the glossary read as undefined.
+
+### The function-reachability audit
+
+`tests/audit-functions.mjs` runs the app under Chromium's precise coverage counter, clicks
+every control on every route across **nine states** — including one per structurally distinct
+plot sheet — follows every dialog, drives twelve scripted journeys, and then asks the browser
+which of the 281 functions in `src/` never executed. The dead-data scan proves a name is
+*imported*; this proves a player can *reach* it.
+
+**Result: 275/281 reachable by clicking. Six triaged with reasons** — three destructive
+controls the sweep must not press, the import dialog that needs a pasted file, and
+`rules.granularColumn`, which docs/AUDIT.md already records as a test-only export. **No
+unreachable feature.**
+
+### What this cycle actually cost, and the lesson in it
+
+The pass reported 43, then 25, then 12, then 8, then 2, then 1 finding across six runs.
+**Every single one was a defect in the instrument, not in the app.** They are worth listing,
+because each is a distinct way a reachability audit can lie:
+
+1. **Offset-keyed coverage.** Matching a source declaration to the *tightest* coverage range
+   containing it picks the enclosing closure, not the function. Keyed by name instead.
+2. **One click per dialog.** Clicking only a dialog's first button never reaches a commit
+   action sitting behind a body button — which is why the whole prep wizard, `store.setNode`,
+   `addCast` and `addProtagonist` all read as unreachable while the app plainly reaches them.
+3. **One fixture, one sheet.** "Customize" renders only when `sheet.customizable`, so four
+   fixtures on a Standard sheet reported the entire custom-track permission as dead. Same
+   lesson `audit-deep` learned in cycle 5, arrived at again the hard way.
+4. **Folds closed.** A player opens a disclosure and clicks what is inside it; a sweep that
+   re-renders between clicks never gets there.
+5. **Sequences are not clicks.** The wizard will not leave the protagonists step until a name
+   is typed **and** Add is pressed. The Customized sheet ships with no track, so Customize
+   appears only after a section exists. Nearly every remaining surface is a *result card*,
+   which exists only after a roll.
+6. **The glossary chip collision, again.** `tapText(/random prompt/)` matched the chip at the
+   top of the Play screen rather than the beat control, so forty consecutive "rolls" rolled
+   nothing and the audit concluded the node line was unreachable. This is F-34 exactly,
+   reintroduced inside the new tool within a day of being fixed in the probes — which is the
+   argument for the collision being excluded in one shared place rather than three.
+
+The instrument is only trustworthy because it was watched failing: the "Choose" control was
+deleted from `src/sheet.js`, `chooseNodeDialog` was reported unreachable, and the control was
+restored.
+
+### Cycle 7 result
+
+`npm run cycle`, thirteen passes: unit 1,790 · dead-data clean · smoke · interaction · modals ·
+deep · novice 0 findings · reach 20×3 routes, 41 terms · guide 0 drift · **functions 275/281
+reachable, 0 findings** · firstrun, flow and layout VERDICT clean.
+

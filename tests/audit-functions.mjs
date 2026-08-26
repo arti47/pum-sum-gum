@@ -37,11 +37,29 @@ const DONE = (() => {
   return s;
 })();
 
+// One state per structurally distinct plot sheet, because a control can exist
+// only on one of them: "Customize" renders only when sheet.customizable, so four
+// fixtures on a Standard sheet report the whole custom-track permission — the
+// three store mutators behind it included — as unreachable. Same lesson as
+// audit-deep's sheet matrix, arrived at the hard way.
+const onSheet = (id) => {
+  const s = structuredClone(MID);
+  const g = s.games[0];
+  const sc = g.scopes.find((x) => x.id === g.activeScopeId) || g.scopes[0];
+  sc.sheetId = id;
+  return s;
+};
+
 const STATES = [
   { id: "fresh", state: null },
   { id: "mid", state: MID },
   { id: "done", state: DONE },
   { id: "stress", state: STRESS },
+  { id: "customized", state: onSheet("customized") },
+  { id: "sandbox", state: onSheet("sandbox") },
+  { id: "improvised", state: onSheet("improvised") },
+  { id: "journey", state: onSheet("journey") },
+  { id: "story-focus", state: onSheet("story-focus") },
 ];
 
 const ROUTES = [
@@ -68,8 +86,12 @@ const SKIP = [
 // an unreachable feature.
 const EXPECTED_UNREACHED = new Map([
   ["importJSON", "needs a pasted export; the unit harness round-trips it instead"],
+  ["importData", "opens the import dialog, which is in SKIP for the same reason"],
   ["resetAll", "wipes the fixture every later route stands on (in SKIP)"],
   ["deleteGame", "same — destructive, covered by the unit harness"],
+  ["clearJournal", "destructive; in SKIP, and round-tripped by the unit harness"],
+  ["granularColumn", "test-only export, already recorded in docs/AUDIT.md under "
+    + "\"known and accepted\" — read by the harness, by no shipped surface"],
 ]);
 
 const { server, url } = await serve();
@@ -94,6 +116,10 @@ async function seed(state, tab, section) {
     for (const b of document.querySelectorAll(".modal-back")) b.remove();
     const r = await import("./src/router.js");
     r.go(t, s);
+    // A player opens a fold and then clicks what is inside it. A sweep that
+    // re-renders between clicks never gets there, so every control behind a
+    // disclosure reads as unreachable. Open them all first.
+    for (const d of document.querySelectorAll("#screen details")) d.open = true;
   }, [state, tab, section]);
   await page.waitForTimeout(35);
 }
@@ -169,8 +195,13 @@ async function dialogWidth() {
   }, SKIP);
 }
 
+const PLAY_ONLY = new Set(["customized", "sandbox", "improvised", "journey", "story-focus"]);
+
 for (const st of STATES) {
-  for (const [tab, section] of ROUTES) {
+  const routes = PLAY_ONLY.has(st.id)
+    ? ROUTES.filter(([t]) => t === "play")
+    : ROUTES;
+  for (const [tab, section] of routes) {
     await seed(st.state, tab, section);
     const names = await screenControls();
     for (let i = 0; i < names.length; i++) {
@@ -197,32 +228,268 @@ for (const st of STATES) {
   }
 }
 
-// The wizard renders only while a draft exists, so it never appears on a route.
-// Walk it end to end, clicking every control on every step.
-await seed(null, "more", "home");
-await page.evaluate(async () => {
-  const w = await import("./src/wizard.js");
-  w.startWizard();
-});
-await page.waitForTimeout(60);
-for (let step = 0; step < 8; step++) {
-  const names = await screenControls();
-  for (let i = 0; i < names.length; i++) {
-    const hit = await clickNth(i);
-    if (hit) { clicks += 1; await page.waitForTimeout(25); await followDialog(0); }
-  }
-  const moved = await page.evaluate(() => {
-    const next = [...document.querySelectorAll("#action-bar button, #screen button")]
-      .find((b) => /next|finish|start playing|create/i.test(b.textContent || "") && !b.disabled);
-    if (!next) return false;
-    for (const f of document.querySelectorAll("#screen input[type=text], #screen textarea")) {
-      if (!f.value) { f.value = "audit"; f.dispatchEvent(new Event("input", { bubbles: true })); }
-    }
-    next.click();
+// --- scripted journeys ------------------------------------------------------
+// Clicking every control from a freshly-seeded state cannot reach anything that
+// needs a SEQUENCE. Two of the app's features are sequences, and both read as
+// unreachable until the sweep actually performs them:
+//
+//   · the prep wizard, which will not leave the protagonists step until a name
+//     has been typed AND the Add button pressed — filling the field is not
+//     enough, and the first version of this pass stalled there silently;
+//   · the Customized plot sheet, which starts with no track at all. "Customize"
+//     appears only once a section exists, so a sweep that re-seeds between
+//     clicks can add a section or open the dialog, never both.
+//
+// A journey is written out, step by step, rather than discovered. That is the
+// honest shape: this pass proves what clicking reaches, and names what needs a
+// sequence instead of pretending a sequence is a click.
+
+async function type(selector, value) {
+  await page.evaluate(([sel, v]) => {
+    const f = document.querySelector(sel);
+    if (!f) return;
+    f.value = v;
+    f.dispatchEvent(new Event("input", { bubbles: true }));
+    f.dispatchEvent(new Event("change", { bubbles: true }));
+  }, [selector, value]);
+  await page.waitForTimeout(60);
+}
+
+async function tapText(re, where = "#screen button, #action-bar button, .modal button") {
+  const hit = await page.evaluate(([sel, src]) => {
+    const rx = new RegExp(src, "i");
+    const b = [...document.querySelectorAll(sel)]
+      .filter((x) => x.offsetParent !== null && !x.disabled)
+      // A glossary chip is a definition link, not a step of play. Without this
+      // the chip "Random prompt" at the top of the Play screen is the first
+      // match for /random prompt/, so the journey navigated to Rules and forty
+      // consecutive "rolls" rolled nothing. Exactly the collision F-34 recorded
+      // in the flow probes, reintroduced here.
+      .filter((x) => !x.classList.contains("term"))
+      .find((x) => rx.test((x.textContent || "").trim()));
+    if (!b) return false;
+    b.click();
     return true;
+  }, [where, re.source]);
+  if (hit) { clicks += 1; await page.waitForTimeout(90); }
+  return hit;
+}
+
+const journeys = [];
+
+// 1. Prepare a game, end to end. The only route to wizard.finish and createGame.
+{
+  await seed(null, "more", "home");
+  await page.evaluate(async () => (await import("./src/wizard.js")).startWizard());
+  await page.waitForTimeout(90);
+  const steps = [];
+  for (let i = 0; i < 8; i++) {
+    // Fill whatever this step asks for, and press any per-step Add button, which
+    // is what the protagonists and plot-node steps require before they are legal.
+    await page.evaluate(() => {
+      for (const f of document.querySelectorAll("#screen input[type=text], #screen textarea")) {
+        if (!f.value) {
+          f.value = "audit";
+          f.dispatchEvent(new Event("input", { bubbles: true }));
+          f.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+      for (const d of document.querySelectorAll("#screen details")) d.open = true;
+    });
+    await page.waitForTimeout(70);
+    await tapText(/^add /);
+    await page.waitForTimeout(70);
+    const label = await page.evaluate(() =>
+      document.querySelector(".ab-ctx")?.textContent || "");
+    steps.push(label);
+    if (!(await tapText(/^(next|start playing)$/))) break;
+  }
+  journeys.push(`wizard: ${steps.length} step(s) — ${steps.join(" → ")}`);
+}
+
+// 2. Cancel out of the wizard: the only route to cancelWizard.
+{
+  await seed(null, "more", "home");
+  await page.evaluate(async () => (await import("./src/wizard.js")).startWizard());
+  await page.waitForTimeout(80);
+  const ok = await tapText(/^cancel$/);
+  await followDialog(0);
+  journeys.push(`wizard cancel: ${ok ? "taken" : "NO CONTROL"}`);
+}
+
+// 3. Build a custom track: add a section, then a box, then open Customize.
+{
+  await seed(onSheet("customized"), "play", "track");
+  const added = await tapText(/add a track section/);
+  await followDialog(0);
+  await page.waitForTimeout(80);
+  const customize = await tapText(/^customize$/);
+  if (customize) {
+    // Inside: add a box, edit the prompt column, remove a section.
+    await tapText(/^\+|add a box/, ".modal button");
+    await page.waitForTimeout(60);
+    await tapText(/prompt column|customize the prompt/, ".modal button");
+    await page.waitForTimeout(60);
+    await followDialog(0);
+  }
+  journeys.push(`custom track: section ${added ? "added" : "NO CONTROL"}, `
+    + `Customize ${customize ? "opened" : "NOT OFFERED after adding a section"}`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
+// 4. Roll, then use what the roll put on screen. This is the shape of nearly
+// everything left: a result card exists only AFTER a roll, so a sweep that
+// re-seeds between clicks can never reach one of its follow-ups. That is a
+// property of the sweep, not of the app, and the only fix is to roll first.
+{
+  await seed(MID, "oracles", "yesno");
+  await tapText(/^ask$/);
+  // The answer's own follow-ups: re-roll, and the plot beat PUM p.28 says a
+  // yes or no triggers.
+  await tapText(/it said (yes|no)|random prompt|modified proposal/);
+  await page.waitForTimeout(80);
+  const beat = await page.evaluate(() =>
+    (document.querySelector("#screen h1")?.textContent || "") + " "
+    + [...document.querySelectorAll("#screen .result-kind")].map((n) => n.textContent).join(" "));
+  journeys.push(`oracle → beat trigger: landed on "${beat.trim().slice(0, 40)}"`);
+
+  // An enriched oracle, and the granular variant, each rolled once.
+  await seed(MID, "oracles", "descriptive");
+  await tapText(/someone|place|object/);
+  await seed(MID, "oracles", "granular");
+  await tapText(/^ask$/);
+  await seed(MID, "oracles", "quantifiers");
+  await tapText(/how many|how good|how hard/);
+  journeys.push("oracles: enriched, granular and quantifier rolls taken");
+}
+
+// 5. Roll in the Forge, then keep the result — the only route to keepDialog.
+{
+  await seed(MID, "more", "forge");
+  await tapText(/roll a whole plot seed|roll all/);
+  await page.waitForTimeout(90);
+  const kept = await tapText(/keep it/);
+  if (kept) { await page.waitForTimeout(80); await followDialog(0); }
+  journeys.push(`forge → keep: ${kept ? "taken" : "NO CONTROL after rolling"}`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
+// 6. Roll a plot beat until it points at a plot node, then act on it.
+// A beat's face is a die roll: on a Standard sheet only some faces reach a node
+// list, and only faces 5 and 6 reach a list the sheet does not print. Rolling
+// once and hoping is not a test — roll until the surface appears, or say it
+// never did.
+{
+  let nodeLine = false, unprinted = false, tries = 0;
+  for (; tries < 40 && !(nodeLine && unprinted); tries++) {
+    await seed(MID, "play", "track");
+    if (!(await tapText(/random prompt/))) break;
+    await page.waitForTimeout(70);
+    const seen = await page.evaluate(() => {
+      const t = document.querySelector("#screen")?.innerText || "";
+      const btn = (re) => [...document.querySelectorAll("#screen button")]
+        .some((b) => b.offsetParent !== null && re.test((b.textContent || "").trim()));
+      return {
+        // The empty-slot line is THREE separate buttons — "Add new", "Choose",
+        // "Reroll" — not one control named after all three. Matching the card's
+        // prose instead of its buttons is why this journey reported the node
+        // line reached and still never opened the Choose dialog.
+        choose: btn(/^choose$/i),
+        unprinted: /bring one in|recall/i.test(t),
+      };
+    });
+    if (seen.choose && !nodeLine) {
+      nodeLine = true;
+      await tapText(/^choose$/);
+      await page.waitForTimeout(70);
+      await followDialog(0);
+    }
+    if (seen.unprinted) unprinted = true;
+  }
+  journeys.push(`beat → empty-slot Choose: ${nodeLine ? "reached" : "NEVER APPEARED"}, `
+    + `unprinted-list block: ${unprinted ? "reached" : "NEVER APPEARED"} (${tries} rolls)`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
+// 6b. The oracle result card's own follow-ups, named rather than hoped for:
+// re-roll writes a LINKED journal entry, and "Enrich it" rolls only the second
+// die into the same entry. Both are controls on a card that exists only after a
+// roll, which is why a re-seeding sweep never sees either.
+{
+  await seed(MID, "oracles", "descriptive");
+  await tapText(/someone|place|object/);
+  await page.waitForTimeout(80);
+  const rerolled = await tapText(/^re-?roll$/);
+  await page.waitForTimeout(80);
+  const enriched = await tapText(/enrich it/);
+  journeys.push(`oracle card: re-roll ${rerolled ? "taken" : "NOT OFFERED"}, `
+    + `enrich ${enriched ? "taken" : "NOT OFFERED"}`);
+
+  // Enrichment is the books' default, so "Enrich it" only has work to do when
+  // the automatic roll is switched off. Order matters: seed() reloads the
+  // fixture, which would put the setting straight back.
+  await seed(MID, "oracles", "story");
+  await page.evaluate(async () => {
+    const st = await import("./src/settings.js");
+    st.Settings.setAutoEnrich(false);
+    (await import("./src/router.js")).go("oracles", "story");
   });
   await page.waitForTimeout(60);
-  if (!moved) break;
+  await tapText(/discovery|problem|intent/);
+  await page.waitForTimeout(80);
+  const enriched2 = await tapText(/enrich it/);
+  await page.evaluate(async () => {
+    const st = await import("./src/settings.js");
+    st.Settings.setAutoEnrich(true);
+  });
+  journeys.push(`oracle card with auto-enrich off: enrich ${enriched2 ? "taken" : "NOT OFFERED"}`);
+}
+
+// 7. Inside Customize, remove a section as well as adding one.
+{
+  await seed(onSheet("customized"), "play", "track");
+  await tapText(/add a track section/);
+  await followDialog(0);
+  await page.waitForTimeout(80);
+  if (await tapText(/^customize$/)) {
+    await page.waitForTimeout(80);
+    const removed = await tapText(/remove/, ".modal button");
+    if (removed) await followDialog(0);
+    journeys.push(`custom track: remove ${removed ? "taken" : "NOT OFFERED"}`);
+  }
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
+// 8. The two things that are not clicks at all: a key press and a slider.
+{
+  await seed(MID, "more", "settings");
+  await page.evaluate(() => {
+    const r = document.querySelector('#screen input[type="range"]');
+    if (r) { r.value = "1.15"; r.dispatchEvent(new Event("change", { bubbles: true })); }
+  });
+  await page.waitForTimeout(80);
+  // Escape closes a dialog — a keyboard path no click can exercise.
+  await seed(MID, "play", "cast");
+  await tapText(/add|new/);
+  await page.waitForTimeout(80);
+  const hadModal = await page.evaluate(() => !!document.querySelector(".modal"));
+  if (hadModal) await page.keyboard.press("Escape");
+  await page.waitForTimeout(60);
+  journeys.push(`keyboard + slider: text size changed, Escape ${hadModal ? "pressed on a dialog" : "had no dialog"}`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
+// 9. Two games, so switching between them is reachable.
+{
+  await seed(MID, "more", "home");
+  await page.evaluate(async () => {
+    const store = await import("./src/store.js");
+    store.createGame({ title: "second", sheetId: "standard" });
+    store.setActiveGame(store.games()[1].id);
+  });
+  await page.waitForTimeout(60);
+  await seed(null, "more", "home");
+  journeys.push("two games: seeded for the switch control");
 }
 
 const coverage = await page.coverage.stopJSCoverage();
@@ -301,6 +568,9 @@ for (const rel of files) {
     }
   }
 }
+
+console.log("\nScripted journeys (what clicking alone cannot reach):");
+for (const j of journeys) console.log("  · " + j);
 
 console.log(`\nFunction-reachability audit: ${clicks} controls clicked, `
   + `${dialogButtons} in-dialog buttons, ${STATES.length} states × ${ROUTES.length} routes + the wizard\n`);
