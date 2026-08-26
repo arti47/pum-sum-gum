@@ -181,6 +181,15 @@ let explainState = null;
 
 export function registerExplainState(fns) { explainState = fns; }
 
+// The glossary chips under each note are injected the same way, and for the same
+// reason the open state is: a teaching surface each screen has to opt into is one
+// some screen will forget (D-22). glossary.js registers a decorator at boot, and
+// every explain() in the app gets chips for the jargon its own text uses, with no
+// call site changed.
+let explainDecorator = null;
+
+export function registerExplainDecorator(fn) { explainDecorator = fn; }
+
 export function explain(text, ruleId = null, onRuleLink = null) {
   const body = el("div", { class: "body" });
   const paras = Array.isArray(text) ? text : [text];
@@ -191,6 +200,7 @@ export function explain(text, ruleId = null, onRuleLink = null) {
       onclick: () => onRuleLink(ruleId),
     }, "Read the rule →"));
   }
+  if (explainDecorator) add(body, explainDecorator(paras.join(" ")));
   const open = explainState ? explainState.isOpen() : false;
   const d = el("details", { class: "explain" },
     el("summary", null, "What this does"),
@@ -210,7 +220,9 @@ export function explain(text, ruleId = null, onRuleLink = null) {
 // --- the pinned action bar (§6.2) -------------------------------------------
 // Returns the bar; the mount owns the body class that reserves its space, so a
 // caller cannot forget the spacer.
-export function actionBar({ label, context = "", onClick, disabled = false, secondary = null }) {
+export function actionBar({
+  label, context = "", onClick, disabled = false, secondary = null, ariaLabel = null,
+}) {
   const mount = $("#action-bar");
   clear(mount);
   const bar = el("div", { class: "action-bar" });
@@ -218,8 +230,12 @@ export function actionBar({ label, context = "", onClick, disabled = false, seco
   add(bar, secondary
     ? el("button", { class: "btn small", onclick: secondary.onClick }, secondary.label)
     : null);
+  // The context line beside the button is visual only. A one-word primary
+  // ("Ask") needs that context inside its own accessible name, or the button
+  // says nothing at all to anyone who cannot see the two together.
   add(bar, el("button", {
     class: "btn primary", onclick: onClick, disabled: disabled || undefined,
+    "aria-label": ariaLabel || (context && label.length < 8 ? `${label} — ${context}` : null),
   }, label));
   mount.append(bar);
   document.body.classList.add("has-actionbar");
@@ -246,12 +262,33 @@ export function inlineRow(k, v) {
   );
 }
 
-export function emptyState(title, message, action = null) {
+export function emptyState(title, message, action = null, secondary = null) {
   // Empty states name the thing to do and link to it (§6.4).
   return el("div", { class: "empty" },
     el("h3", { text: title }),
     el("p", { class: "muted", text: message }),
-    action ? el("button", { class: "btn primary", onclick: action.onClick }, action.label) : null
+    action ? el("button", { class: "btn primary", onclick: action.onClick }, action.label) : null,
+    secondary ? el("button", { class: "btn", onclick: secondary.onClick }, secondary.label) : null
+  );
+}
+
+// --- the first-run notice on a rolling surface ------------------------------
+// Every oracle, SUM table and generator rolls perfectly well with no game
+// prepared — and silently drops the journal entry, because addJournal has
+// nowhere to put it. A control that appears to work and quietly does half its
+// job is worse than one that refuses, so the surface says so before you roll
+// rather than leaving you to notice an empty journal an hour later.
+export function noGameNotice({ what, onPrepare, onWalkthrough }) {
+  return el("div", { class: "card notice" },
+    el("h3", { text: "Nothing here is being saved yet" }),
+    el("p", { text: `You can roll ${what} right now and read the answers — but with no game prepared there is no journal to write them into, so nothing is kept.` }),
+    el("p", { class: "muted", text: "Preparing a game takes about a minute, and you can change every answer later." }),
+    el("div", { class: "btn-row" },
+      el("button", { class: "btn primary", onclick: onPrepare }, "Prepare a game"),
+      onWalkthrough
+        ? el("button", { class: "btn", onclick: onWalkthrough }, "Read the first-session walkthrough")
+        : null
+    )
   );
 }
 

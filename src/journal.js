@@ -28,8 +28,10 @@ export function renderJournal(host, section) {
   add(host, sectionNav("journal", section));
   const game = store.activeGame();
   if (!game) {
-    add(host, emptyState("No game yet", "The journal fills itself as you play.",
-      { label: "Prepare a game", onClick: () => go("more", "home") }));
+    add(host, emptyState("No game yet",
+      "The journal fills itself as you play — once there is a game for it to fill.",
+      { label: "Prepare a game", onClick: () => go("more", "home") },
+      { label: "Read the first-session walkthrough", onClick: () => go("more", "tutorial") }));
     return;
   }
   if (section === "dice") return renderDice(host, game);
@@ -164,6 +166,7 @@ function renderDice(host, game) {
   add(host, el("h1", { text: "Dice" }));
   add(host, explain([
     "Every die the app has rolled in this game, counted by face. Digital dice are only trusted if you can check them.",
+    "The counts are read straight out of the journal beside this screen, so anything you can see there you can add up yourself.",
     "The app uses the browser's cryptographic random source, never Math.random.",
     "One exception, stated rather than hidden: an inspiration roll beside a text field is only recorded when you keep a word from it. Words you rolled and discarded are not counted here, so this chart is a record of the dice you used, not of every die thrown.",
   ], "dice"));

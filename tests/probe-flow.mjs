@@ -34,7 +34,10 @@ async function route() {
 async function tap(label) {
   const hit = await page.evaluate((want) => {
     const nodes = [...document.querySelectorAll("#screen button, #screen .btn, #action-bar button, .modal button")]
-      .filter((n) => n.offsetParent !== null && !n.disabled);
+      .filter((n) => n.offsetParent !== null && !n.disabled
+        // A glossary chip is a definition link, not a step of play. "Confirming
+        // a beat" would otherwise be the first control matching "Confirm".
+        && !n.classList.contains("term"));
     const n = nodes.find((x) => (x.textContent || "").trim().toLowerCase().includes(want.toLowerCase()));
     if (!n) return false;
     n.click();
@@ -107,4 +110,8 @@ console.log("");
 console.log(gaps.length
   ? `${gaps.length} step(s) needed the tab bar: ${gaps.map((g) => g.name).join("; ")}`
   : "Every step of the loop was offered by the screen the player was already on.");
+console.log("");
+console.log(gaps.length
+  ? `VERDICT: ${gaps.length} step(s) of the book's loop needed the tab bar`
+  : "VERDICT: every step of the book's loop was offered in place.");
 console.log("");

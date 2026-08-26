@@ -546,6 +546,34 @@ details.acc:target > summary, details.acc.flash > summary { background: var(--ac
   border: 1px dashed var(--rule-2); border-radius: var(--radius);
 }
 .empty h3 { margin-top: 0; }
+.empty .btn + .btn { margin-top: .45rem; }
+
+/* The first-run notice on a rolling surface: marked, not shouted — an accent
+   edge, not a colour the rest of the sheet does not use. */
+.notice { border-left: 3px solid var(--accent); }
+.notice h3 { margin-top: 0; }
+
+/* Glossary chips under every "what this does" note (§6.6 layer 0). */
+.term-row {
+  display: flex; flex-wrap: wrap; gap: .35rem; align-items: center;
+  margin-top: .6rem; padding-top: .5rem; border-top: 1px dashed var(--rule-2);
+}
+.term-lead { font-size: .72rem; color: var(--ink-3); margin-right: .15rem; }
+.chip.term {
+  flex: 0 0 auto; min-height: var(--tap); padding: .35rem .6rem;
+  font-size: .78rem; font-weight: 600; border-radius: 999px;
+  border-style: dashed; color: var(--ink-2);
+  display: inline-flex; align-items: center;
+}
+.chip.term::after { content: "?"; margin-left: .35rem; color: var(--accent); font-weight: 700; }
+
+/* The glossary's two layers get headings, so the group that assumes nothing is
+   visibly the one to start from. */
+.term-group {
+  margin: .9rem 0 .3rem; font-size: .74rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.term-group:first-child { margin-top: .2rem; }
 
 .pill {
   display: inline-block; padding: .1rem .45rem; border-radius: 999px;

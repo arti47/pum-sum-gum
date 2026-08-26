@@ -1,7 +1,7 @@
 // The oracle console: Yes/No, descriptive, story, granular, quantifiers.
 
 import { el, add, announce } from "./core.js";
-import { explain, actionBar, resultCard, toast, promptModal } from "./ui.js";
+import { explain, actionBar, resultCard, toast, promptModal, noGameNotice } from "./ui.js";
 import * as store from "./store.js";
 import { rollYesNo, rollGranular, rollOracle, enrichOracle, journalRoll, diceText, rollProposal, rollPrompt }
   from "./roller.js";
@@ -28,6 +28,14 @@ export function renderOracles(host, section) {
     NO_TASK_RESOLUTION,
     "Dislike an answer? Re-roll it, ignore it, or read it against the grain. The journal keeps both rolls either way.",
   ], "no-resolution", openRule));
+
+  if (!store.activeGame()) {
+    add(host, noGameNotice({
+      what: "any oracle here",
+      onPrepare: () => go("more", "home"),
+      onWalkthrough: () => go("more", "tutorial"),
+    }));
+  }
 
   const q = el("input", { type: "text", placeholder: "What are you asking? (optional)", value: question });
   q.addEventListener("input", () => { question = q.value; });
@@ -77,6 +85,7 @@ function renderYesNo(host) {
 
   actionBar({
     label: "Ask",
+    ariaLabel: `Ask the Yes or No oracle — 1d10, ${ynRegister} register${ynBias ? ", with bias: roll twice and pick" : ""}`,
     context: `1d10 · ${ynRegister}${ynBias ? " · bias" : ""}`,
     onClick: () => {
       const r = rollYesNo({ register: ynRegister, bias: ynBias, question });
@@ -117,6 +126,7 @@ function renderGranular(host) {
 
   actionBar({
     label: "Ask",
+    ariaLabel: `Ask the granular Yes or No oracle — 1d100, ${ynRegister} register, a yes is ${grBand}`,
     context: `1d100 · ${ynRegister} · ${grBand}`,
     onClick: () => {
       const r = rollGranular({ register: ynRegister, band: grBand, question });
@@ -135,6 +145,9 @@ function renderList(host, tables, title, blurb) {
   for (const t of tables) {
     add(grid, el("button", {
       class: "btn",
+      // The label is two lines of markup, so its own text reads back as one run
+      // -on word ("Someonewho", "Objectwhat for"). Name it properly.
+      "aria-label": `${t.name}${t.question ? " — " + t.question : ""}`,
       onclick: () => {
         const r = rollOracle({ oracleId: t.id, question });
         const second = r.enrichment ? `${r.enrichment.name}: ${r.enrichment.word}` : "";

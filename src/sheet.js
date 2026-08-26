@@ -41,7 +41,8 @@ export function renderPlay(host, section) {
     add(host, emptyState(
       "No game yet",
       "PUM starts with a little preparation: a universe, a plot scope, your protagonists, and a plot sheet.",
-      { label: "Prepare a game", onClick: () => go("more", "home") }
+      { label: "Prepare a game", onClick: () => go("more", "home") },
+      { label: "Read the first-session walkthrough", onClick: () => go("more", "tutorial") }
     ));
     return;
   }

@@ -1,7 +1,7 @@
 // Mixed strategy per template §5: the app shell and data files are cache-first against a
 // versioned cache; navigation requests are network-first so a stale shell never outlives a
 // deploy. Bump CACHE_VERSION on ANY shipped-file change.
-const CACHE_VERSION = "um-v24";
+const CACHE_VERSION = "um-v25";
 
 const APP_SHELL = [
   "./",
@@ -37,6 +37,7 @@ const APP_SHELL = [
   "./src/router.js",
   "./src/viewstate.js",
   "./src/forge.js",
+  "./src/glossary.js",
 ];
 
 self.addEventListener("install", (e) => {

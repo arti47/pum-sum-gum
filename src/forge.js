@@ -8,7 +8,7 @@
 
 import { el, add, announce } from "./core.js";
 import { explain, actionBar, resultCard, toast, modal, closeModal, promptModal, emptyState,
-  registerInspire } from "./ui.js";
+  registerInspire, noGameNotice } from "./ui.js";
 import * as store from "./store.js";
 import { rollGum, rollGumSet, journalRoll, diceText } from "./roller.js";
 import { gumTable, gumSection } from "./rules.js";
@@ -44,6 +44,14 @@ export function renderForge(host) {
     return;
   }
 
+  if (!store.activeGame()) {
+    add(host, noGameNotice({
+      what: "any generator here",
+      onPrepare: () => go("more", "home"),
+      onWalkthrough: () => go("more", "tutorial"),
+    }));
+  }
+
   const nav = el("nav", { class: "section-nav", "aria-label": "Forge sections" });
   for (const [id, label] of FORGE_SECTIONS) {
     add(nav, el("button", {
@@ -77,7 +85,9 @@ function renderSeed(host) {
       el("span", { class: "node-txt" }, el("strong", { text: t.name }), el("br"),
         el("span", { class: "muted", text: t.blurb })),
       el("button", {
-        class: "btn small",
+        // "d20" is a die size, not a name. The row beside it says which table
+        // this is; the button's own accessible name has to say it too.
+        class: "btn small", "aria-label": `Roll ${t.name} — d${t.die}`,
         onclick: () => fireOne(id),
       }, `d${t.die}`)
     ));
@@ -166,7 +176,10 @@ function renderSectionTables(host, sectionId) {
         el("span", { class: "node-txt" },
           el("strong", { text: t.name }), el("br"),
           el("span", { class: "muted", text: t.blurb })),
-        el("button", { class: "btn small", onclick: () => fireOne(t.id) }, `d${t.die}`)
+        el("button", {
+          class: "btn small", "aria-label": `Roll ${t.name} — d${t.die}`,
+          onclick: () => fireOne(t.id),
+        }, `d${t.die}`)
       ));
     }
     if (g.tables.length > 1) {

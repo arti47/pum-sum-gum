@@ -85,4 +85,14 @@ const small = rows.filter((r) => typeof r.smallestTap === "number" && r.smallest
 console.log("");
 if (tall.length) console.log(`Long screens (>8 viewports): ${tall.map((r) => r.route + " " + r.viewports).join(", ")}`);
 if (small.length) console.log(`Small tap targets (<40px): ${small.map((r) => r.route + " " + r.smallestTap).join(", ")}`);
+
+// A probe prints; it does not assert. But it must still state a verdict in one
+// line, or a runner reading its output has to re-derive the judgement from the
+// table — and a header word like "overflow" then reads as a finding.
+const wide = rows.filter((r) => r.overflow > 1);
+const bad = [...new Set([...small, ...wide])];
+console.log("");
+console.log(bad.length
+  ? `VERDICT: ${bad.length} route(s) fail the layout floor — ${bad.map((r) => r.route).join(", ")}`
+  : "VERDICT: every route fits its width and every tap target clears 40px.");
 console.log("");

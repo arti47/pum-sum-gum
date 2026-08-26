@@ -2,22 +2,195 @@
 // Every automated surface links here by id (template §6.6 layer 2).
 
 // The rules library is organised rule by rule, which answers "how does this
-// work" and not "what is this word". Twelve terms, plainly, for the reader who
-// has just met them in the wizard.
+// work" and not "what is this word". The glossary answers the second question.
+//
+// It runs in two layers, because a player arrives at one of two starting points.
+// The first group assumes NOTHING — not that you have read the books, not that
+// you have ever played a solo RPG, not that you know what a d20 is. The rest
+// name the machinery.
+//
+// `aka` is the machine-checkable part. `src/glossary.js` reads it to put a chip
+// under every screen's "what this does" note for the jargon that note actually
+// uses, and tests/audit-reach.mjs fails if a term is defined and unreachable, or
+// if two entries claim the same word. Put a word on a screen, put it here.
 export const GLOSSARY = [
-  { term: "Plot scope", page: "PUM p.3", body: "One defined mission, task or goal — the thread this plot sheet is about. A long game is several scopes, one after another." },
-  { term: "Plot sheet", page: "PUM pp.14-23", body: "The pacing choice for a scope: how long the track is, how it is sectioned, and what the ten prompt faces reach for. Ten of them are printed; you pick one per scope." },
-  { term: "Plot track", page: "PUM p.7", body: "The row of boxes. Each confirmed beat crosses the next one, and a full track means the scope has resolved. It is a compass against wandering, not a clock." },
-  { term: "Plot beat", page: "PUM p.4", body: "The moment you hand the story to the machine. Two kinds: a modified proposal and a random prompt." },
-  { term: "Modified proposal", page: "PUM p.14", body: "You have an idea what happens next; 1d10 twists it — the location, the mood, someone arriving, the intensity." },
-  { term: "Random prompt", page: "PUM p.14", body: "You do not have an idea; 1d10 on your sheet's own column tells you what the story reaches for — a random event, or one of your plot nodes." },
-  { term: "Plot node", page: "PUM p.28", body: "Your game's own content, written in lists: world elements, potential problems, useful findings, pending questions, and on the extension sheet notable characters and interesting locations. A prompt rolls on one of these lists." },
-  { term: "Confirming a beat", page: "PUM p.7", body: "Deciding, after you have played the beat out, that it mattered enough to cross a box. Calling a beat permits this; it never requires it." },
-  { term: "Oracle", page: "PUM p.8", body: "A table you ask when you genuinely do not know, or would rather not decide. Yes/No, descriptive, story, quantifier and the granular variant." },
-  { term: "Register", page: "PUM p.12", body: "Who is answering a Yes/No question: the universe (Deterministic), a character's own view (Subjective), or someone talking to you (Conversation)." },
-  { term: "Rule of Bias", page: "SUM p.3", body: "SUM's rule: roll twice and keep the lowest if you expect things to favour the PCs, the highest if you expect trouble. Distinct from PUM's bias, where you roll twice and choose." },
-  { term: "Scene arc", page: "SUM p.4", body: "SUM's three boundary rolls: an opener when you do not know how a scene begins, an intervention check when it stalls, and a closure to see how the world responds." },
+  // --- assumes nothing -----------------------------------------------------
+  {
+    id: "solo-rpg", group: "If this is your first solo game", term: "Solo roleplaying",
+    aka: ["solo rpg", "solo play", "solo game", "played solo"], page: "PUM p.2",
+    body: "Playing a roleplaying game with no other people and no gamemaster. You play the heroes, and you also decide what the world does — except that when you would rather not decide, you ask a table instead.",
+    more: "That is all three of these books are: tables to ask, and a procedure saying when to ask them. You supply the story.",
+  },
+  {
+    id: "gm", group: "If this is your first solo game", term: "Gamemaster (GM)",
+    aka: ["gamemaster", "game master", "referee", "gme"], page: "PUM p.2",
+    body: "In a group game, the person who describes the world, plays everyone the heroes meet, and decides what happens next. In solo play there isn't one.",
+    more: "The oracles and plot beats do the GM's job of surprising you. They do not do the GM's job of judging whether you succeeded — that is still yours.",
+  },
+  {
+    id: "dice-notation", group: "If this is your first solo game", term: "d10, d20, d100",
+    aka: ["1d10", "1d20", "1d100", "d10", "d20", "d100", "dice notation"], page: "standard dice notation",
+    body: "How many sides the die has. A d10 gives 1 to 10, a d20 gives 1 to 20, a d100 gives 1 to 100.",
+    more: "You never need real dice: the app rolls them, shows every face it rolled, and writes the numbers into the journal so you can check its working.",
+  },
+  {
+    id: "protagonist", group: "If this is your first solo game", term: "Protagonist",
+    aka: ["protagonists", "player character", "the pcs"], page: "PUM p.3",
+    body: "A character you play. Their thoughts, voice and choices are always yours — nothing here ever decides what your protagonist does.",
+  },
+  {
+    id: "scene", group: "If this is your first solo game", term: "Scene",
+    aka: ["scenes"], page: "SUM p.2",
+    body: "One continuous chunk of story in one place — a conversation, a fight, a search of a room. Stories are built out of them the way a film is.",
+    more: "SUM exists to help you start a scene when you don't know how it opens, shake it up when it stalls, and end it when it is over.",
+  },
+  {
+    id: "in-medias-res", group: "If this is your first solo game", term: "In medias res",
+    aka: ["in medias res"], page: "PUM p.3",
+    body: "Latin for \"into the middle of things\": opening the story mid-action rather than with travel and preamble.",
+    more: "PUM recommends it for a first scene — start with the ambush already happening, and work out afterwards how you got there.",
+  },
+
+  // --- PUM's machinery -----------------------------------------------------
+  { id: "plot-scope", group: "The plot machine", term: "Plot scope", aka: ["plot scope"], page: "PUM p.3", body: "One defined mission, task or goal — the thread this plot sheet is about. A long game is several scopes, one after another." },
+  { id: "plot-sheet", group: "The plot machine", term: "Plot sheet", aka: ["plot sheet", "plot sheets"], page: "PUM pp.14-23", body: "The pacing choice for a scope: how long the track is, how it is sectioned, and what the ten prompt faces reach for. Ten of them are printed; you pick one per scope." },
+  { id: "plot-track", group: "The plot machine", term: "Plot track", aka: ["plot track"], page: "PUM p.7", body: "The row of boxes. Each confirmed beat crosses the next one, and a full track means the scope has resolved. It is a compass against wandering, not a clock." },
+  { id: "plot-beat", group: "The plot machine", term: "Plot beat", aka: ["plot beat", "plot beats"], page: "PUM p.4", body: "The moment you hand the story to the machine. Two kinds: a modified proposal and a random prompt." },
+  { id: "modified-proposal", group: "The plot machine", term: "Modified proposal", aka: ["modified proposal", "modified proposals"], page: "PUM p.14", body: "You have an idea what happens next; 1d10 twists it — the location, the mood, someone arriving, the intensity." },
+  { id: "random-prompt", group: "The plot machine", term: "Random prompt", aka: ["random prompt", "random prompts"], page: "PUM p.14", body: "You do not have an idea; 1d10 on your sheet's own column tells you what the story reaches for — a random event, or one of your plot nodes." },
+  { id: "plot-node", group: "The plot machine", term: "Plot node", aka: ["plot node", "plot nodes"], page: "PUM p.28", body: "Your game's own content, written in lists: world elements, potential problems, useful findings, pending questions, and on the extension sheet notable characters and interesting locations. A prompt rolls on one of these lists." },
+  { id: "confirming", group: "The plot machine", term: "Confirming a beat", aka: ["confirming a beat", "confirm the beat", "cross a box"], page: "PUM p.7", body: "Deciding, after you have played the beat out, that it mattered enough to cross a box. Calling a beat permits this; it never requires it." },
+  {
+    id: "resolved", group: "The plot machine", term: "Resolved",
+    // NOT "resolution": the books use that word for task resolution, the one
+    // thing PUM explicitly does not do. Two meanings, one word.
+    aka: ["resolved"], page: "PUM p.7",
+    body: "Every box on the track is crossed, so this storyline has reached its ending. The header says so and the track stops there.",
+    more: "It does not end your game. Start another plot sheet for the next storyline; the same cast and journal carry over.",
+  },
+  {
+    id: "timed-beat", group: "The plot machine", term: "Timed beat",
+    aka: ["timed beat", "timed beats"], page: "PUM p.9",
+    body: "A note pinned to a box further along the track — something you have already decided will happen once the story gets that far. The app reminds you when you cross it.",
+  },
+  {
+    id: "disruption", group: "The plot machine", term: "Disruption die",
+    aka: ["disruption die"], page: "PUM p.9",
+    body: "An optional extra die riding along with every oracle answer, which occasionally interrupts you with a plot beat. Off until you turn it on, because the book presents it as a variant rather than the normal way to play.",
+  },
+
+  // --- the oracles ---------------------------------------------------------
+  { id: "oracle", group: "Asking the oracles", term: "Oracle", aka: ["oracles", "an oracle"], page: "PUM p.8", body: "A table you ask when you genuinely do not know, or would rather not decide. Yes/No, descriptive, story, quantifier and the granular variant." },
+  { id: "register", group: "Asking the oracles", term: "Register", aka: ["register", "registers", "deterministic", "subjective"], page: "PUM p.12", body: "Who is answering a Yes/No question: the universe (Deterministic), a character's own view (Subjective), or someone talking to you (Conversation)." },
+  {
+    id: "pum-bias", group: "Asking the oracles", term: "Bias (PUM's version)",
+    aka: ["bias", "biased"], page: "PUM p.12",
+    body: "When you think one answer is likelier, roll the Yes/No twice and pick whichever of the two fits your story better. The choice is yours, not the machine's.",
+    more: "SUM's Rule of Bias shares the name and is a different rule: there the app keeps the die for you.",
+  },
+  {
+    id: "enrichment", group: "Asking the oracles", term: "Enrichment",
+    aka: ["enrichment", "enriched", "description word", "focus word"], page: "PUM pp.12-13",
+    body: "A second word rolled alongside a descriptive or story oracle, to stop the answer being bland. \"A guard\" plus \"desperate\" is a scene; read the pair together.",
+  },
+  {
+    id: "granular", group: "Asking the oracles", term: "Granular Yes/No",
+    aka: ["granular", "likelihood"], page: "PUM p.24",
+    body: "The finer version of Yes/No. Say out loud how likely a yes actually is, then roll a d100 against that column. Saying \"unlikely\" before you roll is honesty about the fiction, not cheating.",
+  },
+  {
+    id: "quantifier", group: "Asking the oracles", term: "Quantifier",
+    aka: ["quantifier", "quantifiers"], page: "PUM p.13",
+    body: "A table answering \"how many?\", \"how good?\" or \"how hard?\" — relative to a baseline you fix in your head first. Without that baseline, \"much more than expected\" means nothing.",
+  },
+
+  // --- SUM -----------------------------------------------------------------
+  { id: "sum-bias", group: "The scene machine", term: "Rule of Bias", aka: ["rule of bias", "keep the lowest", "keep the highest"], page: "SUM p.3", body: "SUM's rule: roll twice and keep the lowest if you expect things to favour the PCs, the highest if you expect trouble. Distinct from PUM's bias, where you roll twice and choose." },
+  { id: "scene-arc", group: "The scene machine", term: "Scene arc", aka: ["scene arc"], page: "SUM p.4", body: "SUM's three boundary rolls: an opener when you do not know how a scene begins, an intervention check when it stalls, and a closure to see how the world responds." },
+  {
+    id: "intervention", group: "The scene machine", term: "Intervention check",
+    aka: ["intervention check", "intervention"], page: "SUM p.4",
+    body: "The mid-scene roll for when things have stalled — the characters are dithering, the tension needs a push, a silence has gone on too long. Yours to fire, never automatic.",
+  },
+  {
+    id: "closure", group: "The scene machine", term: "Scene closure",
+    aka: ["scene closure", "scene opener"], page: "SUM p.4",
+    body: "The roll that ends a scene: whether the world responds fortunately or unfortunately, and the hook into what comes next. Its sibling, the scene opener, tells you what to describe first when you do not know how a scene begins.",
+  },
+  {
+    id: "emulation", group: "The scene machine", term: "Character emulation",
+    aka: ["character emulation", "first contact", "shallow interaction", "trust conversation", "deep relationship"],
+    page: "SUM pp.8-11",
+    body: "Tables for playing someone your protagonist meets, at four depths: a first sighting, small talk, a real conversation, a long relationship. Roll at the depth you actually have with that person.",
+    more: "Results stick to that cast entry, so the innkeeper you met twice stays recognisably the same innkeeper.",
+  },
+
+  // --- GUM -----------------------------------------------------------------
+  {
+    id: "gum", group: "The game machine", term: "GUM",
+    aka: ["gum", "game unfolding machine", "the forge"], page: "GUM p.3",
+    body: "The third book: 43 tables for inventing the raw material — worlds, factions, places, objects, villains, people — before or during play.",
+    more: "Its method is combination: roll several tables about one subject and read the results as one idea. Switch it off in Settings if you do not own the book.",
+  },
+  {
+    id: "plot-seed", group: "The game machine", term: "Plot seed",
+    aka: ["plot seed"], page: "GUM pp.6-7",
+    body: "Six GUM tables rolled together — a hook, a motive, a mission, a first lead, a catch and an opposition — which between them describe a whole starting situation. Read the six lines as one paragraph and keep the parts you like.",
+  },
+  {
+    id: "grand-oracle", group: "The game machine", term: "Grand oracle",
+    aka: ["grand oracle"], page: "GUM pp.22-24",
+    body: "Three d100 words — an action, an adjective and a subject — for a moment when no specific table fits. \"Betray · hollow · the archive\" means nothing until you make it mean something; that act of interpretation is the answer.",
+  },
+  {
+    id: "world-truths", group: "The game machine", term: "World truths",
+    aka: ["world truths"], page: "GUM pp.4-5",
+    body: "Two tables setting the ground everything else stands on: what kind of place this is, and what is already wrong with it.",
+  },
+  {
+    id: "nemesis", group: "The game machine", term: "Nemesis",
+    aka: ["nemesis"], page: "GUM p.12",
+    body: "The opposition with a face — the one antagonist this story is really against. GUM builds one from their goal, their method and their weakness.",
+  },
+
+  // --- the app's own words -------------------------------------------------
+  {
+    id: "universe", group: "This app's words", term: "Universe",
+    aka: ["universe"], page: "PUM p.3",
+    body: "The setting and rules you are borrowing — \"Blades in the Dark\", \"Dune\", \"my own dying-earth thing\". Written down mostly so your head starts in the right place.",
+  },
+  {
+    id: "mission", group: "This app's words", term: "Mission",
+    aka: ["mission"], page: "PUM p.3",
+    body: "One line saying what the protagonists are trying to do in this plot scope. It keeps the machine's answers pointed somewhere.",
+  },
+  {
+    id: "starting-point", group: "This app's words", term: "Starting point",
+    aka: ["starting point"], page: "PUM p.3",
+    body: "Where the very first scene opens and what is introduced there. PUM asks for it explicitly, and the app keeps nagging until you write it — a game that never opens never starts.",
+  },
+  {
+    id: "cast", group: "This app's words", term: "Cast",
+    aka: ["cast", "notable character"], page: "this app's word, for PUM p.28's notable characters",
+    body: "Everyone and everywhere your game has met: people and places you can bring back later. SUM's character tables roll against a cast entry and stick their results to it.",
+  },
+  {
+    id: "journal", group: "This app's words", term: "Journal",
+    aka: ["journal"], page: "this app's word",
+    body: "Every roll the app made, with the dice it rolled, plus whatever you write yourself. Both the record of the story and the way to check the app's working.",
+  },
 ];
+
+// Flat index: every alias → its entry id. Read by the chip decorator and by the
+// reachability audit; a second copy of the term list would drift.
+export const GLOSSARY_INDEX = (() => {
+  const m = new Map();
+  for (const e of GLOSSARY) {
+    m.set(e.term.toLowerCase(), e.id);
+    for (const a of e.aka || []) m.set(a.toLowerCase(), e.id);
+  }
+  return m;
+})();
 
 export const RULES_LIBRARY = [
   {

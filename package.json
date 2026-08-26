@@ -16,7 +16,11 @@
     "audit:novice": "node tests/audit-novice.mjs",
     "audit:guide": "node tests/audit-guide.mjs",
     "tutorial": "node tests/tools/gen-tutorial.mjs",
-    "pdf": "node tests/tools/gen-pdf.mjs"
+    "pdf": "node tests/tools/gen-pdf.mjs",
+    "audit:reach": "node tests/audit-reach.mjs",
+    "probe:firstrun": "node tests/probe-firstrun.mjs",
+    "cycle": "node tests/cycle.mjs",
+    "cycle:watch": "node tests/cycle.mjs --watch"
   },
   "dependencies": {
     "playwright-core": "^1.62.1"

@@ -20,6 +20,7 @@ import { GUM_ERRATA, INSPIRE_ABSENT } from "../data-gum.js";
 
 let ruleSearch = "";
 let pendingRuleId = null;
+let pendingTermId = null;
 
 export function renderMore(host, section) {
   // The wizard lives on Home. It must not hijack the other More routes, or the
@@ -44,6 +45,13 @@ export function renderMore(host, section) {
 // Open a rules-library entry, expanded and scrolled to (§6.6 layer 2).
 export function openRule(id) {
   pendingRuleId = id;
+  go("more", "library");
+}
+
+// Open one glossary entry, the same way. This is what every chip under every
+// "what this does" note taps into (§6.6 layer 0).
+export function openTerm(id) {
+  pendingTermId = id;
   go("more", "library");
 }
 
@@ -384,6 +392,15 @@ function renderLibrary(host) {
   add(host, errataCard());
   if (Settings.gum()) add(host, noRollCard());
 
+  if (pendingTermId) {
+    const target = pendingTermId;
+    pendingTermId = null;
+    requestAnimationFrame(() => {
+      const node = document.getElementById("term-" + target);
+      if (node) node.scrollIntoView({ block: "center" });
+    });
+  }
+
   if (pendingRuleId) {
     const target = pendingRuleId;
     pendingRuleId = null;
@@ -395,9 +412,14 @@ function renderLibrary(host) {
 }
 
 // "What is a plot scope?" has no answer in a library organised rule by rule.
+// The glossary answers it, in two layers: a first group that assumes the reader
+// has never played a solo RPG at all, then the machinery.
 function glossaryCard(q) {
   const terms = GLOSSARY.filter((g) => !q
-    || g.term.toLowerCase().includes(q) || g.body.toLowerCase().includes(q));
+    || g.term.toLowerCase().includes(q)
+    || g.body.toLowerCase().includes(q)
+    || (g.more || "").toLowerCase().includes(q)
+    || (g.aka || []).some((a) => a.includes(q)));
   if (!terms.length) return null;
   const card = el("div", { class: "card glossary" });
   const body = el("div");
@@ -408,14 +430,20 @@ function glossaryCard(q) {
     el("summary", null, "Glossary", el("span", { class: "pill", text: String(terms.length) })),
     body
   );
-  for (const g of terms) {
-    add(body, el("div", { class: "defrow" },
-      el("span", { class: "k", text: g.term }),
-      el("span", { class: "v" },
-        g.body,
-        el("span", { class: "cite", text: " " + g.page })
-      )
-    ));
+  for (const group of [...new Set(terms.map((g) => g.group || "Terms"))]) {
+    add(body, el("h4", { class: "term-group", text: group }));
+    for (const g of terms.filter((x) => (x.group || "Terms") === group)) {
+      const row = el("div", { class: "defrow", id: "term-" + g.id },
+        el("span", { class: "k", text: g.term }),
+        el("span", { class: "v" },
+          g.body,
+          g.more ? el("span", { class: "muted", text: " " + g.more }) : null,
+          el("span", { class: "cite", text: " " + g.page })
+        )
+      );
+      if (pendingTermId === g.id) row.classList.add("flash");
+      add(body, row);
+    }
   }
   add(card, fold);
   return card;

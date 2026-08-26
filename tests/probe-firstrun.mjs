@@ -40,7 +40,10 @@ async function tap(label, { exact = false } = {}) {
   const hit = await page.evaluate(({ want, exact }) => {
     const nodes = [...document.querySelectorAll(
       ".modal button, #screen button, #screen .btn, #action-bar button, .tab-bar button, .sectionnav button")]
-      .filter((n) => n.offsetParent !== null && !n.disabled);
+      .filter((n) => n.offsetParent !== null && !n.disabled
+        // A glossary chip is a definition link, not a step of play. "Confirming
+        // a beat" would otherwise be the first control matching "Confirm".
+        && !n.classList.contains("term"));
     const t = (x) => (x.textContent || "").trim().toLowerCase();
     const n = exact ? nodes.find((x) => t(x) === want.toLowerCase())
                     : nodes.find((x) => t(x).includes(want.toLowerCase()));
@@ -137,4 +140,11 @@ console.log(gaps.length
   ? `${gaps.length} step(s) the screen did not offer: ${gaps.map((g) => g.name).join("; ")}`
   : "Every step was offered by the screen the player was already on.");
 if (errors.length) console.log(`\n${errors.length} page error(s): ${errors[0]}`);
+
+// One line a runner can read, so the stopping rule does not have to re-derive
+// this probe's judgement from its own table.
+console.log("");
+console.log(gaps.length || errors.length
+  ? `VERDICT: ${gaps.length} unoffered step(s), ${errors.length} page error(s) on the first-run path`
+  : "VERDICT: every step of the first run was offered in place, with no page errors.");
 console.log("");

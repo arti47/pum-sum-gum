@@ -18,7 +18,7 @@ stored in your browser's `localStorage`; nothing is sent anywhere.
 | **Scenes** | SUM's whole arc — opener, intervention check, closure — plus exploration, battle and discovery tables |
 | **Characters** | SUM's four depths of acquaintance, rolled from a cast entry and stored with that person |
 | **Journal** | Every roll with its dice, your own notes, filters, paging, and a per-face distribution view |
-| **Teaching** | A "what this does" note on every screen, a searchable rules library citing the books' pages, and a first-session walkthrough |
+| **Teaching** | Four layers, for a reader who has opened none of the books. A plain-language **glossary** of 38 terms — starting from "what is a solo RPG" and "what is an oracle" — surfaced both in the rules library and as chips under each screen's own note, so a word is defined where you meet it. A "what this does" note on every screen, open until you close one. A searchable rules library citing the books' pages. And a complete guide, in the app, as a page, and as a PDF. |
 
 ## What it deliberately does not do
 
@@ -46,13 +46,36 @@ Service workers and installation need `http(s)://`, not `file://`.
 No runtime dependencies. The harnesses are dev-only.
 
 ```sh
-npm test              # parse gate + data and engine invariants (seconds)
+npm run cycle         # ALL of the below, in order, in one report — see below
+npm run cycle:watch   # re-run the whole cycle on every change, until one comes back clean
+
+npm test              # parse gate + data, engine and glossary invariants (seconds)
 npm run deadcode      # the dead-data scan: rules extracted and never called
 npm run smoke         # browser smoke: every route, three widths, the end-to-end walk
 npm run audit         # interaction audit: clicks every control in isolation
+npm run audit:modals  # every button inside every dialog
+npm run audit:deep    # every plot sheet, every wizard step, every branch
+npm run audit:novice  # could a stranger tell what each surface is for?
+npm run audit:reach   # can they reach it — 20 routes across three states of the app
+npm run audit:guide   # the shipped guide's wording against what the app renders
 npm run probe         # measured layout table (a probe prints; it does not assert)
+npm run probe:flow    # the book's own loop, walked without touching the tab bar
+npm run probe:firstrun # a stranger, from a cold open to a scene played and journalled
 node tests/make-fixtures.mjs   # regenerate the seed fixtures after a schema change
 ```
+
+### Running until nothing is reported
+
+The rule this project is held to is: **done when one complete cycle of every pass produces no
+finding** — not "the pass I just fixed is green". `npm run cycle` enforces it. It runs all
+twelve passes in order, *never stops at the first failure* (a runner that bails hides how much
+is broken), gathers every finding into one report, and exits non-zero unless the whole cycle
+was clean.
+
+To iterate until it is clean, leave `npm run cycle:watch` running: it re-runs the entire cycle
+whenever a shipped file changes, and exits itself the moment one complete cycle reports
+nothing. `--repeat 3` runs up to three cycles in a row, which is how a flaky pass shows itself;
+`--only unit,reach` narrows it while you work.
 
 `CLAUDE.md` is the project's canonical spec — the completed System Profile, the extraction
 and traceability ledgers, and the rulings taken where the books were ambiguous. Change code,

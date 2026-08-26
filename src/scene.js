@@ -2,7 +2,7 @@
 // open → intervene → close, all player-fired, each with a summary and one-step undo.
 
 import { el, add, announce, fmtTime } from "./core.js";
-import { explain, actionBar, resultCard, toast, modal, promptModal, emptyState } from "./ui.js";
+import { explain, actionBar, resultCard, toast, modal, promptModal, emptyState, noGameNotice } from "./ui.js";
 import * as store from "./store.js";
 import { rollSum, journalRoll, diceText } from "./roller.js";
 import { sumTable } from "./rules.js";
@@ -24,6 +24,16 @@ export function renderScene(host, section) {
   const scope = store.currentScope();
   add(host, sectionNav("scene", section, { arc: !!(scope && scope.openScene) }));
 
+  // The arc screen has its own empty state; the table screens roll happily with
+  // no game and would otherwise discard every result in silence.
+  if (!store.activeGame() && section !== "arc") {
+    add(host, noGameNotice({
+      what: "these SUM tables",
+      onPrepare: () => go("more", "home"),
+      onWalkthrough: () => go("more", "tutorial"),
+    }));
+  }
+
   if (section === "people") return renderPeopleTables(host);
   if (SECTION_TABLES[section]) return renderTableGroup(host, section);
   return renderArc(host, scope);
@@ -39,7 +49,8 @@ function renderArc(host, scope) {
 
   if (!store.activeGame()) {
     add(host, emptyState("No game yet", "Scenes belong to a plot scope. Prepare a game first.",
-      { label: "Prepare a game", onClick: () => go("more", "home") }));
+      { label: "Prepare a game", onClick: () => go("more", "home") },
+      { label: "Read the first-session walkthrough", onClick: () => go("more", "tutorial") }));
     return;
   }
 

@@ -258,7 +258,7 @@ text-size control paying back the zoom lock.
 | `data-sum.js` | All 24 SUM tables, grouped by the book's own sections |
 | `data-gum.js` | All 43 GUM tables (1,580 rows) + `GUM_FOR_FIELDS`, `INSPIRE_ABSENT`, `GUM_PLOT_SEED`, `GUM_GRAND`, `INSPIRE_WORDS`, `GUM_ERRATA` |
 | `data-guidance.js` | The books' procedural framing: play states, flowchart, beat triggers, advice — plus the app's own `NEW_TO_SOLO` and `FIRST_BEAT_COACH`, which teach what neither book stops to explain |
-| `data-rules-library.js` | One entry per automated rule, in the app's own words, page-cited, plus a twelve-term `GLOSSARY` |
+| `data-rules-library.js` | One entry per automated rule, in the app's own words, page-cited, plus the 38-term `GLOSSARY` — six groups, opening with one that assumes the reader has never played a solo RPG — and the `GLOSSARY_INDEX` of aliases the chips and the reachability audit read |
 | `data-tutorial.js` | The complete guide: quick start + four parts. One source, four renderings |
 | `src/*.js` | Modules, §4.2 |
 | `manifest.json`, `service-worker.js`, `icon.svg` | PWA |
@@ -266,7 +266,7 @@ text-size control paying back the zoom lock.
 | `tutorial.pdf` | **Generated** from `tutorial.html` by `tests/tools/gen-pdf.mjs`: the paginated rendering — title page, numbered contents, PDF bookmarks, one part per page break. In the app shell, so the download works offline |
 | `docs/tutorial-pdf.sha256` | The hash of the HTML the PDF was printed from. A PDF cannot be byte-diffed (its bytes carry a build timestamp), so this is what the drift guard compares |
 | `.github/workflows/pages.yml`, `.nojekyll` | Publishes the repository root to GitHub Pages on every push to `main` |
-| `tests/` | Harnesses (`harness`, `smoke`, `interaction`, `audit-modals`, `audit-deep`, `audit-novice`, `audit-guide`, `deadcode`), probes (`probe-layout`, `probe-flow`, `probe-firstrun`), seed fixtures, and `tests/tools/` — the retained extraction scripts plus the two guide generators (`gen-tutorial`, `gen-pdf`) |
+| `tests/` | Harnesses (`harness`, `smoke`, `interaction`, `audit-modals`, `audit-deep`, `audit-novice`, `audit-reach`, `audit-guide`, `deadcode`), probes (`probe-layout`, `probe-flow`, `probe-firstrun`), `cycle.mjs` — the stopping-rule runner (§7.2) — seed fixtures, and `tests/tools/` — the retained extraction scripts plus the two guide generators (`gen-tutorial`, `gen-pdf`) |
 | `docs/AUDIT.md` | Numbered findings per pass + the verified-clean list |
 | `docs/rules/*.md` | Distilled per-subsystem reference the audit reads against the engine |
 | `docs/TUTORIAL.md` | **Generated** from `data-tutorial.js` by `tests/tools/gen-tutorial.mjs`; the harness regenerates and diffs it. The published page is a third rendering of the same data, the PDF a fourth |
@@ -289,7 +289,8 @@ text-size control paying back the zoom lock.
 | `cast.js` | Characters & locations roster + SUM character emulation |
 | `journal.js` | The journal: entries, narration, filters, paging, dice distribution |
 | `wizard.js` | The four-step game prep |
-| `screens.js` | Home, rules library, settings |
+| `screens.js` | Home, rules library (which holds the glossary), settings |
+| `glossary.js` | The chip decorator: every `explain()` in the app grows links to the jargon its own text uses, registered once at boot |
 | `tutorial.js` | Renders `data-tutorial.js`: the quick start, then the complete guide in collapsible parts |
 | `router.js` | Tab routing, section nav, live-state badges, the persistent plot header |
 | `viewstate.js` | The clearer registry for transient view state (the open beat, the last answer, paging). `main.js` fires it whenever the active game or scope changes |
@@ -449,6 +450,11 @@ All ticked boxes are extracted, cited and unit-checked for row count and range c
 - [x] **Audit cycle 5 — every tab, every button, every sheet**: the audit matrix widened from
       one fixture to all ten plot sheets and the prep wizard (`tests/audit-deep.mjs`), which is
       where the write-back defect and the two missing controls were found. See §8.
+- [x] **Audit cycle 6 — reachability and vocabulary**: the matrix widened again, from one state
+      of the app to three, including the empty one no browser pass had ever booted
+      (`tests/audit-reach.mjs`); the glossary taken from 12 terms to 38 and pushed to where the
+      words are met rather than waiting to be looked up (`src/glossary.js`); and the stopping
+      rule itself made a command rather than a habit (`tests/cycle.mjs`, §7.2). See §8.
 
 ---
 
@@ -490,10 +496,38 @@ that means, for any change worth committing:
 **Merge only green work.** Before merging to `main`: `npm test`, `npm run deadcode`, and
 `npm run smoke` at minimum; the full cycle (§11 of the template) at the end of a phase.
 
+### 7.2 The stopping rule is a command, not a habit
+
+The template's rule — *done when one complete cycle of every pass produces no finding* — is
+easy to fake by hand across twelve passes: fix A, re-run A, ship, never notice the fix broke B.
+So the rule is executable:
+
+```sh
+npm run cycle          # all twelve passes, in order, never stopping at the first failure;
+                       # one report; exits 0 only if the whole cycle was clean
+npm run cycle:watch    # re-runs the whole cycle on every shipped-file change, and exits
+                       # itself the first time one complete cycle reports nothing
+npm run cycle -- --repeat 3        # up to 3 cycles; how a flaky pass shows itself
+npm run cycle -- --only unit,reach
+```
+
+Three consequences the runner forces, all of them corrections to how the passes were written:
+
+- **A pass whose findings are "fixed, not tolerated" must be able to fail.** `audit-novice`
+  and `audit-guide` printed findings and exited 0, so nothing could see them. Both exit
+  non-zero now.
+- **A probe must state its verdict in one line.** The runner reads that line, never a word
+  that also appears in a column header — matching "overflow" in the layout probe's own heading
+  made the first version report a finding against a table reading "none" in every row.
+- **A new guard is not trusted until it has been watched failing.** Break the thing it guards,
+  see the finding, restore, see it green. `docs/AUDIT.md` names which guards were verified that
+  way in each cycle.
+
 ## 8. Changelog
 
 | Date | Change | Verification | Cache |
 |---|---|---|---|
+| 2026-08-26 | **Audit cycle 6 — reachability, vocabulary, and the stopping rule made executable.** Cycle 5 asked whether a stranger could tell what each surface is for; this asks whether they can reach it, whether the words mean anything, and whether each surface is honest. New `tests/audit-reach.mjs` runs 20 routes × **three states** — no game, in play, resolved — the first of which no browser pass had ever visited, since they all boot the mid-session fixture. Six findings. F-27: nine rolling surfaces (5 oracles, 4 SUM tables, the Forge) rolled with no game and silently discarded every journal entry, while the Journal promised it "fills itself as you play" — `ui.noGameNotice()` says so before the roll, and the audit asserts both that it says so and that the claim is true. F-28: 44 Forge buttons named only "d20", twelve run-together oracle labels, and a one-word action-bar primary whose context sat outside its name. F-29: the glossary grew from 12 terms to 38 in six groups, opening with one that assumes the reader has never played a solo RPG. F-30: it also stopped waiting to be looked up — `src/glossary.js` registers a decorator so every `explain()` grows chips for its own jargon, with no call site changed; `audit-novice` widened to count a chip as the per-term route its own comment describes. F-31: one destination, two labels. F-33: the layout probe's verdict had to be inferred from its column header. F-34: the flow and first-run probes started matching the chip "Confirming a beat" for "Confirm" — introduced by F-30 and caught by the new runner on its first outing, which is the argument for having it. Plus `tests/cycle.mjs`, and `audit-novice`/`audit-guide` made able to fail. | `npm run cycle`: unit 1,775 · dead-data clean · smoke · interaction · modals · deep · novice 0 findings · reach 20×3 routes, 38 terms · guide 0 drift · firstrun, flow and layout VERDICT clean — **one complete cycle, no findings** | v25 |
 | 2026-08-21 | **The guide audited against what the app actually renders, not against its source.** Reported from play again: the wording still did not match. Every previous check compared the guide with string literals in `src/`, which flatters a paraphrase and misses anything the app composes at runtime. New `tests/audit-guide.mjs` drives the real app — 20 routes, 73 dialogs, every fold opened — harvests the **805 strings actually on screen**, and tests the guide's 101 claims against them, separating *seen on screen* from *the app can render it but this sweep never reached that state* from *the app never says this*. Nine real drifts, all in Part 3's reference: the journal's node kind listed "Plot node from GUM" (the app writes "Kept from GUM — <table>", and files it under `note`), "Beat confirmed" is really "Beat confirmed — <the beat>", "Character brought in" has a "Location brought in" twin, the beat card's "Recall" carries a count — "Recall (N)" — the Forge's is "Re-roll this one" not "Re-roll this one on a set", the Forge's no-game fallback is "Prepare a game →", the GUM toggle is "Game Unfolding Machine (GUM v2.2)", the text-size slider labels itself "Text size — N%", the node header's pill reads "1d10"/"1d20" rather than "1dN", the journal pager says "Show N more of M", and the Scene tab's bias is three labelled buttons ("Neutral — roll once" and its two siblings), not the bare words. | guide audit: 805 strings harvested, 101 claims, **0 the app never says** (was 9 after the extractor stopped mistaking prose for labels) · unit 1568 · dead-data clean · smoke 464 · novice audit 0 findings · first-run probe clean · guide, page and PDF regenerated | v24 |
 | 2026-08-21 | **One stored field was called two different things.** Reported from play: the guide named a field the app does not show. It was right on one screen and wrong on the other — the scope's mission is *Mission and initial goals* in the prep wizard and *Mission* in both dialogs that edit the same stored value, and the game's title is *Name this game* in prep and *Title* on Home. A field a player meets twice must be called the same thing both times, so both are unified on the friendlier label (**Mission**, **Name this game**) with the extra words moved into the wizard's hint, where guidance belongs (§6.6). New harness guard: every stored text field carries one label across `wizard.js`, `screens.js`, `sheet.js` and `cast.js` — watched failing on the restored *Title*. This is the defect class the previous row's tap-route guard could not see: both spellings existed, so both passed a "does the app say this?" check. | unit 1575 · guard watched failing · dead-data clean · smoke 464 · novice audit 0 findings · interaction, modal audits clean · first-run probe clean · guide, page and PDF regenerated | v23 |
 | 2026-08-21 | **The guide's wording checked against the app's, in both directions.** The harness already proved every control is *named* somewhere in the guide; it could not see the opposite drift — the guide sending a reader somewhere the app does not have, or spelling a control differently after a rename. Every `tap:` route in `data-tutorial.js` is a path a reader follows literally, so each segment must now resolve to a real tab, a real section, or a real control label, with template labels matched as wildcards and near-empty templates skipped (`.{1,28}` alone would match anything). Watched failing on a renamed tab and on an invented control. The sweep that motivated it found the shipped guide **already in sync**: 117 quoted on-screen strings, 135 control phrases in the Part 3 reference and all 14 tap routes resolve. | unit 1581 · guard watched failing twice · dead-data clean · no shipped file changed, so no cache bump | v22 |

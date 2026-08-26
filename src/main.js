@@ -9,7 +9,8 @@ import { renderPlay } from "./sheet.js";
 import { renderOracles } from "./oracles.js";
 import { renderScene } from "./scene.js";
 import { renderJournal } from "./journal.js";
-import { renderMore } from "./screens.js";
+import { installGlossary } from "./glossary.js";
+import { renderMore, openTerm } from "./screens.js";
 import { clearTransient } from "./viewstate.js";
 
 store.load();
@@ -27,6 +28,10 @@ registerExplainState({
   isOpen: () => Settings.explainOpen(),
   set: (v) => Settings.setExplainOpen(v),
 });
+
+// Every "what this does" note in the app grows chips for the jargon its own text
+// uses, from here on, without any screen opting in (§6.6 layer 0).
+installGlossary({ openTerm });
 
 registerScreen("play", renderPlay);
 registerScreen("oracles", renderOracles);

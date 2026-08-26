@@ -81,12 +81,20 @@ const readScreen = () => page.evaluate((TERMS) => {
     }
     return "empty";
   })();
+  // A glossary chip under the note is a per-term route into the definition —
+  // a better one than a generic "read the rule" link, because it lands on the
+  // word rather than on the screen holding it. A term with its own chip is
+  // answered, so it is not counted as unexplained.
+  const chips = [...screen.querySelectorAll(".chip.term")]
+    .filter(vis).map((n) => (n.textContent || "").trim().toLowerCase());
   return {
     hasExplain: !!screen.querySelector("details.explain"),
     explainOpen: !!screen.querySelector("details.explain[open]"),
     firstContent,
     linksToRule: /read the rule/.test(text("button")),
-    unexplained: TERMS.filter((t) => labels.includes(t) && !prose.includes(t)),
+    chips,
+    unexplained: TERMS.filter((t) =>
+      labels.includes(t) && !prose.includes(t) && !chips.some((c) => c.includes(t))),
     controls: [...screen.querySelectorAll("button")].filter(vis).length,
   };
 }, TERMS);
@@ -102,7 +110,7 @@ for (const [tab, section] of ROUTES) {
   // a defect if the screen also offers no way to look it up. The rules library
   // holds the glossary, so a screen that links into it has answered the question.
   const unexplained = [...new Set(m.unexplained)];
-  if (unexplained.length && !m.linksToRule) {
+  if (unexplained.length && !m.linksToRule && !m.chips.length) {
     findings.push(`${tab}/${section}: uses ${unexplained.map((t) => `"${t}"`).join(", ")} `
       + "with no prose and no route to the rule");
   }
@@ -160,3 +168,6 @@ for (const r of rows) {
 console.log(`\n${rows.length} routes · ${dialogs} dialogs opened`);
 console.log(findings.length ? `\n${findings.length} finding(s):\n  ` + findings.join("\n  ") : "\nNo findings.");
 console.log("");
+// A pass whose findings are "fixed, not tolerated" has to be able to fail, or
+// the stopping rule cannot see it. Exits non-zero like the other audits.
+if (findings.length) process.exit(1);

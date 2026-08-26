@@ -845,3 +845,94 @@ measured on a five-slot Standard sheet, and does not survive a ten-slot sheet wi
 a consequence — the card says so itself ("a game you cannot take with you is a rental") — so it
 is pinned with Import as its secondary, and the inline copy drops to a plain button so the
 screen carries one accent rather than two.
+
+---
+
+## Cycle 6 — reachability, vocabulary, and the stopping rule as a command
+
+Prompted by two questions. *How idiot-proof is it, for someone who never read the manuals and
+does not know how to play a solo RPG — and is anything missing that a user cannot reach?* And:
+*how do I make the test keep running until nothing is reported?*
+
+Cycle 5 asked whether a stranger could tell what each surface is FOR. This one asks whether
+they can **get to it**, whether the words mean anything, and whether each surface is honest
+about what it is doing. It runs in three states — no game, a game in play, a resolved scope —
+and the first of those is the one no audit had ever visited, because every browser pass boots
+the `mid-session` fixture.
+
+**F-27 · Nine rolling surfaces worked with no game and silently discarded the result.**
+*Target:* the five oracles, the four SUM table screens, and the Forge all render and roll
+perfectly with nothing prepared. `store.addJournal` → `mutate` → `activeGame()` returns null →
+return. The entry is dropped without a word, while the Journal tab's own empty state promised
+"the journal fills itself as you play".
+*Fix:* `ui.noGameNotice()` on all of them, stating it **before** the roll with the way out
+beside it.
+*Guard:* `audit-reach.mjs` asserts both halves — the notice is present, **and** rolling with no
+game really does leave the store empty. A notice that lied would be worse than none.
+
+**F-28 · 44 controls whose entire accessible name was a die size.** Every Forge table row
+renders `<button>d20</button>` beside its name: unambiguous to the eye, forty-four identical
+buttons to a screen reader. The same defect in two more shapes — the descriptive and story
+oracles' two-line `<strong>`+`<small>` label, which reads back as "Someonewho" and
+"Objectwhat for"; and the action bar's one-word primary "Ask", whose qualifying context
+("1d10 · deterministic") lives in a sibling span its name never reaches. All three named
+properly; `actionBar` now folds its context into the name automatically when the label is short.
+
+**F-29 · The glossary stopped where a beginner starts.** The twelve terms added in cycle 5
+define PUM and SUM's machinery — and assume the reader knows what a solo RPG is, what a
+gamemaster does, what a d20 is, and what a scene is. Extended to **38 terms in six groups**,
+opening with a group that assumes nothing, and covering GUM and the app's own words. Every
+entry now carries an `id`, a `group` and an `aka` list.
+
+**F-30 · The glossary waited to be looked up.** It answered "what does that word mean" only
+for a player who already knew to go to Rules and open the fold. New `src/glossary.js`
+registers a decorator with `ui.explain()`, so **every** "what this does" note in the app grows
+chips for the jargon its own text uses, each landing on that specific entry. Registered once
+in `main.js`; not one call site changed, so no screen can forget to teach its own vocabulary
+(D-22). `audit-novice.mjs` was widened to recognise a chip as the per-term route it already
+counted a generic "read the rule" link as — which is what its own comment describes.
+
+**F-31 · One destination, two labels.** Home said "Read the first-session walkthrough"; the
+new first-run notices said "I've never played solo". Unified: one label for one destination.
+
+**F-33 · The layout probe's verdict had to be inferred from its own table.** Tooling, not the
+app — found the moment the new runner read the probe's output and matched the word "overflow"
+in its **column header**. Same class as F-7. All three probes now end with one `VERDICT:` line
+and the runner reads only that.
+
+**F-34 · Two probes started measuring the chips instead of the loop.** Introduced by F-30 and
+caught by the same cycle. The flow and first-run probes tap by visible-label substring, and
+the glossary entry "Confirming a beat" renders a chip at the top of the Play screen — so
+"Confirm" matched the chip, the walk landed on Rules, and the next four steps failed from the
+wrong screen. A definition link is not a step of play: the probes now exclude `.chip.term`.
+Verified by re-running — the walk lands on Play → Scene → Journal exactly as before the chips
+existed, which is what distinguishes this fix from making a test pass.
+
+### The stopping rule, executable
+
+The template's rule is *done when one complete cycle of every pass produces no finding*, and
+running twelve passes by hand makes it easy to fake: fix A, re-run A, ship, never notice the
+fix broke B. F-34 is that failure mode caught by the new runner on its first outing. New
+`tests/cycle.mjs`:
+
+- `npm run cycle` runs all twelve passes in order, **never stopping at the first failure** — a
+  runner that bails hides how much is broken — gathers every finding into one report, and
+  exits 0 only if the whole cycle was clean;
+- `npm run cycle:watch` re-runs the entire cycle on every shipped-file change and exits itself
+  the first time one complete cycle reports nothing;
+- `--repeat N` re-runs up to N cycles, which is how a flaky pass shows itself;
+- `--only unit,reach` narrows it while iterating.
+
+Two report-only passes were made able to fail so the rule can see them: `audit-novice.mjs` and
+`audit-guide.mjs` now exit non-zero on findings, matching `audit-deep`'s stated convention and
+their own comments ("findings are fixed, not tolerated"; a phrase in a shipped guide the app
+never says is a lie to the reader).
+
+### What this cycle does NOT prove
+
+`audit-reach.mjs` checks that every word **in the glossary** which appears on screen is
+defined, reachable and correctly anchored, and that no two entries claim the same word. It
+cannot detect jargon nobody thought to add — there is no external dictionary of "words a
+beginner would not know". That direction stays a human judgement, and the contract is written
+at the top of the glossary: put a word on a screen, put it in the glossary.
+

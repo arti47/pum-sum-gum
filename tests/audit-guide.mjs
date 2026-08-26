@@ -209,3 +209,6 @@ else {
   for (const [t, where] of drift) console.log("  ✗ " + pad(`"${t}"`, 44) + near(t));
 }
 console.log("");
+// The guide is a shipped document; a phrase in it the app never says is a lie
+// to the reader. Exits non-zero so the stopping rule can see it.
+if (drift.length) process.exit(1);

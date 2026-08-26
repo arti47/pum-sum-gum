@@ -1068,6 +1068,48 @@ const core = await import("../src/core.js");
   ok("the disruption die is silent when off", off.disruption === null);
 }
 
+// --- glossary invariants ----------------------------------------------------
+// The glossary is the layer under the rules library (§6.6 layer 0), and its
+// defects are quiet ones: an alias two entries both claim sends a chip to the
+// wrong definition, and an entry with no body is a word the app promises to
+// explain and then does not.
+{
+  const G = lib.GLOSSARY;
+  ok("the glossary has entries", G.length > 20, `${G.length}`);
+
+  const gids = G.map((e) => e.id);
+  eq("every glossary id is unique", new Set(gids).size, gids.length);
+
+  // The first group must be the one that assumes nothing: a reader who has
+  // never played a solo RPG meets it before any of the machinery.
+  ok("the glossary opens with the group that assumes nothing",
+    /first solo game/i.test(G[0].group || ""), G[0].group);
+
+  for (const e of G) {
+    ok(`“${e.term}” has a plain-language body`, !!e.body && e.body.length > 30);
+    ok(`“${e.term}” belongs to a group`, !!e.group);
+    ok(`“${e.term}” cites a page`, !!e.page);
+    for (const a of e.aka || []) {
+      ok(`alias “${a}” of “${e.term}” is lowercase`, a === a.toLowerCase());
+    }
+  }
+
+  // Two entries claiming one word: the flat index silently keeps the last, so a
+  // chip for that word would point at whichever entry was written second.
+  const claims = new Map();
+  for (const e of G) {
+    for (const a of new Set([e.term.toLowerCase(), ...(e.aka || [])])) {
+      const held = claims.get(a);
+      if (held && held !== e.id) {
+        ok(`the word “${a}” is claimed by one entry`, false,
+          `both “${held}” and “${e.id}” claim it`);
+      }
+      claims.set(a, e.id);
+    }
+  }
+  eq("the flat index covers every alias", lib.GLOSSARY_INDEX.size, claims.size);
+}
+
 // --- report -----------------------------------------------------------------
 console.log(`\n${pass} passed, ${fail} failed`);
 if (failures.length) {
