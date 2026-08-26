@@ -657,7 +657,7 @@ function renderSettings(host) {
   add(about, el("h2", { text: "About the books" }));
   add(about, el("p", { class: "muted", text: "Plot Unfolding Machine v9.0, Scene Unfolding Machine v8.0 Rev2 and Game Unfolding Machine v2.2 by JeansenVaars, CC BY-NC-SA 4.0. This app is a personal play aid built from those books; it reproduces no rules prose and carries no setting content." }));
   add(about, el("h3", { text: "Safety tools" }));
-  add(about, el("p", { class: "muted", text: "Neither book ships any — no lines and veils, no X-card, no debrief. The app does not invent one and present it as theirs. If your table wants them, bring them from elsewhere; solo play still benefits from deciding in advance what you would rather not write about tonight." }));
+  add(about, el("p", { class: "muted", text: "Safety tools are agreements made in advance about what a story will not include, and how to step away from it if it does. None of the three books ships any — no lines and veils, no X-card, no debrief — so the app does not invent one and present it as theirs. Playing alone, the useful half is still the first: decide before you start what you would rather not write about tonight." }));
   add(about, el("h3", { text: "Task resolution" }));
   add(about, el("p", { class: "muted", text: "PUM resolves nothing. It never says whether an action succeeded — it says what the world offers. Bring your own RPG's rules, or narrate it yourself." }));
   add(about, el("p", { class: "cite", text: `App version ${APP_VERSION}` }));

@@ -69,6 +69,22 @@ export const GLOSSARY = [
     more: "It does not end your game. Start another plot sheet for the next storyline; the same cast and journal carry over.",
   },
   {
+    id: "acts", group: "The plot machine", term: "Exposition, Confrontation, Resolution",
+    // Found by tests/tools/harvest-jargon.mjs: "exposition" is on the busiest
+    // screen in the app 34 times, and is story-structure vocabulary a beginner
+    // has no reason to have met.
+    aka: ["exposition", "confrontation", "rising", "climax", "falling action", "five-act"],
+    page: "PUM pp.14-23",
+    body: "The named stretches a plot track is divided into — borrowed from how stories are usually described. Exposition is the setting-up, Confrontation or Rising is where it gets harder, Climax is the worst of it, and Resolution is the aftermath.",
+    more: "They are labels on the track, not rules: nothing changes mechanically when you cross from one into the next. They tell you what kind of scene tends to belong here, and nothing stops you ignoring that.",
+  },
+  {
+    id: "abcd", group: "The plot machine", term: "ABCD tables",
+    aka: ["abcd"], page: "PUM p.14",
+    body: "Four small tables of generic story events, reached when a random prompt sends you to one instead of to your own plot nodes. They are deliberately vague — a hint, not a script.",
+    more: "Read one and decide what it means here. If nothing suggests itself, roll again or take the other kind of beat.",
+  },
+  {
     id: "timed-beat", group: "The plot machine", term: "Timed beat",
     aka: ["timed beat", "timed beats"], page: "PUM p.9",
     body: "A note pinned to a box further along the track — something you have already decided will happen once the story gets that far. The app reminds you when you cross it.",
@@ -154,6 +170,15 @@ export const GLOSSARY = [
   },
 
   // --- the app's own words -------------------------------------------------
+  {
+    id: "safety-tools", group: "This app's words", term: "Safety tools",
+    // Settings names three of these in one breath — "no lines and veils, no
+    // X-card, no debrief" — which says nothing at all to a first-time player.
+    aka: ["safety tools", "x-card", "lines and veils", "debrief"],
+    page: "absent from all three books",
+    body: "Agreements a roleplaying group makes in advance about what the story will not include, and how to step back from it if it does. Lines and veils name what is off the table and what happens off-screen; an X-card is a way to stop a scene without explaining; a debrief is talking afterwards about how it landed.",
+    more: "None of the three books ships any, so this app does not invent one and present it as theirs. Playing alone, the useful half is still the first: decide before you start what you would rather not write about tonight.",
+  },
   {
     id: "universe", group: "This app's words", term: "Universe",
     aka: ["universe"], page: "PUM p.3",
