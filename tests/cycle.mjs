@@ -38,6 +38,7 @@ const PASSES = [
   { id: "novice", label: "could a stranger tell what it is for", cmd: ["node", "tests/audit-novice.mjs"] },
   { id: "reach", label: "reachability + naming, three states", cmd: ["node", "tests/audit-reach.mjs"] },
   { id: "guide", label: "the guide against what the app renders", cmd: ["node", "tests/audit-guide.mjs"] },
+  { id: "hostile", label: "oversized, malformed and adversarial input", cmd: ["node", "tests/audit-hostile.mjs"] },
   { id: "functions", label: "every function, reached by clicking", cmd: ["node", "tests/audit-functions.mjs"] },
   { id: "firstrun", label: "a stranger, cold open to a played scene", cmd: ["node", "tests/probe-firstrun.mjs"], probe: true },
   { id: "flow", label: "the book's loop, without the tab bar", cmd: ["node", "tests/probe-flow.mjs"], probe: true },

@@ -1068,6 +1068,57 @@ const core = await import("../src/core.js");
   ok("the disruption die is silent when off", off.disruption === null);
 }
 
+// --- normalize() is total ---------------------------------------------------
+// It stands between JSON.parse(localStorage) and the whole app: if it throws,
+// the app does not boot and the player's campaign looks deleted. The
+// hostile-input lens found six shapes that made it throw. These are the cheap
+// versions of those, so a regression costs two seconds to find rather than the
+// ninety the browser pass takes.
+{
+  const hostile = [
+    ["null", null],
+    ["undefined", undefined],
+    ["a string", "nope"],
+    ["a number", 42],
+    ["an array", [1, 2]],
+    ["a boolean", true],
+    ["games not an array", { games: "nope" }],
+    ["games is null", { games: null }],
+    ["a null game", { games: [null] }],
+    ["a string game", { games: ["x"] }],
+    ["a null scope", { games: [{ scopes: [null] }] }],
+    ["a null protagonist", { games: [{ protagonists: [null] }] }],
+    ["a null cast entry", { games: [{ cast: [null] }] }],
+    ["a null journal entry", { games: [{ journal: [null] }] }],
+    ["a null trait", { games: [{ cast: [{ traits: [null] }] }] }],
+    ["settings not an object", { games: [], settings: "nope" }],
+    ["track is null", { games: [{ scopes: [{ track: null }] }] }],
+    ["nodes not an object", { games: [{ scopes: [{ nodes: "nope" }] }] }],
+    ["openScene is a string", { games: [{ scopes: [{ openScene: "open" }] }] }],
+  ];
+  for (const [name, input] of hostile) {
+    let out = null, threw = null;
+    try { out = derived.normalize(input); } catch (e) { threw = String(e && e.message || e); }
+    ok(`normalize(${name}) does not throw`, threw === null, threw);
+    if (threw) continue;
+    ok(`normalize(${name}) returns a games array`, Array.isArray(out.games));
+    ok(`normalize(${name}) returns valid settings`, out.settings && typeof out.settings === "object");
+  }
+
+  // A non-string where a string belongs must never reach the screen as the
+  // literal text "[object Object]".
+  const typed = derived.normalize({
+    games: [{ title: { a: 1 }, universe: [], tone: 7, scopes: [{ name: {}, mission: [] }] }],
+  });
+  const g = typed.games[0];
+  ok("an object title becomes a usable string", typeof g.title === "string" && !g.title.includes("object Object"), g.title);
+  ok("an array universe becomes a string", typeof g.universe === "string", typeof g.universe);
+  ok("a numeric tone becomes its digits", g.tone === "7", g.tone);
+  ok("an object scope name becomes a usable string", typeof g.scopes[0].name === "string"
+    && !g.scopes[0].name.includes("object Object"), g.scopes[0].name);
+  ok("an array mission becomes a string", typeof g.scopes[0].mission === "string");
+}
+
 // --- glossary invariants ----------------------------------------------------
 // The glossary is the layer under the rules library (§6.6 layer 0), and its
 // defects are quiet ones: an alias two entries both claim sends a chip to the

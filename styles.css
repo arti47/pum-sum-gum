@@ -67,6 +67,22 @@
 
 * { box-sizing: border-box; }
 
+/* Everything on these screens is text the PLAYER wrote, and a player can paste a
+   URL, a compound word or a 4,000-character run with no space in it. Without
+   this, one unbroken token widens the document — the hostile-input audit measured
+   83,214px of horizontal overflow at 390px wide from a single long word, and
+   22-290px from something as ordinary as a pasted link.
+   `anywhere` rather than `break-word` so the break is allowed to count towards
+   the element's intrinsic width, which is what stops a flex or grid child from
+   being sized by its longest word. */
+#screen, #plot-header, .modal, .toast, #action-bar {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+/* Tables and pre-formatted blocks scroll instead: breaking a die row mid-number
+   would make the books' own tables unreadable. */
+#screen .table-scroll, #screen pre { overflow-wrap: normal; overflow-x: auto; }
+
 html { font-size: calc(100% * var(--scale)); }
 
 body {

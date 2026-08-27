@@ -22,7 +22,8 @@
     "cycle": "node tests/cycle.mjs",
     "cycle:watch": "node tests/cycle.mjs --watch",
     "audit:functions": "node tests/audit-functions.mjs",
-    "jargon": "node tests/tools/harvest-jargon.mjs"
+    "jargon": "node tests/tools/harvest-jargon.mjs",
+    "audit:hostile": "node tests/audit-hostile.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.62.1"

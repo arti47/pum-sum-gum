@@ -1021,3 +1021,98 @@ restored.
 deep · novice 0 findings · reach 20×3 routes, 41 terms · guide 0 drift · **functions 275/281
 reachable, 0 findings** · firstrun, flow and layout VERDICT clean.
 
+---
+
+## Cycle 8 — LENS: hostile input
+
+Run from the audit-prompts playbook: converge first (Prompt A), then widen with **one** named
+lens (Prompt B). The lens chosen was **hostile input**, the highest-yield entry in the
+catalogue that this project had no pass for at all.
+
+Every other pass feeds the app data it wrote itself — fixtures shaped exactly the way the app
+shapes them. This one asks what happens when the input is not like that. The app has two doors
+that take input it did not write: every text field, and Import JSON, which is parsed and
+installed as the entire application state with everything downstream of `normalize()` trusting
+it.
+
+`tests/audit-hostile.mjs`, 832 checks, all findings reported in one run. **21 findings, in two
+clusters.**
+
+### F-38 · `normalize()` was not total, and the app would not boot
+
+`store.load()` is `JSON.parse(localStorage)` → `normalize(raw)`. If that throws, the app does
+not render at all: a blank screen, and a player whose entire campaign appears to have been
+deleted. It threw on six shapes, every one of which a corrupted write, a truncated save or a
+hand-edited export can produce:
+
+| Input | What happened |
+|---|---|
+| `null` | `Cannot read properties of null (reading 'theme')` — a default parameter covers `undefined`, never `null` |
+| `{games:[null]}` | `reading 'id'` |
+| a `null` scope | `reading 'id'` |
+| a `null` protagonist | `reading 'id'` |
+| a `null` cast entry | `reading 'id'` |
+| a `null` journal entry | `reading 'id'` |
+
+Plus a seventh, quieter one: a `title` that is an object put the literal text
+**"[object Object]"** on Home. Not a null leaking through — D-1's cousin, a *type* nobody
+checked. `str()` now coerces, and a finite number becomes its digits rather than vanishing.
+
+Fixed with two helpers — `obj()` and `str()` — applied to every field read out of raw data, so
+the property is impossible to get wrong one field at a time. `normalize()` is now total by
+construction: it returns a usable state for any input at all.
+
+### F-39 · One long word destroyed the layout
+
+The app is phone-first and asserts zero horizontal overflow at 320/360/390 — but only against
+fixtures containing ordinary prose. A player pastes a URL, or types a compound word, and:
+
+| Payload | Overflow at 390px |
+|---|---|
+| a 4,000-character unbroken word | **83,214px** |
+| a 50,000-character value | **942,358px** |
+| `<img src=x onerror="…">` | 58px |
+| `${constructor.constructor(…)()}` | 290px |
+
+The last two matter most: those are not adversarial at all, they are just *long tokens with no
+spaces*, and a pasted link is the same shape. Fixed with `overflow-wrap: anywhere` on the five
+containers that hold player text, with tables and `<pre>` exempted to scroll instead — breaking
+a die row mid-number would make the books' own tables unreadable.
+
+### What the lens did NOT find
+
+Worth recording, because a clean result is only meaningful if the check could have failed:
+
+- **Injection: nothing.** Script tags, `onerror` handlers, tag-closers, HTML entities and
+  template-literal syntax in every text field, on every route — none executed, none was parsed
+  into an element. `el()` writes user values through `textContent` and `add()` through
+  `createTextNode`; the `html:` escape hatch in `el()` exists but has **no call site anywhere in
+  the app**. The discipline holds.
+- **Unicode: nothing.** RTL, bidi overrides, zalgo, astral pairs, ZWJ sequences, combining
+  marks and NUL all render and survive a store round trip byte for byte.
+- **Round trip: nothing.** Export → import is lossless with every payload in place at once.
+- **`importJSON` rejection: nothing.** Seven junk strings all rejected with a message, and none
+  left the store half-written.
+
+### The coverage boundary
+
+A clean run now prints what it covered **and what it deliberately does not**, so "clean" is a
+bounded claim. This lens does not cover: storage quota exhaustion, permission denial or two
+tabs writing at once (lens: storage failure); records written by an older schema version (lens:
+migration); or the input size at which the app becomes slow rather than wrong (lens:
+performance envelope). Those are the next three lenses if they are ever worth their cost.
+
+### Guards, watched failing
+
+Both, before either fix was trusted. Reverting `normalize()` to the non-total form produced
+`✗ normalize(null) does not throw`; removing the `overflow-wrap` rule produced 14 overflow
+findings. The unit harness carries the cheap half — 19 hostile shapes through `normalize()` in
+two seconds — so a regression does not wait for the ninety-second browser pass to be noticed.
+
+### Cycle 8 result
+
+`npm run cycle`, fourteen passes, one contiguous run over the committed tree: unit 1,861 ·
+dead-data clean · smoke · interaction · modals · deep · novice 0 findings · reach 20x3 routes,
+41 terms · guide 0 drift · **hostile 832 checks, 0 findings** · functions 275/281 · firstrun,
+flow and layout VERDICT clean. **One complete cycle, no findings.**
+

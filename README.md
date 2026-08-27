@@ -59,6 +59,7 @@ npm run audit:novice  # could a stranger tell what each surface is for?
 npm run audit:reach   # can they reach it — 20 routes across three states of the app
 npm run audit:guide   # the shipped guide's wording against what the app renders
 npm run audit:functions # every function in src/, reached by clicking (Chromium coverage)
+npm run audit:hostile # oversized, malformed and adversarial input at every door
 npm run jargon        # words the app says in its own voice that the glossary does not define
 npm run probe         # measured layout table (a probe prints; it does not assert)
 npm run probe:flow    # the book's own loop, walked without touching the tab bar
@@ -70,7 +71,7 @@ node tests/make-fixtures.mjs   # regenerate the seed fixtures after a schema cha
 
 The rule this project is held to is: **done when one complete cycle of every pass produces no
 finding** — not "the pass I just fixed is green". `npm run cycle` enforces it. It runs all
-thirteen passes in order, *never stops at the first failure* (a runner that bails hides how much
+fourteen passes in order, *never stops at the first failure* (a runner that bails hides how much
 is broken), gathers every finding into one report, and exits non-zero unless the whole cycle
 was clean.
 

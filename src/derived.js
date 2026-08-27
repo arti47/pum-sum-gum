@@ -154,48 +154,77 @@ export function activeScope(game) {
 }
 
 // --- normalization / migration (§7: never crash on old data) ---------------
+//
+// normalize() is TOTAL: it returns a usable state for any input at all, because
+// it stands between `JSON.parse(localStorage)` and the whole app. If it throws,
+// the app does not boot — a blank screen, and a player whose campaign looks
+// deleted. The hostile-input audit found it throwing on six shapes, every one of
+// which a corrupted write or a hand-edited export can produce:
+//
+//   · `null` — a default parameter covers `undefined`, never `null`;
+//   · a `null` element inside games, scopes, protagonists, cast or journal.
+//
+// Two helpers do the whole job. Use them for every field read out of raw data.
+
+// An object, whatever was actually there. null, a string, a number and an array
+// all become {} — reading a field off that yields undefined, which every
+// `|| default` below already handles.
+function obj(v) {
+  return (v && typeof v === "object" && !Array.isArray(v)) ? v : {};
+}
+
+// A string, whatever was actually there. An object title would otherwise reach
+// the screen as the literal text "[object Object]": not a null leaking through
+// (D-1) but a type nobody checked.
+function str(v, fallback = "") {
+  if (typeof v === "string") return v;
+  if (typeof v === "number" && Number.isFinite(v)) return String(v);
+  return fallback;
+}
+
 function blankNodes() {
   const n = {};
   for (const id of NODE_IDS) n[id] = [];
   return n;
 }
 
-export function normalizeScope(raw = {}) {
+export function normalizeScope(input = {}) {
+  const raw = obj(input);
+  const track = obj(raw.track);
+  const scene = obj(raw.openScene);
   const scope = {
-    id: raw.id || uid("scope"),
-    name: raw.name || "Untitled scope",
-    mission: raw.mission || "",
-    sheetId: plotSheet(raw.sheetId) ? raw.sheetId : "standard",
-    startingPoint: raw.startingPoint || "",
-    createdAt: raw.createdAt || Date.now(),
+    id: str(raw.id) || uid("scope"),
+    name: str(raw.name) || "Untitled scope",
+    mission: str(raw.mission),
+    sheetId: (typeof raw.sheetId === "string" && plotSheet(raw.sheetId)) ? raw.sheetId : "standard",
+    startingPoint: str(raw.startingPoint),
+    createdAt: Number(raw.createdAt) || Date.now(),
     track: {
-      crossed: Math.max(0, Number(raw.track && raw.track.crossed) || 0),
-      marks: (raw.track && raw.track.marks && typeof raw.track.marks === "object")
-        ? { ...raw.track.marks } : {},
-      fired: (raw.track && raw.track.fired && typeof raw.track.fired === "object")
-        ? { ...raw.track.fired } : {},
-      custom: Array.isArray(raw.track && raw.track.custom) ? raw.track.custom : null,
+      crossed: Math.max(0, Number(track.crossed) || 0),
+      marks: { ...obj(track.marks) },
+      fired: { ...obj(track.fired) },
+      custom: Array.isArray(track.custom) ? track.custom : null,
     },
     customPrompts: Array.isArray(raw.customPrompts) && raw.customPrompts.length === 10
-      ? raw.customPrompts : null,
+      ? raw.customPrompts.map((p) => str(p)) : null,
     customNames: {
-      custom1: (raw.customNames && typeof raw.customNames.custom1 === "string") ? raw.customNames.custom1 : "",
-      custom2: (raw.customNames && typeof raw.customNames.custom2 === "string") ? raw.customNames.custom2 : "",
+      custom1: str(obj(raw.customNames).custom1),
+      custom2: str(obj(raw.customNames).custom2),
     },
-    notes: typeof raw.notes === "string" ? raw.notes : "",
+    notes: str(raw.notes),
     closedAt: Number(raw.closedAt) > 0 ? Number(raw.closedAt) : null,
     nodes: blankNodes(),
-    openScene: raw.openScene && raw.openScene.id ? {
-      id: raw.openScene.id,
-      openedAt: raw.openScene.openedAt || Date.now(),
-      opener: raw.openScene.opener || "",
-      interventions: Array.isArray(raw.openScene.interventions) ? raw.openScene.interventions : [],
+    openScene: scene.id ? {
+      id: str(scene.id),
+      openedAt: Number(scene.openedAt) || Date.now(),
+      opener: str(scene.opener),
+      interventions: Array.isArray(scene.interventions) ? scene.interventions : [],
     } : null,
-    lastBeat: raw.lastBeat || null,
+    lastBeat: (raw.lastBeat && typeof raw.lastBeat === "object") ? raw.lastBeat : null,
   };
   for (const id of NODE_IDS) {
-    const src = raw.nodes && Array.isArray(raw.nodes[id]) ? raw.nodes[id] : [];
-    scope.nodes[id] = src.map((s) => (typeof s === "string" ? s : ""));
+    const src = Array.isArray(obj(raw.nodes)[id]) ? obj(raw.nodes)[id] : [];
+    scope.nodes[id] = src.map((x) => str(x));
   }
   // A crossed count can never exceed the track it belongs to.
   const total = trackLength(scope);
@@ -204,49 +233,60 @@ export function normalizeScope(raw = {}) {
   return scope;
 }
 
-export function normalizeGame(raw = {}) {
+export function normalizeGame(input = {}) {
+  const raw = obj(input);
   const game = {
-    id: raw.id || uid("game"),
-    title: raw.title || "Untitled game",
-    universe: raw.universe || "",
-    tone: raw.tone || "",
-    inspiration: raw.inspiration || "",
-    createdAt: raw.createdAt || Date.now(),
-    archivedAt: raw.archivedAt || null,
-    activeScopeId: raw.activeScopeId || null,
-    scopes: Array.isArray(raw.scopes) ? raw.scopes.map(normalizeScope) : [],
+    id: str(raw.id) || uid("game"),
+    title: str(raw.title) || "Untitled game",
+    universe: str(raw.universe),
+    tone: str(raw.tone),
+    inspiration: str(raw.inspiration),
+    createdAt: Number(raw.createdAt) || Date.now(),
+    archivedAt: Number(raw.archivedAt) || null,
+    activeScopeId: str(raw.activeScopeId) || null,
+    scopes: Array.isArray(raw.scopes) ? raw.scopes.map((s) => normalizeScope(obj(s))) : [],
     protagonists: Array.isArray(raw.protagonists)
-      ? raw.protagonists.map((p) => ({
-          id: p.id || uid("pc"), name: p.name || "Unnamed", notes: p.notes || "",
-        }))
+      ? raw.protagonists.map((x) => {
+          const p = obj(x);
+          return { id: str(p.id) || uid("pc"), name: str(p.name) || "Unnamed", notes: str(p.notes) };
+        })
       : [],
     cast: Array.isArray(raw.cast)
-      ? raw.cast.map((c) => ({
-          id: c.id || uid("cast"),
-          kind: c.kind === "location" ? "location" : "character",
-          name: c.name || "Unnamed",
-          notes: c.notes || "",
-          traits: Array.isArray(c.traits)
-            ? c.traits.map((t) => ({
-                table: t.table || "", label: t.label || "", text: t.text || "",
-                roll: Number(t.roll) || 0,
-              }))
-            : [],
-        }))
+      ? raw.cast.map((x) => {
+          const c = obj(x);
+          return {
+            id: str(c.id) || uid("cast"),
+            kind: c.kind === "location" ? "location" : "character",
+            name: str(c.name) || "Unnamed",
+            notes: str(c.notes),
+            traits: Array.isArray(c.traits)
+              ? c.traits.map((y) => {
+                  const t = obj(y);
+                  return {
+                    table: str(t.table), label: str(t.label), text: str(t.text),
+                    roll: Number(t.roll) || 0,
+                  };
+                })
+              : [],
+          };
+        })
       : [],
     journal: Array.isArray(raw.journal)
-      ? raw.journal.map((e) => ({
-          id: e.id || uid("j"),
-          ts: e.ts || Date.now(),
-          kind: e.kind || "note",
-          title: e.title || "",
-          detail: e.detail || "",
-          dice: Array.isArray(e.dice) ? e.dice : [],
-          note: e.note || "",
-          scopeId: e.scopeId || null,
-          sceneId: e.sceneId || null,
-          linkedTo: e.linkedTo || null,
-        }))
+      ? raw.journal.map((x) => {
+          const e = obj(x);
+          return {
+            id: str(e.id) || uid("j"),
+            ts: Number(e.ts) || Date.now(),
+            kind: str(e.kind) || "note",
+            title: str(e.title),
+            detail: str(e.detail),
+            dice: Array.isArray(e.dice) ? e.dice : [],
+            note: str(e.note),
+            scopeId: str(e.scopeId) || null,
+            sceneId: str(e.sceneId) || null,
+            linkedTo: str(e.linkedTo) || null,
+          };
+        })
       : [],
   };
   if (!game.scopes.length) game.scopes = [normalizeScope({ name: game.title })];
@@ -256,25 +296,24 @@ export function normalizeGame(raw = {}) {
   return game;
 }
 
-export function normalize(raw = {}) {
+export function normalize(input = {}) {
+  const raw = obj(input);
+  const set = obj(raw.settings);
   const state = {
     version: STATE_VERSION,
     theme: ["light", "dark", "system"].includes(raw.theme) ? raw.theme : "system",
     textScale: Number(raw.textScale) >= 0.85 && Number(raw.textScale) <= 1.4
       ? Number(raw.textScale) : 1,
     settings: {
-      disruptionDie: !!(raw.settings && raw.settings.disruptionDie),
-      disruptionVolatile: !!(raw.settings && raw.settings.disruptionVolatile),
-      autoEnrich: raw.settings && typeof raw.settings.autoEnrich === "boolean"
-        ? raw.settings.autoEnrich : true,
-      gum: raw.settings && typeof raw.settings.gum === "boolean"
-        ? raw.settings.gum : true,
-      explainOpen: raw.settings && typeof raw.settings.explainOpen === "boolean"
-        ? raw.settings.explainOpen : true,
-      seenTutorial: !!(raw.settings && raw.settings.seenTutorial),
+      disruptionDie: !!set.disruptionDie,
+      disruptionVolatile: !!set.disruptionVolatile,
+      autoEnrich: typeof set.autoEnrich === "boolean" ? set.autoEnrich : true,
+      gum: typeof set.gum === "boolean" ? set.gum : true,
+      explainOpen: typeof set.explainOpen === "boolean" ? set.explainOpen : true,
+      seenTutorial: !!set.seenTutorial,
     },
-    activeGameId: raw.activeGameId || null,
-    games: Array.isArray(raw.games) ? raw.games.map(normalizeGame) : [],
+    activeGameId: str(raw.activeGameId) || null,
+    games: Array.isArray(raw.games) ? raw.games.map((g) => normalizeGame(obj(g))) : [],
   };
   if (state.games.length && !state.games.some((g) => g.id === state.activeGameId)) {
     state.activeGameId = state.games[0].id;
