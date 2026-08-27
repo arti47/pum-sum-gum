@@ -123,21 +123,38 @@ const lit = new Set(); const pats = [];
     for (const m of src.matchAll(/(?:name|term|title|label|text):\s*"([^"]{3,80})"/g)) remember(m[1]);
   }
 }
-const inSource = (t) => lit.has(t) || pats.some((p) => p.test(t));
+// Same normalisation on both sides, for the same reason as `says()`: the claim
+// arrives with its apostrophes already stripped, so comparing it against raw
+// source literals mis-sorts every label containing one into "the app never says
+// this" when the app says it perfectly well.
+const litBare = new Set([...lit].map((x) => x.replace(/[“”"'’]/g, "")));
+const inSource = (t) => lit.has(t) || litBare.has(t.replace(/[“”"'’]/g, ""))
+  || pats.some((p) => p.test(t));
 
 // --- the guide's claims -----------------------------------------------------
 const onScreen = new Set(seen.keys());
+
+// addClaim() below strips quotes and apostrophes out of a guide phrase, because
+// the guide writes its labels inside quotation marks. The on-screen set keeps
+// its apostrophes, so before this the two sides were normalised differently and
+// NO control label containing an apostrophe could ever match — "Add to the
+// game's inspiration" was reported as a phrase the app never says while the app
+// was rendering it. Latent until a label with an apostrophe existed; compare
+// like with like.
+const quoteless = (x) => x.replace(/[“”"'’]/g, "");
+const onScreenBare = new Set([...onScreen].map(quoteless));
+
 const says = (t) => {
-  if (onScreen.has(t)) return true;
+  if (onScreen.has(t) || onScreenBare.has(quoteless(t))) return true;
   // "Recall" is rendered "Recall (1)"; "Game Unfolding Machine (GUM v2.2)" is
   // the whole label. Accept a claim that matches either side of a suffix.
   const bare = t.replace(/\s*\([^)]*\)$/, "");
-  if (bare !== t && onScreen.has(bare)) return true;
-  if ([...onScreen].some((s) => s.replace(/\s*\([^)]*\)$/, "") === t)) return true;
+  if (bare !== t && (onScreen.has(bare) || onScreenBare.has(quoteless(bare)))) return true;
+  if ([...onScreenBare].some((s) => s.replace(/\s*\([^)]*\)$/, "") === quoteless(t))) return true;
   // a label the app composes: "Show all 10 slots", "All 6 tables", "1d20"
-  const rx = new RegExp("^" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const rx = new RegExp("^" + quoteless(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     .replace(/\\\{?N\\\}?|\bN\b|\bdN\b/g, "\\d+") + "$", "i");
-  return [...onScreen].some((s) => rx.test(s));
+  return [...onScreenBare].some((s) => rx.test(s));
 };
 
 const claims = new Map();             // phrase → where the guide says it

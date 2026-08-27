@@ -13,6 +13,11 @@ import { Settings } from "./settings.js";
 let step = 0;
 let draft = null;
 let onDone = null;
+// A result carried in from the Forge. GUM is a prep tool, so rolling a plot seed
+// before any game exists is the normal way to use it — and until now that roll
+// had nowhere to go but the floor. Held here, offered against each field on the
+// step that owns it, and cleared when prep ends.
+let carried = null;
 // How many node slots each list is currently showing in prep (§6.5: a long list
 // reveals progressively rather than landing all at once).
 const SLOTS_AT_FIRST = 3;
@@ -26,9 +31,10 @@ const STEPS = [
   { n: 5, name: "Nodes", legend: "Write your plot nodes" },
 ];
 
-export function startWizard(after = null) {
+export function startWizard(after = null, seed = null) {
   step = 0;
   onDone = after;
+  carried = seed;
   draft = {
     title: "", universe: "", tone: "", inspiration: "",
     scopeName: "", mission: "", startingPoint: "",
@@ -44,10 +50,10 @@ export function startWizard(after = null) {
 
 export function inWizard() { return draft !== null; }
 
-function cancelWizard() { draft = null; step = 0; render(); }
+function cancelWizard() { draft = null; step = 0; carried = null; render(); }
 
 // Switching game mid-prep discards the draft rather than carrying it across.
-registerClearer(() => { draft = null; step = 0; onDone = null; visible = {}; });
+registerClearer(() => { draft = null; step = 0; onDone = null; visible = {}; carried = null; });
 
 export function renderWizard(host) {
   const s = STEPS[step];
@@ -106,6 +112,38 @@ function legalUpTo(i) {
   return true;
 }
 
+// What was rolled in the Forge, offered against the fields this step owns. One
+// button per field, because "use this" with no destination is the question the
+// player already could not answer.
+function carriedCard(fields) {
+  if (!carried || !fields.length) return null;
+  const card = el("div", { class: "card notice" });
+  add(card, el("div", { class: "card-head" },
+    el("h3", { text: "Rolled in the Forge" }),
+    el("span", { class: "cite", text: carried.label || "GUM" })
+  ));
+  add(card, el("p", { text: carried.text }));
+  add(card, el("p", { class: "muted", text: "Add it to any field on this step. It is appended, never substituted for what you have already written." }));
+  const row = el("div", { class: "btn-row" });
+  for (const [key, name] of fields) {
+    add(row, el("button", {
+      class: "btn small", "aria-label": `Add the rolled text to ${name}`,
+      onclick: () => {
+        const was = (draft[key] || "").trim();
+        draft[key] = was ? `${was}\n\n${carried.text}` : carried.text;
+        toast(`Added to ${name}.`);
+        render();
+      },
+    }, name));
+  }
+  add(card, row);
+  add(card, el("button", {
+    class: "btn small ghost", style: "margin-top:.4rem",
+    onclick: () => { carried = null; render(); },
+  }, "Dismiss"));
+  return card;
+}
+
 function field(label, key, { multiline = false, placeholder = "", hint = "", inspire = null } = {}) {
   const input = multiline ? el("textarea", { placeholder }) : el("input", { type: "text", placeholder });
   input.value = draft[key] || "";
@@ -131,6 +169,10 @@ function field(label, key, { multiline = false, placeholder = "", hint = "", ins
 }
 
 function stepUniverse(host) {
+  add(host, carriedCard([
+    ["title", "Name this game"], ["universe", "Universe or RPG"],
+    ["tone", "World, tone and theme"], ["inspiration", "Inspiration"],
+  ]));
   const card = el("div", { class: "card" });
   add(card, el("p", { class: "muted", text: "Narrow things down. Which RPG or universe do you want to roleplay in? If it brings no setting, define the world, tone and theme yourself. Mystery or horror? Social or action?" }));
   add(card, field("Name this game", "title", { placeholder: "The Neverwinter road", inspire: "game-title" }));
@@ -147,6 +189,10 @@ function stepUniverse(host) {
 }
 
 function stepScope(host) {
+  add(host, carriedCard([
+    ["scopeName", "Plot scope name"], ["mission", "Mission"],
+    ["startingPoint", "Starting point"],
+  ]));
   const card = el("div", { class: "card" });
   add(card, el("p", { class: "muted", text: "A plot scope is one defined mission, task or goal. What kind of story do you want to unfold — defeating a powerful enemy, uncovering a mystery, solving an inner problem?" }));
   add(card, field("Plot scope name", "scopeName", { placeholder: "Find out who burned the caravan", inspire: "scope-name" }));
@@ -371,6 +417,7 @@ function finish() {
   const d = draft;
   draft = null;
   step = 0;
+  carried = null;
 
   const game = store.createGame(d);
   const scope = game.scopes[0];

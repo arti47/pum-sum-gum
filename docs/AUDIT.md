@@ -1116,3 +1116,53 @@ dead-data clean · smoke · interaction · modals · deep · novice 0 findings �
 41 terms · guide 0 drift · **hostile 832 checks, 0 findings** · functions 275/281 · firstrun,
 flow and layout VERDICT clean. **One complete cycle, no findings.**
 
+---
+
+## Reported from play — a Forge result could not reach the thing it was for
+
+GUM is a prep tool by the books' own division of labour, and its six-table plot seed is *a
+hook, a motivation, a **mission**, a first lead, a caveat, an opposition*. "Keep it →" offered
+plot-node lists, the cast and the journal — and nothing else. Not one of those six lines could
+reach the plot sheet's Mission, the game's universe, its tone, its inspiration, the starting
+point, the game notes, or a protagonist.
+
+**F-40 · The moment a plot seed is most useful, the result was discarded.** With no game open
+the dialog said "there is no game open yet, so there is nowhere to keep this" and offered
+"Prepare a game" — which threw the roll away and opened a blank wizard. Rolling six tables and
+then retyping them by hand was the whole experience of using GUM for its stated purpose.
+*Fix:* `startWizard(after, seed)` carries the result into prep, and a "Rolled in the Forge"
+strip on each step offers it against every field that step owns, one button per field, with
+Dismiss. It appends, never substitutes.
+
+**F-41 · With a game open, six of the fields it was for were not destinations.** *Fix:* 14
+destinations, the six setting/scope fields folded under "Into this game's setting or plot
+sheet" because the node lists are the commoner answer mid-play. All of them append.
+
+### Two tooling defects the change exposed
+
+Both latent, both found by the passes doing their job on a change that touched real surfaces.
+
+**F-42 · The guide audit could never verify a label containing an apostrophe.** `addClaim()`
+strips quotes and apostrophes from the guide's claims, because the guide writes its labels
+inside quotation marks. The on-screen set kept its apostrophes. So the two sides were
+normalised differently and every label with an apostrophe read as a phrase the app never says —
+"Add to the game's inspiration" was reported as drift while the app was rendering it. Nothing
+in the app had an apostrophe in its label until now. Fixed by comparing like with like in both
+`says()` and `inSource()`; the second matters because `inSource()` is what sorts a finding into
+*drift* rather than *the sweep never reached this state*. Guard re-verified by replacing a real
+label with "Summon the ancient one" and watching it report.
+
+**F-43 · A closed fold hides its buttons from the function audit.** The six new destinations
+sit inside a `<details>`, and a shut fold's buttons have no `offsetParent`, so `followDialog`
+skipped every one and the append helper behind them read as unreachable. Same class as the
+fold problem cycle 7 hit on the route sweep, in a place cycle 7 did not reach. That journey
+opens the fold now.
+
+### Result
+
+`npm run cycle`, fourteen passes in one contiguous run: unit 1,861 · dead-data clean · smoke ·
+interaction · modals · deep · novice 0 findings · reach clean · **guide 0 drift** · hostile 832
+checks · **functions 275/281** · firstrun, flow and layout VERDICT clean. Both directions were
+also walked by hand in a real browser: no game → carry → field, and game open → all 14
+destinations listed with the mission write confirmed in the store.
+

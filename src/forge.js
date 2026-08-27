@@ -16,6 +16,10 @@ import { nodeSlots, categoryName } from "./derived.js";
 import { render, go } from "./router.js";
 import { Settings } from "./settings.js";
 import { openRule } from "./screens.js";
+// Prep is where a plot seed belongs, so the Forge has to be able to start it.
+// forge -> wizard -> forge is a cycle the module graph already contains (both
+// reach each other only inside functions called after load), same as forge/screens.
+import { startWizard } from "./wizard.js";
 import { registerClearer } from "./viewstate.js";
 import { GUM_TABLES, GUM_PLOT_SEED, GUM_GRAND, GUM_FOR_FIELDS, INSPIRE_WORDS }
   from "../data-gum.js";
@@ -276,86 +280,157 @@ function renderLast() {
 }
 
 // A generated result is only useful once it is written somewhere the game reads.
+// A rolled idea does nothing until it is written where the game will reach for
+// it. GUM is a PREP tool by the book's own division of labour, so the two moments
+// that mattered most were the two this dialog served worst:
+//
+//   · before a game exists — the whole point of the plot seed — where it could
+//     only say "there is nowhere to keep this" and drop the result on the floor;
+//   · while setting a game up, where the only destinations were plot nodes, the
+//     cast and the journal. GUM's own six-table seed is a hook, a motivation, a
+//     MISSION, a first lead, a caveat and an opposition, and not one of those
+//     could reach the scope's Mission, the game's universe, its tone, or a
+//     protagonist.
+//
+// Both are destinations now, and a roll taken with no game open is carried into
+// prep rather than discarded.
+function appendInto(existing, text) {
+  const was = (existing || "").trim();
+  return was ? `${was}\n\n${text}` : text;
+}
+
 function keepDialog(parts, label) {
   const text = parts.map((p) => p.answer).join(" · ");
   const scope = store.currentScope();
+  const game = store.activeGame();
   const body = el("div");
   add(body, el("p", { class: "muted", text: "A rolled idea does nothing until it is written down. Put it where the game will reach for it." }));
   add(body, el("div", { class: "card" }, el("p", { text })));
 
-  if (!store.activeGame()) {
-    // Without a game there is no cast, no journal and no node list to write to;
-    // store.addCast would no-op while the toast said "Added to the cast".
-    add(body, el("p", { class: "muted", text: "There is no game open yet, so there is nowhere to keep this. Roll freely for inspiration — then prepare a game and the same tables are one tap from every blank." }));
+  if (!game) {
+    // No game yet is the NORMAL case for a plot seed, not an error state. Carry
+    // the result into prep and let the wizard offer it against each field.
+    add(body, el("p", { class: "muted", text: "No game open yet — which is exactly when a plot seed is most useful. Take this into game prep and it will be offered against every field it could fill." }));
     modal({
       title: "Keep this",
       body,
       actions: [
-        { label: "Prepare a game", primary: true, onClick: () => go("more", "home") },
+        {
+          label: "Prepare a game with this", primary: true,
+          onClick: () => { closeModal(); startWizard(null, { text, label }); return true; },
+        },
         { label: "Cancel" },
       ],
     });
     return;
   }
 
-  const actions = [];
+  const dest = (labelText, run) => add(body, el("button", {
+    class: "btn wide", onclick: () => { closeModal(); run(); },
+  }, labelText));
+
+  // 1. The plot-node lists this sheet actually prints.
   if (scope) {
     for (const cat of NODE_CATEGORIES) {
       const slots = nodeSlots(scope, cat.id);
       if (!slots) continue;
-      add(body, el("button", {
-        class: "btn wide",
-        onclick: () => {
-          const at = store.writeNodeToFirstEmpty(cat.id, text, slots);
-          closeModal();
-          if (at < 0) toast(`${categoryName(scope, cat.id)} is full — clear a slot first.`);
-          else { toast(`Written into ${cat.name}.`, { undo: true }); go("play", "nodes"); }
-        },
-      }, `Write into ${categoryName(scope, cat.id)}`));
+      dest(`Write into ${categoryName(scope, cat.id)}`, () => {
+        const at = store.writeNodeToFirstEmpty(cat.id, text, slots);
+        if (at < 0) toast(`${categoryName(scope, cat.id)} is full — clear a slot first.`);
+        else { toast(`Written into ${cat.name}.`, { undo: true }); go("play", "nodes"); }
+      });
     }
   }
-  add(body, el("button", {
-    class: "btn wide",
-    onclick: () => {
-      closeModal();
-      promptModal({
-        // no-inspire: you have just rolled; this only names the result.
-        title: "Name them", label: "Name",
-        hint: text,
-        onSubmit: (v) => {
-          if (!v) return;
-          store.addCast("character", v, text);
-          toast("Added to the cast.", { undo: true });
-          go("play", "cast");
-        },
-      });
-    },
-  }, "Add to the cast as a character"));
-  add(body, el("button", {
-    class: "btn wide",
-    onclick: () => {
-      closeModal();
-      promptModal({
-        // no-inspire: as above.
-        title: "Name the place", label: "Name",
-        hint: text,
-        onSubmit: (v) => {
-          if (!v) return;
-          store.addCast("location", v, text);
-          toast("Added to the cast.", { undo: true });
-          go("play", "cast");
-        },
-      });
-    },
-  }, "Add to the cast as a location"));
-  add(body, el("button", {
-    class: "btn wide",
-    onclick: () => {
-      store.addJournal({ kind: "note", title: `Kept from GUM — ${label}`, detail: text });
-      closeModal();
-      toast("Kept in the journal.", { undo: true });
-    },
-  }, "Just keep it in the journal"));
+
+  // 2. The game's own setting fields, and the scope's. These are what a plot
+  // seed, a world truth or a faction is actually FOR. Folded, because they are
+  // six destinations and the node lists above are the commoner answer in play.
+  const fold = el("details", { class: "acc" },
+    el("summary", null, "Into this game's setting or plot sheet"));
+  const foldBody = el("div", { class: "acc-body" });
+  const into = (labelText, run) => add(foldBody, el("button", {
+    class: "btn wide", onclick: () => { closeModal(); run(); },
+  }, labelText));
+
+  into("Add to the universe", () => {
+    store.updateGame({ universe: appendInto(game.universe, text) });
+    toast("Added to the universe.", { undo: true });
+    go("more", "home");
+  });
+  into("Add to the world, tone and theme", () => {
+    store.updateGame({ tone: appendInto(game.tone, text) });
+    toast("Added to the tone.", { undo: true });
+    go("more", "home");
+  });
+  into("Add to the game's inspiration", () => {
+    store.updateGame({ inspiration: appendInto(game.inspiration, text) });
+    toast("Added to the inspiration.", { undo: true });
+    go("more", "home");
+  });
+  if (scope) {
+    into("Add to this plot sheet's mission", () => {
+      store.updateScope({ mission: appendInto(scope.mission, text) });
+      toast("Added to the mission.", { undo: true });
+      go("more", "home");
+    });
+    into("Add to the starting point", () => {
+      store.updateScope({ startingPoint: appendInto(scope.startingPoint, text) });
+      toast("Added to the starting point.", { undo: true });
+      go("more", "home");
+    });
+    into("Add to the game notes", () => {
+      store.setScopeNotes(appendInto(scope.notes, text));
+      toast("Added to the game notes.", { undo: true });
+      go("play", "track");
+    });
+  }
+  add(fold, foldBody);
+  add(body, fold);
+
+  // 3. People and places.
+  dest("Add as a protagonist", () => {
+    promptModal({
+      // no-inspire: you have just rolled; this only names the result.
+      title: "Name your protagonist", label: "Name",
+      hint: text,
+      onSubmit: (v) => {
+        if (!v) return;
+        store.addProtagonist(v, text);
+        toast("Added as a protagonist.", { undo: true });
+        go("play", "cast");
+      },
+    });
+  });
+  dest("Add to the cast as a character", () => {
+    promptModal({
+      // no-inspire: you have just rolled; this only names the result.
+      title: "Name them", label: "Name",
+      hint: text,
+      onSubmit: (v) => {
+        if (!v) return;
+        store.addCast("character", v, text);
+        toast("Added to the cast.", { undo: true });
+        go("play", "cast");
+      },
+    });
+  });
+  dest("Add to the cast as a location", () => {
+    promptModal({
+      // no-inspire: as above.
+      title: "Name the place", label: "Name",
+      hint: text,
+      onSubmit: (v) => {
+        if (!v) return;
+        store.addCast("location", v, text);
+        toast("Added to the cast.", { undo: true });
+        go("play", "cast");
+      },
+    });
+  });
+  dest("Just keep it in the journal", () => {
+    store.addJournal({ kind: "note", title: `Kept from GUM — ${label}`, detail: text });
+    toast("Kept in the journal.", { undo: true });
+  });
 
   modal({ title: "Keep this", body, actions: [{ label: "Cancel" }] });
 }

@@ -363,7 +363,9 @@ Forty-three tables in four sections, for prep and for the moment a blank stops y
 
 > **Why.** GUM's stated method is combination — roll several tables for one subject, or the same table twice, and read the results as one thing. Every group offers 'Roll all of it' for exactly that reason. A single row is rarely the point.
 
-'Keep it →' is what stops a good roll evaporating: write it into any plot node list, add it to the cast as a character or a location, or keep it in the journal. With no game open the app says there is nowhere to keep it yet rather than pretending to save it.
+'Keep it →' is what stops a good roll evaporating. Write it into any plot node list, add it as a protagonist or a cast entry, keep it in the journal — or, folded under 'Into this game's setting or plot sheet', add it to the universe, the tone, the game's inspiration, the plot sheet's mission, the starting point, or the game notes. Everything appends; nothing replaces what you already wrote.
+
+With no game open — which is when a plot seed is most useful, since GUM is a prep tool — 'Prepare a game with this' carries the roll into the wizard, where it is offered against every field on the step that owns it. Rolling six tables and then retyping them by hand was the gap this closes.
 
 ### Three words beside a blank
 
@@ -700,7 +702,11 @@ Forge (hidden when GUM is off)
 - Plot seed · World · Characters · Grand oracle.
 - Roll a whole plot seed (pinned) · World truths · Roll all three · per-table dN buttons · Roll all of <group>.
 - Result card: Re-roll · Keep it → · Dismiss · Re-roll this one — on a set, it re-rolls just that table.
-- Keep this → Write into <list> · Add to the cast as a character · Add to the cast as a location · Just keep it in the journal. With no game open, Prepare a game → instead.
+- Keep this → Write into <list> · Add as a protagonist · Add to the cast as a character · Add to the cast as a location · Just keep it in the journal.
+- Keep this, folded under 'Into this game's setting or plot sheet' → Add to the universe · Add to the world, tone and theme · Add to the game's inspiration · Add to this plot sheet's mission · Add to the starting point · Add to the game notes. Every one appends; none replaces what you wrote.
+- Keep this with no game open → Prepare a game with this. The roll is carried into prep and offered against each field, rather than discarded.
+- Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.
+- Rolled in the Forge (in game prep) → one button per field on that step, plus Dismiss.
 
 Rules
 

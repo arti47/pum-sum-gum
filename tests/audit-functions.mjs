@@ -369,8 +369,27 @@ const journeys = [];
   await tapText(/roll a whole plot seed|roll all/);
   await page.waitForTimeout(90);
   const kept = await tapText(/keep it/);
-  if (kept) { await page.waitForTimeout(80); await followDialog(0); }
-  journeys.push(`forge → keep: ${kept ? "taken" : "NO CONTROL after rolling"}`);
+  let appended = false;
+  if (kept) {
+    await page.waitForTimeout(80);
+    // The six setting/scope destinations sit inside a fold, and a fold's buttons
+    // have no offsetParent while it is shut — so followDialog skips every one of
+    // them, and the append helper behind them reads as unreachable. Open it.
+    appended = await page.evaluate(() => {
+      const box = document.querySelector(".modal");
+      if (!box) return false;
+      for (const d of box.querySelectorAll("details")) d.open = true;
+      const b = [...box.querySelectorAll("button")]
+        .find((x) => /add to the universe/i.test(x.textContent || ""));
+      if (!b) return false;
+      b.click();
+      return true;
+    });
+    await page.waitForTimeout(90);
+    await followDialog(0);
+  }
+  journeys.push(`forge → keep: ${kept ? "taken" : "NO CONTROL after rolling"}, `
+    + `folded setting destination: ${appended ? "taken" : "NOT OFFERED"}`);
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
