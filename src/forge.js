@@ -19,10 +19,10 @@ import { openRule } from "./screens.js";
 // Prep is where a plot seed belongs, so the Forge has to be able to start it.
 // forge -> wizard -> forge is a cycle the module graph already contains (both
 // reach each other only inside functions called after load), same as forge/screens.
-import { startWizard } from "./wizard.js";
+import { carryIntoWizard, inWizard } from "./wizard.js";
 import { registerClearer } from "./viewstate.js";
-import { GUM_TABLES, GUM_PLOT_SEED, GUM_GRAND, GUM_FOR_FIELDS, INSPIRE_WORDS }
-  from "../data-gum.js";
+import { GUM_TABLES, GUM_PLOT_SEED, GUM_GRAND, GUM_FOR_FIELDS, INSPIRE_WORDS,
+  GUM_SEED_EXAMPLE } from "../data-gum.js";
 import { NODE_CATEGORIES } from "../data-pum-plot.js";
 
 // The last result, held so a re-render never re-rolls it (§5.1).
@@ -33,6 +33,12 @@ let forgeSection = "seed";
 const FORGE_SECTIONS = [
   ["seed", "Plot seed"], ["world", "World"], ["character", "Characters"], ["grand", "Grand oracle"],
 ];
+
+// Prep sends the player here for a starting situation, so it can say which
+// section to land on rather than leaving them wherever they last were.
+export function setForgeSection(id) {
+  if (FORGE_SECTIONS.some(([x]) => x === id)) { forgeSection = id; last = null; }
+}
 
 function resetForge() { last = null; }
 registerClearer(resetForge);
@@ -46,14 +52,6 @@ export function renderForge(host) {
       { label: "Open Settings", onClick: () => go("more", "settings") }
     ));
     return;
-  }
-
-  if (!store.activeGame()) {
-    add(host, noGameNotice({
-      what: "any generator here",
-      onPrepare: () => go("more", "home"),
-      onWalkthrough: () => go("more", "tutorial"),
-    }));
   }
 
   const nav = el("nav", { class: "section-nav", "aria-label": "Forge sections" });
@@ -70,15 +68,59 @@ export function renderForge(host) {
   return renderSectionTables(host, forgeSection);
 }
 
+// With no game open every roll here still works and is still discarded, which
+// the player has to be told — but AFTER the screen has said what it is for.
+function maybeNotice(host) {
+  if (store.activeGame()) return;
+  add(host, noGameNotice({
+    what: "any generator here",
+    onPrepare: () => go("more", "home"),
+    onWalkthrough: () => go("more", "tutorial"),
+  }));
+}
+
+// "What does this look like when it works?" — the question six abstract table
+// names cannot answer. A real roll, and, more usefully, where each line ended up.
+function seedExampleCard() {
+  const card = el("div", { class: "card" });
+  const fold = el("details", { class: "acc" },
+    el("summary", null, "What a rolled seed looks like"));
+  const body = el("div", { class: "acc-body" });
+  add(body, el("p", { class: "muted", text: "One real roll of the six, at the faces shown." }));
+  for (const r of GUM_SEED_EXAMPLE.rolls) {
+    add(body, el("div", { class: "defrow" },
+      el("span", { class: "k", text: `${r.table} ${r.roll}` }),
+      el("span", { class: "v", text: r.text })
+    ));
+  }
+  add(body, el("p", null, el("strong", { text: "Read as one situation: " }), GUM_SEED_EXAMPLE.reading));
+  add(body, el("h4", { class: "term-group", text: "Where the six lines went" }));
+  for (const [field, value] of GUM_SEED_EXAMPLE.became) {
+    add(body, el("div", { class: "defrow" },
+      el("span", { class: "k", text: field }),
+      el("span", { class: "v", text: value })
+    ));
+  }
+  add(body, el("p", { class: "cite", text: "Nothing is binding — this is a seed, not a verdict. Re-roll any line you do not like." }));
+  add(fold, body);
+  add(card, fold);
+  return card;
+}
+
 // --- the plot seed: the book's own combination, in its own order -----------
 function renderSeed(host) {
   add(host, el("h1", { text: "Plot seed" }));
+  // Purpose before mechanism. The old note listed what the six tables ARE — a
+  // hook, a motivation, a mission — which describes the machine and never says
+  // what you get out of it or when you would want it.
   add(host, explain([
-    "GUM's own six-table combination, in the book's order: a hook, a motivation, a mission, the first lead, a caveat, and the opposition.",
-    "Roll the set, read the six lines as one situation, then keep whichever parts you like — this is a seed, not a verdict.",
+    "This is where a game comes from when you do not have one yet. One roll invents the situation your protagonists start in: who pulled them into it, why they took it, what they are actually being asked to do, where to begin, what the catch is, and who stands in the way.",
+    "Roll the set and read the six lines as one paragraph, not six answers. Between them they settle most of what game prep asks you for — and “Keep it →” puts each line where the game will reach for it, or carries the whole thing into prep if you have not made a game yet.",
   ], "gum-what", openRule));
+  maybeNotice(host);
 
   if (last) add(host, renderLast());
+  add(host, seedExampleCard());
 
   const card = el("div", { class: "card" });
   add(card, el("h2", { text: "The six questions" }));
@@ -128,6 +170,7 @@ function renderGrand(host) {
     "Three d100 tables — an action, an adjective and a subject — for the moment no specific oracle fits.",
     "Read the three words together and let them mean something. That interpretation is the answer; the words are only the prompt.",
   ], "gum-what", openRule));
+  maybeNotice(host);
 
   if (last) add(host, renderLast());
 
@@ -158,6 +201,7 @@ function renderSectionTables(host, sectionId) {
     "GUM's strength is combination: roll several tables for one subject, or the same table twice, and read the results together.",
     "Nothing here is binding. Interpret freely to fit your world, tone and theme.",
   ], "gum-what", openRule));
+  maybeNotice(host);
 
   if (last) add(host, renderLast());
 
@@ -310,14 +354,20 @@ function keepDialog(parts, label) {
   if (!game) {
     // No game yet is the NORMAL case for a plot seed, not an error state. Carry
     // the result into prep and let the wizard offer it against each field.
-    add(body, el("p", { class: "muted", text: "No game open yet — which is exactly when a plot seed is most useful. Take this into game prep and it will be offered against every field it could fill." }));
+    // Mid-prep is the commonest way to arrive here, and saying "Prepare a game"
+    // to someone who is already preparing one reads as "start again" — which is
+    // what the old call actually did, since startWizard resets the draft.
+    const resuming = inWizard();
+    add(body, el("p", { class: "muted", text: resuming
+      ? "It will be offered against every field on the step that owns it. Nothing you have already typed is touched."
+      : "No game open yet — which is exactly when a plot seed is most useful. Take this into game prep and it will be offered against every field it could fill." }));
     modal({
       title: "Keep this",
       body,
       actions: [
         {
-          label: "Prepare a game with this", primary: true,
-          onClick: () => { closeModal(); startWizard(null, { text, label }); return true; },
+          label: resuming ? "Take it back to prep" : "Prepare a game with this", primary: true,
+          onClick: () => { closeModal(); carryIntoWizard({ text, label }); return true; },
         },
         { label: "Cancel" },
       ],

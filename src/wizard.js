@@ -9,6 +9,10 @@ import { go, render } from "./router.js";
 import { PLOT_SHEETS, NODE_CATEGORIES } from "../data-pum-plot.js";
 import { registerClearer } from "./viewstate.js";
 import { Settings } from "./settings.js";
+// wizard <-> forge is a mutual import. Both sides reach the other only inside
+// functions called after load, never at module-evaluation time, so the cycle
+// resolves — the same shape forge/screens already has.
+import { setForgeSection } from "./forge.js";
 
 let step = 0;
 let draft = null;
@@ -30,6 +34,15 @@ const STEPS = [
   { n: 4, name: "Sheet", legend: "Pick a plot sheet" },
   { n: 5, name: "Nodes", legend: "Write your plot nodes" },
 ];
+
+// Carry a Forge result into prep WITHOUT restarting it. startWizard resets the
+// draft, so a player who is halfway through, goes to the Forge for an idea and
+// comes back would lose everything they had typed.
+export function carryIntoWizard(seed) {
+  if (!draft) { startWizard(null, seed); return; }
+  carried = seed;
+  go("more", "home");
+}
 
 export function startWizard(after = null, seed = null) {
   step = 0;
@@ -115,6 +128,21 @@ function legalUpTo(i) {
 // What was rolled in the Forge, offered against the fields this step owns. One
 // button per field, because "use this" with no destination is the question the
 // player already could not answer.
+// The Forge was invisible from the one screen where it is most useful. A player
+// stuck on "what is this game even about?" was offered five empty fields and no
+// way to find the machine that answers exactly that.
+function forgeOfferCard(what) {
+  if (!Settings.gum() || carried) return null;
+  const card = el("div", { class: "card" });
+  add(card, el("h3", { text: "Do not know yet?" }));
+  add(card, el("p", { text: what }));
+  add(card, el("p", { class: "muted", text: "Your draft is kept — come back to it from the card at the top of any More screen." }));
+  add(card, el("button", {
+    class: "btn wide", onclick: () => { setForgeSection("seed"); go("more", "forge"); },
+  }, "Invent one in the Forge →"));
+  return card;
+}
+
 function carriedCard(fields) {
   if (!carried || !fields.length) return null;
   const card = el("div", { class: "card notice" });
@@ -169,6 +197,7 @@ function field(label, key, { multiline = false, placeholder = "", hint = "", ins
 }
 
 function stepUniverse(host) {
+  add(host, forgeOfferCard("The Forge rolls six tables at once and hands you a whole starting situation — who pulled your protagonists in, what they are being asked to do, and who stands in the way. Roll it, then bring the parts you like back here."));
   add(host, carriedCard([
     ["title", "Name this game"], ["universe", "Universe or RPG"],
     ["tone", "World, tone and theme"], ["inspiration", "Inspiration"],
@@ -191,6 +220,7 @@ function stepUniverse(host) {
 }
 
 function stepScope(host) {
+  add(host, forgeOfferCard("A plot scope is one goal with an end in sight. The Forge's mission table is a list of exactly those — roll it if nothing has suggested itself."));
   add(host, carriedCard([
     ["scopeName", "Plot scope name"], ["mission", "Mission"],
     ["startingPoint", "Starting point"],

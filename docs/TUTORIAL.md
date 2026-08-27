@@ -704,9 +704,11 @@ Forge (hidden when GUM is off)
 - Result card: Re-roll · Keep it → · Dismiss · Re-roll this one — on a set, it re-rolls just that table.
 - Keep this → Write into <list> · Add as a protagonist · Add to the cast as a character · Add to the cast as a location · Just keep it in the journal.
 - Keep this, folded under 'Into this game's setting or plot sheet' → Add to the universe · Add to the world, tone and theme · Add to the game's inspiration · Add to this plot sheet's mission · Add to the starting point · Add to the game notes. Every one appends; none replaces what you wrote.
-- Keep this with no game open → Prepare a game with this. The roll is carried into prep and offered against each field, rather than discarded.
+- Keep this with no game open → Prepare a game with this, or Take it back to prep if you are already mid-way through it. Either way the roll is carried and offered against each field, rather than discarded, and nothing you have typed is touched.
 - Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.
 - Rolled in the Forge (in game prep) → one button per field on that step, plus Dismiss.
+- Do not know yet? → Invent one in the Forge → — on prep steps 1 and 2, when nothing has suggested itself. The draft is kept while you go and look.
+- What a rolled seed looks like — a fold on Forge → Plot seed: one real roll of the six, read as one situation, and where each of the six lines ended up.
 
 Rules
 

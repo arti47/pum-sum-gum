@@ -111,6 +111,15 @@ async function seed(state, tab, section) {
     else localStorage.removeItem("umState");
     const store = await import("./src/store.js");
     store.load();
+    // main.js caches the active game/scope key and refreshes it only inside the
+    // store subscriber. store.load() does not emit, so after seeding a DIFFERENT
+    // state that cache is stale, and the next mutation anywhere looks like a
+    // context switch and fires clearTransient() — wiping the wizard draft and
+    // the Forge's held result mid-journey. One no-op preference write emits and
+    // resynchronises it. (In the app this cannot happen: load() runs once, at
+    // boot, before the cache is taken.)
+    const cfg = await import("./src/settings.js");
+    cfg.Settings.setExplainOpen(cfg.Settings.explainOpen());
     const vs = await import("./src/viewstate.js");
     vs.clearTransient();
     for (const b of document.querySelectorAll(".modal-back")) b.remove();
@@ -498,6 +507,34 @@ const journeys = [];
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
+// 8b. Prep sends you to the Forge for an idea, and the Forge sends the idea
+// back. Both halves are single controls that exist only in that sequence: the
+// offer card renders only on wizard steps 1-2, and "Prepare a game with this"
+// only when no game exists — so a sweep that starts from a seeded fixture takes
+// the other branch every time.
+{
+  await seed(null, "more", "home");
+  await page.evaluate(async () => (await import("./src/wizard.js")).startWizard());
+  await page.waitForTimeout(120);
+  const offered = await tapText(/invent one in the forge/);
+  await page.waitForTimeout(250);
+  const landed = await page.evaluate(() =>
+    document.querySelector("#screen h1")?.textContent || "");
+  // ...roll there, and carry the result back into the draft.
+  const rolled = await tapText(/roll a whole plot seed/);
+  await page.waitForTimeout(250);
+  const kept = await tapText(/keep it/);
+  await page.waitForTimeout(250);
+  const carriedBack = await tapText(/take it back to prep|prepare a game with this/);
+  await page.waitForTimeout(250);
+  const back = await page.evaluate(() =>
+    document.querySelector("#screen h1")?.textContent || "");
+  journeys.push(`prep → Forge → prep: offer ${offered ? "taken" : "NOT OFFERED"}, `
+    + `landed on "${landed}", roll ${rolled ? "taken" : "no"}, keep ${kept ? "taken" : "no"}, `
+    + `carried back to "${back}"${carriedBack ? "" : " (CARRY CONTROL NOT FOUND)"}`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
 // 9. Two games, so switching between them is reachable.
 {
   await seed(MID, "more", "home");
@@ -551,7 +588,12 @@ let total = 0, reached = 0;
 
 for (const rel of files) {
   const src = readFileSync(join(root, rel), "utf8");
-  const entry = coverage.find((c) => c.url.endsWith("/" + rel));
+  // Chromium emits one record per script LOAD, so a navigation mid-run yields two
+  // entries for the same URL. Reading only the first made a reload look like a
+  // regression: setForgeSection and setActiveGame both "stopped running" purely
+  // because their execution was recorded against the second entry.
+  const entries = coverage.filter((c) => c.url.endsWith("/" + rel));
+  const entry = entries[0];
   const decls = declarations(src);
   total += decls.length;
 
@@ -566,7 +608,8 @@ for (const rel of files) {
   // enclosing closure happens to be tightest, which is how the first version of
   // this pass reported the entire wizard as unreachable while it was running it.
   const ran = (d) => {
-    const recs = entry.functions.filter((f) => f.functionName === d.name && f.ranges.length);
+    const recs = entries.flatMap((e) => e.functions)
+      .filter((f) => f.functionName === d.name && f.ranges.length);
     if (!recs.length) return null;                    // no record: report it as such
     const here = recs.filter((f) =>
       f.ranges[0].startOffset <= d.bodyAt && d.bodyAt <= f.ranges[0].endOffset);

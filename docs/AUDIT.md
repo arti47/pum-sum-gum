@@ -1223,3 +1223,64 @@ from the table's name and blurb rather than from its contents, and no pass could
 harness checks that every field either maps to real tables or states why it does not, which
 this satisfied perfectly while being wrong. Checking the rows takes one command.
 
+---
+
+## Reported from play — "I still don't know what the rolls from the Forge are for"
+
+The previous two rounds fixed where a Forge result *goes*. Neither told the player what it is
+*for*. Three comprehension failures, none of which more plumbing would have fixed.
+
+**F-47 · The wizard never mentioned the Forge.** A player creating a game saw five steps and
+two "Stuck? Roll three words" folds. Nothing anywhere said that a machine exists which invents
+a whole starting situation — and prep is the exact moment it is useful. *Fix:* a card on steps
+1 and 2, "Do not know yet?", with the Forge one tap away and the draft preserved while you go
+and look.
+
+**F-48 · The Forge's note described the mechanism, never the purpose.** It read: *"GUM's own
+six-table combination, in the book's order: a hook, a motivation, a mission, the first lead, a
+caveat, and the opposition."* That is a list of what the machine contains. It never said what
+you get out of it or when you would want it. *Fix:* purpose first — "This is where a game comes
+from when you do not have one yet. One roll invents the situation your protagonists start in."
+
+**F-49 · No worked example.** Six abstract table names — "Caveat", "The opposition" — and
+nothing showing what a rolled seed looks like as an actual game. *Fix:* `GUM_SEED_EXAMPLE`, a
+real roll at real faces, read as one situation, **and where each of the six lines ended up**.
+That last part is the bit a player cannot guess.
+
+Also: the no-game notice sat above everything, answering a question the player had not asked
+yet. It now comes after the screen has said what it is for.
+
+**F-50 · "Prepare a game with this" restarted prep that was already under way.** Reaching the
+Forge mid-wizard and keeping a result called `startWizard()`, which resets the draft. The label
+said "Prepare a game" to someone already preparing one, and the click would have discarded
+everything they had typed. *Fix:* `carryIntoWizard()` attaches to an existing draft, and the
+label becomes "Take it back to prep". Verified: type a title, go to the Forge, roll, carry it
+back — the title survives.
+
+### Three defects in the audit tooling, all found by the pass refusing to pass
+
+**F-51 · Coverage read only the first record per script.** Chromium emits one record per script
+*load*, so any navigation mid-run yields two entries for the same URL. Reading `find()` rather
+than `filter()` meant everything executed after a reload was invisible — inserting one
+`page.reload()` made two already-covered functions report as unreachable. Now merged across all
+entries for a URL.
+
+**F-52 · The sweep was wiping the state its own journey depended on.** `main.js` caches the
+active game/scope key and refreshes it only inside the store subscriber. The audit's `seed()`
+calls `store.load()` directly, which does not emit — so after seeding a different state the
+cached key is stale, and the next mutation *anywhere* reads as a context switch and fires
+`clearTransient()`. Mid-journey that destroyed the wizard draft and the Forge's held result,
+which is why "Keep it →" was not on screen to be clicked. One no-op preference write in `seed()`
+resynchronises it. **This is a test-harness artefact, not an app defect:** in the app `load()`
+runs once, at boot, before the cache is taken.
+
+**F-53 · A `replace(..., 1)` put debug instrumentation in the wrong journey.** Two journeys
+contained the identical line `const kept = await tapText(/keep it/);`. The first one succeeds,
+so the debug never fired and the run looked inexplicable. Worth recording because it cost two
+full seven-minute runs: when instrumenting, anchor on something unique to the block.
+
+### Result
+
+`npm run cycle`, fourteen passes. The prep → Forge → prep journey now reports: *offer taken,
+landed on "Plot seed", roll taken, keep taken, carried back to "Prepare a game"*.
+

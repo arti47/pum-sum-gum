@@ -1202,6 +1202,31 @@ export const GUM_FOR_FIELDS = {
 // way ruling A8 records the absent safety tools: the honest answer is that the
 // book has nothing for this, said plainly, rather than a table pointed at the
 // wrong question so that every field has *something*.
+// A worked example of the plot seed, on the Forge screen itself. Six abstract
+// table names ("Caveat", "The opposition") tell a player what the machine has,
+// not what it gives them — and the one question they actually have is "what does
+// this look like when it works?". Real rows at real die values, like every other
+// example in this project: nothing here is written to flatter the tables.
+export const GUM_SEED_EXAMPLE = {
+  rolls: [
+    { table: "Plot hook", die: 20, roll: 4, text: "Someone in power gives you an order" },
+    { table: "Motivation", die: 20, roll: 11, text: "A personal matter, backstory related" },
+    { table: "The mission", die: 20, roll: 2, text: "Defeat a faction, bandits, or outlaws" },
+    { table: "Initial lead", die: 20, roll: 9, text: "Investigate location of a recent event" },
+    { table: "Caveat", die: 20, roll: 6, text: "Background problem actively in your way" },
+    { table: "The opposition", die: 20, roll: 14, text: "Your backstory is causing them trouble" },
+  ],
+  reading: "A lord orders you to break up a bandit company — but it is personal: they are tied to your own past, and that past is exactly why they are coming for you. Start at the site of their last raid, with whatever is already wrong in this region getting in the way.",
+  // Where each line went. This is the part a player cannot guess.
+  became: [
+    ["Plot scope name", "Break the bandit company before they reach the valley"],
+    ["Starting point", "The raid site, three days cold, with the lord's rider waiting"],
+    ["World, tone and theme", "A region with its own standing trouble, indifferent to yours"],
+    ["A potential problem", "They know who you are — your past is their grievance"],
+    ["The cast", "The lord who gave the order"],
+  ],
+};
+
 export const INSPIRE_ABSENT = {
   "game-universe": "Which RPG or fiction you are playing in is a real-world answer — D&D 5e, Blade Runner, your own. GUM generates worlds, not the names of published ones.",
   "game-title": "A title is a name you coin, and GUM coins none. Its nearest tables emit clusters of synonyms — \"Abundant, plentiful, loaded, rich, wealthy, charged\" — which is raw material for a mood, not a name for a game. Roll the world and the tone below, then name it after what you find.",
