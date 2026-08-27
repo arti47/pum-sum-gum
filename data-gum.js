@@ -1160,16 +1160,26 @@ export const GUM_FOR_FIELDS = {
   custom1: ["grand-action", "grand-adjective", "grand-subject"],
   custom2: ["grand-action", "grand-adjective", "grand-subject"],
 
-  // Game identity (PUM p.3 step 1). A title is a name, so only the two
-  // word-shaped grand tables apply — an adjective and a subject can be read as
-  // a title ("Abundant" + "Frontier"); a plot hook cannot.
-  "game-title": ["grand-adjective", "grand-subject"],
-  // Tone is an adjective before it is anything else, plus the world's state.
-  "game-tone": ["grand-adjective", "background-problem"],
+  // Game identity (PUM p.3 step 1). "game-title" used to map here on the premise
+  // that the grand oracle's adjective and subject tables are "word-shaped", so
+  // an adjective plus a subject could be read as a title. That premise is false:
+  // NOT ONE of those 200 rows is a single word. Every one is a cluster of four
+  // to eight synonyms — "Abundant, plentiful, loaded, rich, wealthy, charged" —
+  // so the field that asks you to name your game was offering to paste a
+  // thesaurus entry into it. Moved to INSPIRE_ABSENT, where the app says so.
+  //
+  // Tone asks for "grim frontier fantasy, low magic": what kind of place this
+  // is, and what is wrong with it. Both of those GUM has directly, so they lead.
+  "game-tone": ["location-archetype", "background-problem", "faction-society"],
   "game-inspiration": ["grand-action", "grand-adjective", "grand-subject"],
 
-  // The plot scope and its mission (PUM p.3 step 2)
-  "scope-name": ["plot-hook", "mission", "motivation"],
+  // The plot scope and its mission (PUM p.3 step 2). A scope NAME is a goal
+  // stated in a line — "find out who burned the caravan" — and exactly one GUM
+  // table is that shape: the mission. A plot hook is an event and a motivation
+  // is a reason; neither answers "what is this story about?", and both were
+  // being offered here. One table is not too few: rolling several times within
+  // one table is GUM p.3's own method, and it yields three candidate goals.
+  "scope-name": ["mission"],
   "scope-mission": ["plot-hook", "motivation", "mission", "initial-lead", "caveat", "opposition"],
   "scope-start": ["plot-hook", "initial-lead", "location-archetype"],
   "scope-notes": ["grand-action", "grand-adjective", "grand-subject"],
@@ -1194,6 +1204,7 @@ export const GUM_FOR_FIELDS = {
 // wrong question so that every field has *something*.
 export const INSPIRE_ABSENT = {
   "game-universe": "Which RPG or fiction you are playing in is a real-world answer — D&D 5e, Blade Runner, your own. GUM generates worlds, not the names of published ones.",
+  "game-title": "A title is a name you coin, and GUM coins none. Its nearest tables emit clusters of synonyms — \"Abundant, plentiful, loaded, rich, wealthy, charged\" — which is raw material for a mood, not a name for a game. Roll the world and the tone below, then name it after what you find.",
   "protagonist-name": "GUM has no name generator. It builds a character as a concept; the concept goes in the notes beside the name.",
   "cast-rename": "Renaming something that already exists is a correction, not an invention.",
   "list-name": "A plot-node list's name is a category you choose — factions, rumours, debts. GUM has no table of categories.",

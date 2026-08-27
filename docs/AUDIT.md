@@ -1166,3 +1166,60 @@ checks · **functions 275/281** · firstrun, flow and layout VERDICT clean. Both
 also walked by hand in a real browser: no game → carry → field, and game open → all 14
 destinations listed with the mission write confirmed in the store.
 
+---
+
+## Reported from play — the wizard's roller offered content of the wrong shape
+
+**F-44 · "Name this game" offered to paste a thesaurus entry into it.** The field asks for a
+title — "The Neverwinter road". It was mapped to the grand oracle's adjective and subject
+tables on a premise stated in `data-gum.js`'s own comment:
+
+> A title is a name, so only the two **word-shaped** grand tables apply — an adjective and a
+> subject can be read as a title ("Abundant" + "Frontier"); a plot hook cannot.
+
+That premise is false, and measurably so: **not one of those 200 rows is a single word.** Every
+row is a cluster of four to eight synonyms — `"Abundant, plentiful, loaded, rich, wealthy,
+charged"`, `"An audience, conference, meeting, council, reunion"`. Median five segments, minimum
+four, maximum eight. So the offer on the title field was to append a thesaurus entry.
+
+This is the same defect the 2026-08-17 changelog row claims to have fixed. That pass correctly
+diagnosed the *class* of problem — GUM emits fiction, not proper names — and then picked the
+"two word-shaped grand tables" without checking whether any row was actually word-shaped.
+A wrong premise, corrected by a fix built on the same wrong premise.
+
+*Fix:* `game-title` moves to `INSPIRE_ABSENT`, beside `game-universe` and `protagonist-name`,
+which already say the honest thing. The entry names the real reason and points somewhere
+useful: roll the world and the tone, then name the game after what you find.
+
+**F-45 · "Plot scope name" offered a reason and an event where a goal belongs.** The field's
+own placeholder is "Find out who burned the caravan" — a goal, in a line. It rolled `plot-hook`
+("Someone made a big sacrifice today" — an event), `motivation` ("A matter of money, debt,
+wrong people" — a reason) and `mission`. Only the third answers "what is this story about?".
+*Fix:* `scope-name: ["mission"]`. One table is not too few — rolling several times within one
+table is GUM p.3's own stated method, and it yields three candidate goals rather than three
+different kinds of answer to three different questions.
+
+**F-46 · "World, tone and theme" led with a synonym cluster.** It asked for "grim frontier
+fantasy, low magic" and offered `grand-adjective` first. GUM has two tables that answer this
+question directly — what kind of place this is, and what is already wrong with it.
+*Fix:* `game-tone: ["location-archetype", "background-problem", "faction-society"]`.
+
+### Verified in the running app, per field
+
+| Field | Now offers |
+|---|---|
+| Name this game | *nothing, with a stated reason* |
+| Universe or RPG | *nothing, with a stated reason* (unchanged) |
+| World, tone and theme | "Urban: Metropolis, city, lively place…" · "Voice: Uprising, rebellion…" · "Blend of multiple cultures into a unique identity" |
+| Inspiration | the grand-oracle triple — what a free notes field is for (unchanged) |
+| Plot scope name | "Retrieve an important or unique artifact" · "Spy on someone to confirm suspicion" · "Stop someone from doing wrong" |
+| Mission | the six plot-seed tables (unchanged, and correct: GUM's seed IS the mission's context) |
+| Starting point | hook · initial lead · location archetype (unchanged) |
+
+### The lesson worth keeping
+
+A mapping is a claim about the *shape* of the rows on the other end of it. This one was written
+from the table's name and blurb rather than from its contents, and no pass could catch it: the
+harness checks that every field either maps to real tables or states why it does not, which
+this satisfied perfectly while being wrong. Checking the rows takes one command.
+

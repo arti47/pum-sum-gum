@@ -175,7 +175,9 @@ function stepUniverse(host) {
   ]));
   const card = el("div", { class: "card" });
   add(card, el("p", { class: "muted", text: "Narrow things down. Which RPG or universe do you want to roleplay in? If it brings no setting, define the world, tone and theme yourself. Mystery or horror? Social or action?" }));
-  add(card, field("Name this game", "title", { placeholder: "The Neverwinter road", inspire: "game-title" }));
+  // no-inspire: a title is a name you coin. GUM's nearest tables emit synonym
+  // clusters, not words, so the offer was to paste a thesaurus entry into it.
+  add(card, field("Name this game", "title", { placeholder: "The Neverwinter road" }));
   // no-inspire: which RPG you are playing is a real-world answer, not one GUM has.
   add(card, field("Universe or RPG", "universe", { placeholder: "D&D 5e · Blade Runner · my own" }));
   add(card, field("World, tone and theme", "tone", { placeholder: "Grim frontier fantasy, low magic", inspire: "game-tone" }));
