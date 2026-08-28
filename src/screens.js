@@ -242,7 +242,7 @@ function editScope(s) {
     title: "Plot sheet",
     body: el("div", null,
       el("p", { class: "muted", text: "One thread of the story: the goal this sheet is about, how it began, and what you are trying to find out. A game can hold several, one after another." }),
-      el("label", { class: "field" }, el("span", { class: "lbl", text: "Scope name" }), name),
+      el("label", { class: "field" }, el("span", { class: "lbl", text: "Plot scope name" }), name),
       inspireBlock("scope-name", name),
       el("label", { class: "field" }, el("span", { class: "lbl", text: "Mission" }), mission),
       inspireBlock("scope-mission", mission),

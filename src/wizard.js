@@ -220,22 +220,41 @@ function stepUniverse(host) {
 }
 
 function stepScope(host) {
-  add(host, forgeOfferCard("A plot scope is one goal with an end in sight. The Forge's mission table is a list of exactly those — roll it if nothing has suggested itself."));
+  add(host, forgeOfferCard("A plot scope is one goal with an end in sight. The Forge rolls a list of exactly those — try it if nothing has suggested itself."));
   add(host, carriedCard([
     ["scopeName", "Plot scope name"], ["mission", "Mission"],
     ["startingPoint", "Starting point"],
   ]));
   const card = el("div", { class: "card" });
-  add(card, el("p", { class: "muted", text: "A plot scope is one defined mission, task or goal. What kind of story do you want to unfold — defeating a powerful enemy, uncovering a mystery, solving an inner problem?" }));
-  add(card, field("Plot scope name", "scopeName", { placeholder: "Find out who burned the caravan", inspire: "scope-name" }));
+  // The old intro read "a plot scope is one defined MISSION, task or goal" and
+  // was followed by two fields, one of them called Mission — the screen defined
+  // the scope as a mission and then asked for both. Reported from play as
+  // impossible to tell apart, and fairly.
+  add(card, el("p", { class: "muted", text: "A plot scope is one storyline with an end in sight — defeating a powerful enemy, uncovering a mystery, solving an inner problem. Two things are asked about it, and they are not the same thing." }));
+  add(card, el("p", { class: "muted" },
+    el("strong", { text: "The name " }),
+    "is a short label. You will see it at the top of every screen while you play. ",
+    el("strong", { text: "The mission " }),
+    "is the paragraph underneath: what is going on, and what your protagonists want out of it."
+  ));
+  add(card, field("Plot scope name", "scopeName", {
+    placeholder: "Find out who burned the caravan",
+    inspire: "scope-name",
+    hint: "A handle, not a description — two to six words. It goes in the header on every screen.",
+  }));
   // One label for one stored field: the scope's mission is called "Mission"
   // here, in the Add-a-scope dialog and on Home. What it is *for* — the initial
   // goals — is guidance, and guidance goes in the hint (§6.6).
+  //
+  // Its placeholder used to be an INSTRUCTION ("A pitch for the situation you
+  // start in…") while the name field's was an EXAMPLE. One field showed and the
+  // other told, which is half of why they read alike — and on a dark screen the
+  // instruction looked like content already in the box.
   add(card, field("Mission", "mission", {
     multiline: true,
     inspire: "scope-mission",
-    placeholder: "A pitch for the situation you start in, and what the PCs are trying to do.",
-    hint: "Draft a pitch for the starting situation — a civil war, a natural disaster, a background problem — and the PCs' initial goals.",
+    placeholder: "Caravans on the Triboar Trail keep burning. A merchant house has hired the party to find out who is behind it and stop them.",
+    hint: "A paragraph, not a title: the situation you are starting in, and the protagonists' initial goals.",
   }));
   add(card, field("Starting point", "startingPoint", {
     multiline: true,
@@ -480,7 +499,7 @@ export function addScopeDialog() {
     title: "New plot sheet",
     body: el("div", null,
       el("p", { class: "muted", text: "A longer game is several plot sheets, each covering one scope. The finished ones stay in the library as a record." }),
-      el("label", { class: "field" }, el("span", { class: "lbl", text: "Scope name" }), name),
+      el("label", { class: "field" }, el("span", { class: "lbl", text: "Plot scope name" }), name),
       el("label", { class: "field" }, el("span", { class: "lbl", text: "Mission" }), mission),
       el("label", { class: "field" }, el("span", { class: "lbl", text: "Plot sheet" }), select)
     ),

@@ -132,7 +132,8 @@ const WALKTHROUGH = [
         "Inspiration — artbooks, films, lore, tarot. Anything you intend to draw on.",
       ] },
 
-      { p: "Step 2 · Scope. A plot scope is one defined mission, task or goal — the thread this plot sheet is about, not the whole campaign. 'Find out who burned the caravan' is a scope. 'Become king' is a campaign." },
+      { p: "Step 2 · Scope. A plot scope is one storyline with an end in sight — the thread this plot sheet is about, not the whole campaign. 'Find out who burned the caravan' is a scope. 'Become king' is a campaign." },
+      { p: "This step asks two things about it, and they are not the same thing. The NAME is a short label — a handle of two to six words, which you will read at the top of every screen while you play. The MISSION is the paragraph underneath it: the situation you are starting in, and what your protagonists want out of it. 'Find out who burned the caravan' is a name; 'Caravans on the Triboar Trail keep burning, and a merchant house has hired the party to find out who is behind it' is a mission." },
       { bullets: [
         "Plot scope name — required.",
         "Mission — a pitch for the situation you start in, and the PCs' initial goals.",

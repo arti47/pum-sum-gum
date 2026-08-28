@@ -1284,3 +1284,42 @@ full seven-minute runs: when instrumenting, anchor on something unique to the bl
 `npm run cycle`, fourteen passes. The prep → Forge → prep journey now reports: *offer taken,
 landed on "Plot seed", roll taken, keep taken, carried back to "Prepare a game"*.
 
+---
+
+## Reported from play — "Plot scope name" and "Mission" were impossible to tell apart
+
+Sent with both fields circled on a screenshot. Three things on that one screen were pushing
+them together, and the app was at fault for all three.
+
+**F-54 · The card's own intro defined the scope AS a mission.** It opened *"A plot scope is one
+defined **mission**, task or goal"* — and was immediately followed by two fields, one of them
+called Mission. The screen told you they were the same thing and then asked for both. Rewritten
+to "one storyline with an end in sight", followed by an explicit contrast line: the **name** is
+a short label you will see at the top of every screen; the **mission** is the paragraph
+underneath saying what is going on and what the protagonists want.
+
+**F-55 · One field showed an example, the other gave an instruction.** "Plot scope name" was
+placeheld with *"Find out who burned the caravan"* — a real answer. "Mission" was placeheld with
+*"A pitch for the situation you start in, and what the PCs are trying to do."* — a description
+of what to write. So one field demonstrated its shape and the other only asserted it, which is
+half of why they read alike. On a dark screen the instruction also looked like content already
+in the box. Mission now carries a real example of the right shape and length, and both fields
+carry a hint naming the difference: *"a handle, not a description — two to six words"* against
+*"a paragraph, not a title"*.
+
+**F-56 · The roller under the name field is labelled "The mission".** `scope-name` maps to
+GUM's mission table — correct by shape, since its rows are goal statements and a scope name is a
+goal in a line (F-45). But the roll display reads "The mission 20 · The mission 11 · The mission
+9", directly above a field called Mission. Left as it is: the mapping is right and the table's
+name is the book's. The two fields being clearly distinct is what stops it mattering, which is
+what F-54 and F-55 fix.
+
+**F-57 · One stored field, two labels — again.** The wizard said "Plot scope name"; the
+Add-a-scope dialog and Home's editor both said "Scope name". This is exactly the defect the
+2026-08-21 row records and guards against, in a place the guard does not look. Unified on "Plot
+scope name".
+
+### Result
+
+Verified by rendering step 2 and reading it back. `npm run cycle`, fourteen passes.
+
