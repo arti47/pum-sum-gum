@@ -1378,3 +1378,40 @@ your game. Adapting them is the intended use, and the block's own framing now sa
 Verified by rendering step 2, opening both blocks, and reading back what "Use all" writes.
 `npm run cycle`, fourteen passes.
 
+---
+
+## Reported from play (third time) — the name field's roller does not help
+
+**F-62 · The same result was offered twice.** Visible in the screenshot: *"The mission 10 — Spy
+on someone to confirm suspicion"*, twice, above a third. `scope-name` mapped to one table, and
+`pickTables` pushes that table three times; three independent d20 rolls on a 20-row table
+collide about **14%** of the time. Rolling repeatedly within one table is GUM p.3's own method,
+but showing the identical row twice as two separate offers is not an offer — it is a visible
+bug. `rollDistinct()` now re-rolls a repeat, bounded at eight tries, and accepts a duplicate
+rather than looping if the table is too small to avoid one.
+
+**F-63 · A scope name cannot be rolled, and two rounds of narrowing the mapping missed why.**
+The field wants *"Find out who burned the caravan"*. The caravan is the player's own noun. GUM
+generates fiction, not the specific nouns of a game it has never seen — so the best any mapping
+could do was hand over a generic goal to be rewritten from scratch, which is not help.
+
+The mapping had already been narrowed twice: all six plot-seed tables → the mission table alone
+(F-45). Both passes reasoned about the *shape* of the rows — goal-shaped, right length — and
+both missed that shape was never the problem. The subject was.
+
+*Fix:* `scope-name` joins `INSPIRE_ABSENT`, beside `game-title`, which is the same defect and
+was fixed the same way one round earlier (F-44). The entry says why and gives the advice that
+actually works: **write the mission first, then lift the name out of it.** The field's hint says
+it too, and the Mission field immediately below now rolls a whole six-table seed (F-58), so the
+route is one screen long.
+
+Ten fields now state a reason for offering no roll.
+
+### The pattern, recorded because it has now cost three rounds
+
+Every one of F-44, F-45 and F-63 is the same reasoning error: judging a table mapping by whether
+its rows *look* like the field's content, without asking whether they could be *about* the
+player's game. A field wanting a proper noun, a title, or a handle for something only the player
+knows cannot be served by a generic table, however well-shaped its rows. The test is not "is
+this the right shape?" but "could this row mention the thing the player is naming?".
+

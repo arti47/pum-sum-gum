@@ -1173,13 +1173,11 @@ export const GUM_FOR_FIELDS = {
   "game-tone": ["location-archetype", "background-problem", "faction-society"],
   "game-inspiration": ["grand-action", "grand-adjective", "grand-subject"],
 
-  // The plot scope and its mission (PUM p.3 step 2). A scope NAME is a goal
-  // stated in a line — "find out who burned the caravan" — and exactly one GUM
-  // table is that shape: the mission. A plot hook is an event and a motivation
-  // is a reason; neither answers "what is this story about?", and both were
-  // being offered here. One table is not too few: rolling several times within
-  // one table is GUM p.3's own method, and it yields three candidate goals.
-  "scope-name": ["mission"],
+  // The plot scope and its mission (PUM p.3 step 2). "scope-name" is NOT here —
+  // see INSPIRE_ABSENT. Two rounds of narrowing it (all six seed tables, then
+  // the mission table alone) both missed the point, which is not the shape of
+  // the rows but their subject: a scope name is a handle for YOUR fiction, and
+  // GUM has no table of your nouns.
   "scope-mission": ["plot-hook", "motivation", "mission", "initial-lead", "caveat", "opposition"],
   "scope-start": ["plot-hook", "initial-lead", "location-archetype"],
   "scope-notes": ["grand-action", "grand-adjective", "grand-subject"],
@@ -1229,6 +1227,7 @@ export const GUM_SEED_EXAMPLE = {
 
 export const INSPIRE_ABSENT = {
   "game-universe": "Which RPG or fiction you are playing in is a real-world answer — D&D 5e, Blade Runner, your own. GUM generates worlds, not the names of published ones.",
+  "scope-name": "A plot scope name is a handle for your own fiction — \"find out who burned THE CARAVAN\". The caravan is yours; GUM has no table of your nouns, so the best it could offer was a generic goal you would have to rewrite from scratch anyway. Write the mission below first: the name is usually a phrase you can lift straight out of it.",
   "game-title": "A title is a name you coin, and GUM coins none. Its nearest tables emit clusters of synonyms — \"Abundant, plentiful, loaded, rich, wealthy, charged\" — which is raw material for a mood, not a name for a game. Roll the world and the tone below, then name it after what you find.",
   "protagonist-name": "GUM has no name generator. It builds a character as a concept; the concept goes in the notes beside the name.",
   "cast-rename": "Renaming something that already exists is a correction, not an invention.",

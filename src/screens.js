@@ -243,7 +243,8 @@ function editScope(s) {
     body: el("div", null,
       el("p", { class: "muted", text: "One thread of the story: the goal this sheet is about, how it began, and what you are trying to find out. A game can hold several, one after another." }),
       el("label", { class: "field" }, el("span", { class: "lbl", text: "Plot scope name" }), name),
-      inspireBlock("scope-name", name),
+      // no-inspire: see INSPIRE_ABSENT — a scope name is a handle for the
+      // player's own fiction, which GUM has no table for.
       el("label", { class: "field" }, el("span", { class: "lbl", text: "Mission" }), mission),
       inspireBlock("scope-mission", mission),
       el("label", { class: "field" }, el("span", { class: "lbl", text: "Starting point" }), start),

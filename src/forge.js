@@ -576,6 +576,22 @@ function inspireFor(fieldId, append, multiline = false) {
     add(out, tools);
   };
 
+  // Rolling the same table more than once is GUM p.3's own method, but showing
+  // the identical row twice as two separate offers is not an offer — it is a
+  // bug the player can see. Re-roll a repeat, bounded, and accept a duplicate
+  // rather than loop if the table is too small to avoid one.
+  function rollDistinct(tableIds) {
+    const out = [];
+    for (const id of tableIds) {
+      let pick = rollGum({ tableId: id });
+      for (let tries = 0; tries < 8 && out.some((p) => p.answer === pick.answer); tries++) {
+        pick = rollGum({ tableId: id });
+      }
+      out.push(pick);
+    }
+    return out;
+  }
+
   const roll = () => {
     // A field asking for a PARAGRAPH gets the whole mapped set, not three of it.
     // The mission field maps to exactly GUM's six-table plot seed, and three of
@@ -585,10 +601,10 @@ function inspireFor(fieldId, append, multiline = false) {
     if (multiline && ids.length > INSPIRE_WORDS) return rollAll();
     const picks = pickTables(ids, offset);
     offset = (offset + INSPIRE_WORDS) % ids.length;
-    show(picks.map((id) => rollGum({ tableId: id })), false);
+    show(rollDistinct(picks), false);
   };
 
-  const rollAll = () => show(ids.map((id) => rollGum({ tableId: id })), true);
+  const rollAll = () => show(rollDistinct(ids), true);
 
   // Nothing is rolled until the block is opened: PUM p.10 asks you not to roll
   // when you already know, and an unopened field is a field you may well know.

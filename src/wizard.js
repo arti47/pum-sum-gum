@@ -237,10 +237,12 @@ function stepScope(host) {
     el("strong", { text: "The mission " }),
     "is the paragraph underneath: what is going on, and what your protagonists want out of it."
   ));
+  // no-inspire: a scope name is a handle for the player's OWN fiction — "who
+  // burned THE CARAVAN". GUM has no table of their nouns, so every offer was a
+  // generic goal they would rewrite from scratch. Reported from play twice.
   add(card, field("Plot scope name", "scopeName", {
     placeholder: "Find out who burned the caravan",
-    inspire: "scope-name",
-    hint: "A handle, not a description — two to six words. It goes in the header on every screen.",
+    hint: "A handle, not a description — two to six words. It goes in the header on every screen. Nothing coming? Write the mission below first, then lift the name out of it.",
   }));
   // One label for one stored field: the scope's mission is called "Mission"
   // here, in the Add-a-scope dialog and on Home. What it is *for* — the initial
