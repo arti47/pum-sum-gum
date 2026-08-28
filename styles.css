@@ -569,6 +569,20 @@ details.acc:target > summary, details.acc.flash > summary { background: var(--ac
 .notice { border-left: 3px solid var(--accent); }
 .notice h3 { margin-top: 0; }
 
+/* An inspiration offer: what it is, then what it says. A bare sentence gave no
+   clue which of the three rolled tables it came from. */
+.btn-col { display: flex; flex-direction: column; gap: .4rem; margin-top: .5rem; }
+/* .btn is an inline-flex row, which laid the table label out BESIDE the text in
+   a narrow column instead of above it. This one is a block. */
+.btn.inspire-pick {
+  display: block; text-align: left; padding: .45rem .6rem; line-height: 1.35;
+}
+.ip-table {
+  display: block; font-size: .68rem; color: var(--ink-3); font-weight: 400;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.ip-text { display: block; }
+
 /* Glossary chips under every "what this does" note (§6.6 layer 0). */
 .term-row {
   display: flex; flex-wrap: wrap; gap: .35rem; align-items: center;

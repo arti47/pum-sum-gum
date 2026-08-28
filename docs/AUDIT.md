@@ -1323,3 +1323,58 @@ scope name".
 
 Verified by rendering step 2 and reading it back. `npm run cycle`, fourteen passes.
 
+---
+
+## Reported from play — the inspiration rolls did not fit the fields they sat under
+
+Both rollers circled on screenshots. Four defects, and the first two are the substance of it.
+
+**F-58 · A field that asks for a paragraph was given three disconnected fragments.** The
+Mission field's hint says *"a paragraph, not a title"*. Its mapped set is exactly GUM's
+six-table plot seed — but the block rolled **three of the six** and rotated, so the player saw a
+hook, a motivation and a mission from three different questions, with no relationship to each
+other. "Use all three" then joined them with a middot:
+
+> `You are being watched, or followed · A relationship matter, someone you care · Reveal or divulge a truth or propaganda`
+
+Three of six is neither the book's method (all six, read together, GUM p.3) nor a paragraph.
+*Fix:* a multiline field rolls its **whole** mapped set. The Mission field now offers all six,
+and "Use all 6" writes them as labelled lines:
+
+```
+Plot hook: Invited to a private meeting, it's important
+Motivation: A matter of money, debt, wrong people
+The mission: Capture an enemy, dead or alive
+Initial lead: Enemy next move has been revealed
+Caveat: Divided opinions. Enemy needed/justified
+The opposition: You are very outnumbered by them
+```
+
+That is a skeleton to write a paragraph over, which is what the field asked for.
+
+**F-59 · The offers did not say which table they came from.** Each was a bare sentence, with the
+table names in one small line above in matching order — so three results from three *different*
+tables read as three unrelated sentences, and the player had to map them back by counting.
+Each offer now carries its table and roll above the text.
+
+**F-60 · The block promised words and delivered sentences.** "Stuck? Roll three words" — every
+row in every mapped table is a phrase or a clause; not one is a word. Renamed to "Stuck? Roll
+some ideas", which is what it does.
+
+**F-61 · The middot join put fragment soup into a textarea.** `appendToField` already knew that
+a textarea joins with a newline and an input with a middot; `keepInspiration` did not, and
+flattened its parts before the append ever saw them. Now it joins on the same rule.
+
+### Not changed, and why
+
+The Plot scope name field rolls the mission table three times and offers e.g. *"Transport
+someone to safety" · "Convince them to change their mind" · "Prevent an imminent planned
+attack"*. These are goals in four to six words, which is exactly what that field asks for
+(F-45), and the dangling pronouns are the book's own text — GUM cannot know who *them* is in
+your game. Adapting them is the intended use, and the block's own framing now says so.
+
+### Result
+
+Verified by rendering step 2, opening both blocks, and reading back what "Use all" writes.
+`npm run cycle`, fourteen passes.
+

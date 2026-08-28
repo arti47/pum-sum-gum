@@ -509,8 +509,14 @@ function pickTables(ids, offset) {
 
 // Only what the player actually uses is journalled (a recorded decision): the
 // dice that produced a kept word are counted, the discarded ones are not.
-function keepInspiration(parts, fieldId) {
-  const text = parts.map((p) => p.answer).join(" · ");
+function keepInspiration(parts, fieldId, multiline = false) {
+  // Several parts come from several DIFFERENT tables — a hook, a motivation, a
+  // mission — and joining them with a middot produced fragment soup in a field
+  // whose own hint asks for a paragraph. Labelled lines instead: the three read
+  // as a seed to write from, and each line says what it is.
+  const text = parts.length === 1
+    ? parts[0].answer
+    : parts.map((p) => `${p.table.name}: ${p.answer}`).join(multiline ? "\n" : " · ");
   store.addJournal({
     kind: "gum",
     title: parts.length === 1
@@ -522,7 +528,7 @@ function keepInspiration(parts, fieldId) {
   return text;
 }
 
-function inspireFor(fieldId, append) {
+function inspireFor(fieldId, append, multiline = false) {
   if (!Settings.gum()) return null;
   const ids = inspireTables(fieldId);
   let offset = 0;
@@ -530,21 +536,29 @@ function inspireFor(fieldId, append) {
   const out = el("div");
   const body = el("div", { class: "body" }, out);
   const block = el("details", { class: "explain inspire" },
-    el("summary", null, "Stuck? Roll three words"),
+    el("summary", null, "Stuck? Roll some ideas"),
     body
   );
 
-  const use = (parts) => append(keepInspiration(parts, fieldId));
+  const use = (parts) => append(keepInspiration(parts, fieldId, multiline));
 
   const show = (parts, all) => {
     out.replaceChildren();
-    add(out, el("p", { class: "cite", text: parts.map((p) => `${p.table.name} ${p.roll}`).join(" · ") }));
-    const words = el("div", { class: "btn-row" });
+    // Each offer used to be a bare sentence, with the table names in one cite
+    // line above in matching order. Three lines from three DIFFERENT tables — a
+    // hook, a motivation, a mission — then read as three unrelated sentences,
+    // and the player had to map them back by counting. Each line now says what
+    // it is, so the set reads as a seed.
+    const words = el("div", { class: "btn-col" });
     for (const p of parts) {
       add(words, el("button", {
-        class: "btn small", "aria-label": `Use "${p.answer}"`,
+        class: "btn small inspire-pick",
+        "aria-label": `Use the ${p.table.name} result: ${p.answer}`,
         onclick: () => use([p]),
-      }, p.answer));
+      },
+        el("span", { class: "ip-table", text: `${p.table.name} ${p.roll}` }),
+        el("span", { class: "ip-text", text: p.answer })
+      ));
     }
     add(out, words);
     const tools = el("div", { class: "btn-row" });
@@ -563,6 +577,12 @@ function inspireFor(fieldId, append) {
   };
 
   const roll = () => {
+    // A field asking for a PARAGRAPH gets the whole mapped set, not three of it.
+    // The mission field maps to exactly GUM's six-table plot seed, and three of
+    // six is neither the book's method (all six, read together) nor a paragraph
+    // — it is three disconnected fragments, which is what this looked like in
+    // play.
+    if (multiline && ids.length > INSPIRE_WORDS) return rollAll();
     const picks = pickTables(ids, offset);
     offset = (offset + INSPIRE_WORDS) % ids.length;
     show(picks.map((id) => rollGum({ tableId: id })), false);

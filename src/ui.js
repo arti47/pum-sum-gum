@@ -127,7 +127,10 @@ function appendToField(input, text) {
 // registered, or GUM switched off).
 export function inspireBlock(fieldId, input) {
   if (!inspireFactory || !fieldId) return null;
-  return inspireFactory(fieldId, (text) => appendToField(input, text));
+  // A field that asks for a paragraph and one that asks for a handle want
+  // different things from the same tables, so the block is told which it is.
+  const multiline = !!(input && input.tagName === "TEXTAREA");
+  return inspireFactory(fieldId, (text) => appendToField(input, text), multiline);
 }
 
 // `notes` adds a second field below the first. It exists because GUM builds a

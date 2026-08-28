@@ -381,7 +381,8 @@ WALKTHROUGH.push(
     id: "inspire",
     title: "Three words beside a blank",
     blocks: [
-      { p: "Every text field the app can serve carries a collapsed line: 'Stuck? Roll three words'. Open it and three GUM tables roll, chosen by what the field is for — a character field pulls archetypes and flaws, a location field pulls features and purpose, the mission field pulls the whole plot seed." },
+      { p: "Every text field the app can serve carries a collapsed line: 'Stuck? Roll some ideas'. Open it and GUM tables roll, chosen by what the field is for — a character field pulls archetypes and flaws, a location field pulls features and purpose, the mission field pulls the whole plot seed." },
+      { p: "Each result says which table it came from, because several results come from several DIFFERENT tables and three unlabelled sentences read as three unrelated ones. A field that asks for a paragraph rolls its WHOLE mapped set rather than three of it, and 'Use all' writes them in as labelled lines — a skeleton to write over, not a sentence to keep." },
       { bullets: [
         "Each word is a chip that appends to what you have written. It never replaces it.",
         "Roll again rotates through the field's tables, so extras are not wasted.",
@@ -763,7 +764,7 @@ const REFERENCE = [
       { bullets: [
         "Save · Cancel · Close · Done · Add · Remove · Delete · Edit · Open · Rename — the standard dialog verbs.",
         "Undo — in the toast raised by any mutating action, and in Settings as a fallback. One player action is one undo, however many things it changed.",
-        "Stuck? Roll three words — the inspiration block, in every text field GUM can serve. Use this · Use all three · Roll again · All N tables.",
+        "Stuck? Roll some ideas — the inspiration block, in every text field GUM can serve. Each offer is a button naming its table and its roll; below them, Use all three (or Use all N) · Roll again · All N tables.",
         "What this does — the folded per-screen note, with Read the rule → where a rules entry matches.",
       ] },
     ],
