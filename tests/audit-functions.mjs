@@ -411,7 +411,19 @@ const journeys = [];
   let nodeLine = false, unprinted = false, tries = 0;
   for (; tries < 40 && !(nodeLine && unprinted); tries++) {
     await seed(MID, "play", "track");
-    if (!(await tapText(/random prompt/))) break;
+    // A missed tap is not a reason to stop rolling. If a beat from the previous
+    // try is still open the pinned bar is gone, and breaking here ended the walk
+    // on try one — which is how this journey reported both surfaces unreachable
+    // on one run and reached on the next. Dismiss whatever is open and roll on.
+    if (!(await tapText(/random prompt/))) {
+      await page.evaluate(async () => {
+        for (const b of document.querySelectorAll(".modal-back")) b.remove();
+        (await import("./src/viewstate.js")).clearTransient();
+        (await import("./src/router.js")).go("play", "track");
+      });
+      await page.waitForTimeout(60);
+      if (!(await tapText(/random prompt/))) continue;
+    }
     await page.waitForTimeout(70);
     const seen = await page.evaluate(() => {
       const t = document.querySelector("#screen")?.innerText || "";
