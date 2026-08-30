@@ -80,7 +80,97 @@ The app itself is at <https://arti47.github.io/pum-sum-gum/>.
 
 ---
 
-## Part 1 · Learning it in play order
+## Part 1 · How to actually play
+
+*Starting when the page is blank, keeping a session moving, and ending a scene, a session and a story so they feel finished.*
+
+### Your first ten minutes
+
+The hard part of solo play is not the rules. It is the blank page — the moment where you are supposed to say something and nothing comes. Everything below exists to get you past that in under ten minutes.
+
+1 · Do not invent a story. Invent a situation and a want, in one sentence: somebody wants something, and something is in the way. “A courier has to reach the far station before the storm closes the pass, and the road is watched.” That sentence is your plot scope. It is enough. A story is what happens when you play it; you cannot write it in advance and you are not supposed to.
+
+`More → Home → Prepare a game`
+
+2 · Write three plot nodes, not thirty. One potential problem, one useful finding, one pending question — taken straight out of the sentence you just wrote. For the courier: “the watchers on the road”, “a shelter no one has burned yet”, “who pays the watchers?”. Empty slots are the machine's invitation to invent later, and whatever you invent stays in the list.
+
+> **Why.** The single commonest way to stall before you start is filling every list. Sixty entries is an afternoon of homework, and the game rolls d10 on lists that are mostly blank anyway.
+
+3 · Write the starting point as one sentence you would actually say out loud, and open in the middle of something: “The pass is an hour behind you and the light is going.” Not “the courier is a woman of thirty who grew up in the valley” — that is a character sheet, not an opening.
+
+4 · Now say two or three sentences of narration, out loud or in the journal, describing what your protagonist can see and hear. Then have them DO something physical in the first minute — knock, climb, hide, call out. Not think, not remember. Do. Action creates the first question, and a question is what the machine answers.
+
+5 · Only now ask the app anything. Your first roll should be a real uncertainty raised by that action: is there smoke from the shelter? Are the watchers still there? That is Oracles → Yes or No, in the register that matches who is answering.
+
+`Oracles → Yes or No`
+
+> **Watch out.** If you have opened the app and rolled four things before saying a single sentence of story, you are playing the machine instead of the game. Close the app, narrate a paragraph, and come back with a question.
+
+### Keeping it going for an hour
+
+Play has a rhythm, and the rhythm is not “roll, read, roll”. It is: narrate until you hit something you genuinely do not know → ask the app → say the answer back into the fiction in your own words → keep narrating. The middle step is the short one.
+
+Roll when both of these are true: you do not know, and the answer changes what happens next. If only one is true, decide it yourself and keep moving — the books are explicit that you may ignore, re-roll or reinterpret anything.
+
+*PUM p.8 · p.10*
+
+Two ways a session dies, and the fix for each:
+
+- Dice soup — every sentence becomes a roll, the fiction thins out, and the answers start contradicting each other. Fix: one or two questions per matter. If your last three actions were rolls, narrate two sentences before the next one.
+- Drift — you are talking, but nothing is at stake and no box has crossed in twenty minutes. Fix: call a plot beat. A beat is the machine's way of making the world act on you instead of waiting for you.
+
+When you are properly stuck, do not ask another oracle — oracles answer questions, and being stuck means you have run out of questions. Roll a random prompt instead. If it lands on an empty node slot, invent the thing on the spot; it becomes a permanent entry in that list.
+
+`Play → Random prompt`
+
+A scene is about five to fifteen minutes, or three to six exchanges. When a scene stops producing change, that is what the intervention check is for — and if the check does not revive it, close the scene rather than letting it fizzle.
+
+`Scene → Roll an intervention check`
+
+Cross a box only when something changed for your protagonists: they learned it, lost it, committed to it, or it got worse. A beat that turned out to be scenery is a beat you played and did not confirm. The track is a measure of the story, not of how often you rolled.
+
+Write one line of your own in the journal per scene, in your words, not the app's. The rolls are recorded automatically; what is not recorded is what any of it meant. That line is what makes it possible to pick the game up a week later.
+
+`Journal → Write an entry`
+
+### Ending a scene, a session, and a story
+
+Three different endings, three different moves. Most solo games that die do so because one of these was never made.
+
+A scene ends on a change, not on a lull. Close it the moment something has shifted — someone decided, something was learned, something got worse — and let the closure roll tell you how the world responds and what it hands you next. That hook is your opening for the following scene, which means you never start from nothing again.
+
+`Scene → Roll a scene closure`
+
+A session ends best while you still want to keep going. Stop on a hook rather than at a natural pause, mark the break, and write one line about what you expect to happen next — not what will happen, what you expect. Next session begins by finding out whether you were right, which is the easiest possible restart.
+
+`Journal → Session break`
+
+A story ends when the plot track fills — and the last third of the track is where you stop introducing and start paying off. Once you are in the final section, no new questions: use the beats to answer the pending ones, and let the useful findings you wrote in prep be what the protagonists actually get.
+
+> **Why.** An ending that lands has three parts: it answers the question the scope was about, it costs something, and it leaves exactly one thing open. The open thing is the seed of the next plot sheet — a new scope in the same game, with the same cast.
+
+And a scope can end before the track fills. If the real question has been answered and the remaining boxes are just more incident, say so and end it — the app records that you ended it rather than pretending the track resolved. Sandbox and Improvised sheets have no track at all, so this is the only way they ever finish.
+
+`Play → Plot track → End this scope`
+
+*PUM p.7*
+
+### If you are stuck right now
+
+In order. Stop at the first one that unsticks you.
+
+1. Say out loud what your protagonist can see. Two sentences. Do not roll anything.
+2. Have them do one physical thing about it.
+3. Ask one Yes or No question that action raises — and take the first answer.
+4. Still nothing? Roll a random prompt and read it as loosely as you like. It is inspiration, not instruction.
+5. Still nothing? Close the scene, take the closure's hook, and open a new scene somewhere else.
+6. Still nothing? Stop for today and write one line about what you wish would happen. That line is tomorrow's opening.
+
+*PUM p.10 — the advice chapter says the same thing at more length, and is in the app under More → Rules.*
+
+---
+
+## Part 2 · Learning it in play order
 
 *Every function, introduced where you would first meet it, with the reason the rule exists.*
 
@@ -412,7 +502,7 @@ The library. One game holds many plot sheets — one per scope — and finished 
 
 ---
 
-## Part 2 · Four scenarios
+## Part 3 · Four scenarios
 
 *Four games on four structurally different plot sheets. Every quoted result is the real row at that die value.*
 
@@ -625,7 +715,7 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 
 ---
 
-## Part 3 · Complete reference
+## Part 4 · Complete reference
 
 *Every screen and every control, for looking something up.*
 
@@ -725,7 +815,7 @@ Rules
 - Errata (folded) — where the books disagree with themselves.
 - Where the app does not roll (folded) — the eight fields with no inspiration block, and why.
 
-Tutorial — this document. Settings — see Part 1.
+Tutorial — this document. Settings — see Part 2.
 
 - Your data: Export JSON (also pinned, with Import beside it) · Import JSON · Export readable · Check my data · Undo.
 - Export and import dialogs: Copy · Download · Close · Import · Cancel.
@@ -783,7 +873,7 @@ Every entry carries a kind, and the filter row uses it. Knowing the titles the a
 
 ---
 
-## Part 4 · What the app does not do
+## Part 5 · What the app does not do
 
 *The deliberate omissions, and the reasoning behind each.*
 
