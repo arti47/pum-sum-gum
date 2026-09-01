@@ -21,7 +21,7 @@ const FILTERS = [
   ["all", "All"], ["beat", "Beats"], ["oracle", "Oracles"], ["yesno", "Yes/No"],
   ["sum", "SUM"], ["gum", "GUM"], ["scene", "Scenes"], ["node", "Nodes"],
   ["track", "Track"], ["timed", "Timed"], ["note", "Notes"], ["prep", "Prep"],
-  ["session", "Sessions"],
+  ["session", "Sessions"], ["ending", "Endings"],
 ];
 
 export function renderJournal(host, section) {

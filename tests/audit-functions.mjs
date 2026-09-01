@@ -535,6 +535,24 @@ const journeys = [];
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
+// 8c. The coach's starting-point dialog exists only while the starting point is
+// blank — a state the mid fixture never has, since it ships one written.
+{
+  const blank = structuredClone(MID);
+  {
+    const g = blank.games[0];
+    const sc = g.scopes.find((x) => x.id === g.activeScopeId) || g.scopes[0];
+    sc.startingPoint = "";
+    sc.openScene = null;
+    sc.lastBeat = null;
+  }
+  await seed(blank, "play", "track");
+  const offered = await tapText(/write the starting point/);
+  if (offered) { await page.waitForTimeout(120); await followDialog(0); }
+  journeys.push(`coach → starting point: ${offered ? "taken" : "NOT OFFERED"}`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
 // 9. Two games, so switching between them is reachable.
 {
   await seed(MID, "more", "home");

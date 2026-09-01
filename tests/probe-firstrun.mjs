@@ -112,6 +112,14 @@ await tap("Save");
 await step("finish prep", "Start playing");
 await tap("Stay here");
 
+// The starting point is optional during prep, so a first-time player commonly
+// arrives on the Play tab without one — and the coach's first job is to say so.
+// This step exists because the app now guides that gap rather than leaving the
+// player on a screen whose next move they cannot see.
+await step("coach: write the starting point", "Write the starting point");
+await type("", "The raid site, three days cold, with the lord's rider still waiting.");
+await tap("Save");
+
 await step("open a scene", "Open a scene");
 await step("roll the opener", "Roll a scene opener");
 await step("ask an oracle", "Ask an oracle");

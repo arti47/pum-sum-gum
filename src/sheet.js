@@ -19,6 +19,7 @@ import { openRule } from "./screens.js";
 import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-plot.js";
 import { BEAT_TRIGGERS, FIRST_BEAT_COACH } from "../data-guidance.js";
 import { renderCast } from "./cast.js";
+import { coachCard } from "./coach.js";
 import { registerClearer } from "./viewstate.js";
 
 // The beat currently on the table, if any. Held in module state so a re-render
@@ -63,6 +64,11 @@ function renderTrack(host, scope) {
   const sheet = plotSheet(scope.sheetId);
   add(host, el("h1", { text: scope.name }));
   add(host, el("p", { class: "lede", text: sheet ? `${sheet.name} · ${sheet.tagline}` : "" }));
+  // The coach leads. It replaces the old "What now" card, which said one true
+  // thing about the middle of a session and nothing about starting or ending,
+  // and which sat below the beat controls where a player looking for "what do I
+  // do now" would already have given up.
+  add(host, coachCard());
   add(host, explain([
     "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
     "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
@@ -126,9 +132,13 @@ function renderTrack(host, scope) {
   // Controls in the order the book performs them (§6.3.3): you call a beat, you
   // play it, and only then do you cross a box. The track's live position is
   // already in the persistent header, so it does not need to lead here.
-  add(host, openBeat ? beatCard(scope) : beatChooser(scope));
+  // Anchored so the coach's "go to the beat" can scroll here rather than
+  // navigating to the screen it is already on.
+  const beats = openBeat ? beatCard(scope) : beatChooser(scope);
+  if (beats) beats.id = "beat-controls";
+  add(host, beats);
   add(host, trackCard(scope));
-  add(host, whatNowCard(scope));
+
   add(host, triggersCard());
 
   // The primary action stays above the fold, pinned, carrying its context (§6.3.2).
@@ -147,43 +157,6 @@ function renderTrack(host, scope) {
 // PUM p.5's flowchart is a loop, and the loop crosses tabs: a scene opens, you
 // ask, you call a beat, you confirm, you close. Without an onward route at each
 // step the player drives the whole loop from the tab bar (§6.3.6, §6.3.9).
-function whatNowCard(scope) {
-  const card = el("div", { class: "card" });
-  const open = scope.openScene;
-  add(card, el("div", { class: "card-head" },
-    el("h3", { text: "What now" }),
-    el("span", { class: "cite", text: "PUM p.5" })
-  ));
-
-  if (isEnded(scope)) {
-    add(card, el("p", { class: "muted", text: isResolved(scope)
-      ? "The track is full. Bring this thread to its end, then open the next plot sheet."
-      : "You called this scope finished. Start the next plot sheet, or reopen it from the track below." }));
-    add(card, el("button", { class: "btn wide", onclick: () => go("more", "home") }, "Start another plot sheet"));
-    return card;
-  }
-
-  if (openBeat) {
-    add(card, el("p", { class: "muted", text: "A beat is on the table. Play it out in the fiction, then confirm it above — or decide it did not matter." }));
-    return card;
-  }
-
-  add(card, el("p", { class: "muted", text: open
-    ? "A scene is running. Roleplay it, ask when you do not know, and call a beat when a moment might matter to the bigger picture."
-    : "No scene is open. SUM's opener exists for exactly the moment you know a scene should happen but not how it starts." }));
-
-  const row = el("div", { class: "btn-row" });
-  if (!open) {
-    add(row, el("button", { class: "btn", onclick: () => go("scene", "arc") }, "Open a scene"));
-  } else {
-    add(row, el("button", { class: "btn", onclick: () => go("scene", "arc") }, "Back to the scene"));
-  }
-  add(row, el("button", { class: "btn", onclick: () => go("oracles", "yesno") }, "Ask an oracle"));
-  add(row, el("button", { class: "btn", onclick: () => go("journal", "entries") }, "Write it down"));
-  add(card, row);
-  return card;
-}
-
 function trackCard(scope) {
   const card = el("div", { class: "card" });
   const sections = sectionsOf(scope);

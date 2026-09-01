@@ -155,3 +155,81 @@ export const MACHINES = [
 // The app must not pretend to resolve tasks.
 export const NO_TASK_RESOLUTION =
   "PUM resolves nothing. It never says whether an action succeeded — it says what the world offers. Bring your own RPG's rules for task resolution, or narrate the outcome yourself.";
+
+// --- The session coach (§6.6 layer -1) --------------------------------------
+//
+// Every teaching surface this app had was a DOCUMENT: a walkthrough, a glossary,
+// a rules library, per-screen notes. All of them ask the player to go and read,
+// and the report from play was "I still don't know how to start, sustain, or end
+// a game — I'm too lazy to read the manual, I want to play straight from the
+// app."
+//
+// That is a fair request and none of the reading surfaces answer it. This one
+// does: the app knows exactly where you are in a session, so it can say the ONE
+// next thing and hand you the button. Ordered by the arc of a session, and read
+// by src/coach.js against live state — never by the player choosing a stage.
+//
+// `say` is what is true right now. `next` is the single thing to do about it.
+export const SESSION_STAGES = {
+  "no-game": {
+    title: "Start here",
+    say: "Nothing exists yet. A game is a world, a storyline, and the people you play.",
+    next: "Prepare a game — four short steps, and everything is editable afterwards.",
+  },
+  "no-start": {
+    title: "One thing left before you play",
+    say: "The game exists, but you have not said where it opens. PUM asks for this on purpose: a story with no first scene never gets one.",
+    next: "Write the starting point — two sentences on where the first scene happens and what is introduced there.",
+  },
+  "first-scene": {
+    title: "Ready. Open your first scene",
+    say: "Everything the machine needs is written down. Play happens inside scenes: one continuous stretch of story in one place.",
+    next: "Open a scene. If you do not know how it begins, roll the opener and it will tell you what to describe first.",
+  },
+  "scene-open": {
+    title: "A scene is running",
+    say: "This is most of the game: you play your protagonists and narrate what happens. The machine is here for the moments you would rather not decide.",
+    next: "Keep playing. Ask an oracle when you genuinely do not know something, and call a plot beat when a moment could matter to the bigger story.",
+  },
+  "beat-open": {
+    title: "A beat is on the table",
+    say: "The machine has offered something. It is a prompt, not an instruction — read it, decide what it means here, and play that out.",
+    next: "Play it out in the fiction first. Then confirm it if it mattered, or say it did not — both are legitimate, and only confirming moves the track.",
+  },
+  "scene-over": {
+    title: "Between scenes",
+    say: "That scene is closed and its consequences are in the journal. A story is a run of scenes, not one long one.",
+    next: "Open the next scene, wherever and whenever it makes sense to cut to.",
+  },
+  "endgame": {
+    title: "This is the last stretch",
+    say: "One box left on the track. Whatever the next confirmed beat turns out to be, it is your climax — so play it for that.",
+    next: "Play toward the ending you can now see, then confirm the last beat when it lands.",
+  },
+  "resolved": {
+    title: "The story has reached its end",
+    say: "The track is full. That is the machine saying this storyline is over — not that your game is.",
+    next: "Write how it ended, in a sentence or a page. Then start the next storyline, or finish the game here.",
+  },
+  "ended": {
+    title: "You called this one finished",
+    say: "You ended this storyline by saying so, which is always allowed and is the only way a trackless sheet ends.",
+    next: "Write how it ended if you have not, then start the next storyline or finish the game.",
+  },
+  "closed": {
+    title: "Finished, and written down",
+    say: "This storyline is over and its ending is in the journal.",
+    next: "Start the next plot sheet to continue in the same world, or leave the game here — everything stays readable.",
+  },
+};
+
+// What the app asks for when a storyline ends. Not a rule from any book — the
+// books have no epilogue procedure (a deliberate absence, like ruling A6's
+// missing session boundary) — but ending well is a third of what a player needs
+// and no surface offered it.
+export const ENDING_PROMPTS = [
+  "How did it end? One sentence is enough.",
+  "Who got what they wanted, and who did not?",
+  "What is different in the world now?",
+  "What is still unfinished — a thread you might pick up in the next storyline?",
+];

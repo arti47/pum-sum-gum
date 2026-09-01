@@ -714,6 +714,10 @@ Forge (hidden when GUM is off)
 - Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.
 - Rolled in the Forge (in game prep) → one button per field on that step, plus Dismiss.
 - Do not know yet? → Invent one in the Forge → — on prep steps 1 and 2, when nothing has suggested itself. The draft is kept while you go and look.
+- The coach card at the top of the Play tab — a heading saying where you are, a sentence of what is true, and one Next line. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.
+- Beside it, at some stages only: Ask an oracle · Call a plot beat · Write it down · Read the whole story.
+- Where does this open? → Starting point — the dialog the coach opens when the starting point is still blank.
+- How did it end? → The ending — the dialog that closes a storyline. It writes an Endings entry into the journal and marks the scope finished.
 - What a rolled seed looks like — a fold on Forge → Plot seed: one real roll of the six, read as one situation, and where each of the six lines ended up.
 
 Rules

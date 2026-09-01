@@ -1415,3 +1415,80 @@ player's game. A field wanting a proper noun, a title, or a handle for something
 knows cannot be served by a generic table, however well-shaped its rows. The test is not "is
 this the right shape?" but "could this row mention the thing the player is naming?".
 
+---
+
+## Reported from play — "I don't know how to start, sustain, or end a game"
+
+With the constraint that matters: *"too lazy to read the manual — just directly play straight
+from the app."*
+
+That is a fair request, and nothing in the app answered it. Every teaching surface built so far
+is a **document**: an eleven-step walkthrough, a 41-term glossary, a rules library, a
+"what this does" note on every screen, a guide rendered four ways. All of them ask the player to
+stop playing and go and read. None of them says *what do I do right now*.
+
+**F-64 · The app knew where the player was and never said so.** It has the whole state — is
+there a game, is a scene open, is a beat unconfirmed, how many boxes are left — and used it only
+for badges. `src/coach.js` now derives one of ten stages from that state and renders a single
+card at the top of the Play tab: what is true now, the one next thing, and the button that does
+it. Nothing to enable, nothing to finish, nothing stored: it is derived on every render, so it
+cannot go stale or be in the wrong place.
+
+It replaces `whatNowCard`, which was the right idea in the wrong place — it said one true thing
+about the middle of a session, nothing at all about starting or ending, and sat below the beat
+controls, where a player asking "what do I do now" has already given up.
+
+The ten stages, in the order a session actually goes: no game · starting point not written ·
+ready for the first scene · scene running · beat on the table · between scenes · one box left ·
+resolved · ended by declaration · finished and written down.
+
+**F-65 · Ending had no surface at all.** A full track showed one line — "the track is full" —
+and a button to start another plot sheet. A third of what was asked for, and the commonest way
+a solo game feels unfinished is that the story simply stops. `endingDialog` asks four questions
+(how did it end · who got what they wanted · what is different now · what is still unfinished),
+writes an `ending` journal entry beside the rest of the story, marks the scope finished, and
+moves the coach to a stage that offers the next storyline or leaving the game where it is.
+
+Neither book has an epilogue procedure and the app does not pretend otherwise — the questions
+are recorded as the app's own, the same way ruling A8 records the absent safety tools. `ending`
+also joins the journal's filters: a kind with no filter is a kind you cannot find again in a
+500-entry log.
+
+**F-66 · "Open your FIRST scene" was shown to players eight scenes in.** The test was whether a
+SUM scene entry existed for this scope. But opening a formal scene is optional — a player can
+roll fourteen beats and cross two boxes without ever touching the scene arc, and the fixture
+this project has used since day one does exactly that. The test is now whether anything has
+happened in this scope at all.
+
+**F-67 · Three coach actions navigated to the screen they were already on.** The coach renders
+only on Play → track, and "Go to the beat", "Call the beat that ends it" and "Call a plot beat"
+all did `go("play", "track")` — a control that changes nothing. The deep audit reported it on
+all ten plot sheets at once, which is what that pass is for. They scroll to the beat controls
+now, which are further down the same screen and carry an anchor for it.
+
+**F-68 · Dropping the old card took two working routes with it.** `whatNowCard` offered "Write
+it down" (the journal) and the flow probe walked it; the replacement offered "Read it back",
+which is a second label for one destination — the defect the 2026-08-21 row guards against.
+Unified on "Write it down", the name the rest of the app already uses. "Open your first scene"
+went the same way, to "Open a scene".
+
+**F-69 · "Have you played here yet?" was tested wrong twice.** The stage that says *open your
+first scene* needs to know whether play has happened in this scope. Looking for a SUM scene
+entry missed every player who never uses the optional scene arc. Looking for *any* journal
+entry counted prep bookkeeping, so writing a plot node in the wizard made a brand-new game
+report as mid-session — caught by the first-run probe, which walked out of prep and was told to
+open its *next* scene. The test is now a set of kinds that mean play actually happened.
+
+### Verified
+
+All ten stages driven in a browser and read back; the ending flow walked end to end (dialog →
+journal entry → stage advances to "finished, and written down"). The first-run probe walks the
+whole arc again — **20 taps from a cold open to a played, journalled scene, every step offered
+by the screen the player was already on** — and now includes the coach's starting-point step,
+because a first-time player commonly leaves that optional field blank in prep and the app
+guides the gap rather than leaving them on a screen whose next move they cannot see.
+
+Three standing guards did their job unprompted: the app-shell check caught `src/coach.js`
+missing from the service worker, the control-completeness check caught all nine new controls
+before they could ship undocumented, and the deep audit caught the three no-op navigations.
+
