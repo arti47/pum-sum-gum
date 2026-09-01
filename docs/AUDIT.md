@@ -1415,6 +1415,27 @@ player's game. A field wanting a proper noun, a title, or a handle for something
 knows cannot be served by a generic table, however well-shaped its rows. The test is not "is
 this the right shape?" but "could this row mention the thing the player is naming?".
 
+
+
+### The function audit's seventh false finding — a random walk that could stop on step one
+
+The cycle reported `nodeUnavailableReason()` and `unprintedListBlock()` as reachable by no
+sequence of clicks. The next run of the same audit, against the same tree, said every function
+in `src/` is reachable. Both surfaces sit behind a die: on a Standard sheet only faces 5 and 6
+reach a list the sheet does not print, which is why journey 6 rolls up to forty times rather
+than rolling once and hoping.
+
+The walk could end on its first step. `if (!(await tapText(/random prompt/))) break;` — and the
+pinned bar carrying that control is absent whenever a beat from the previous try is still open,
+so one missed tap ended the whole walk and reported both surfaces unreachable. A missed tap is
+not evidence about reachability; it is evidence the screen was in a different state. The loop
+now dismisses whatever is open, returns to the track and continues, and only a genuine forty
+rolls without the surface is reported.
+
+This is the seventh distinct way this audit has produced a false finding, and the second in the
+same family as F-34: the tool was looking at a screen it did not expect and drew a conclusion
+about the app from it.
+
 ---
 
 ## Reported from play — "I don't know how to start, sustain, or end a game"
@@ -1491,4 +1512,3 @@ guides the gap rather than leaving them on a screen whose next move they cannot 
 Three standing guards did their job unprompted: the app-shell check caught `src/coach.js`
 missing from the service worker, the control-completeness check caught all nine new controls
 before they could ship undocumented, and the deep audit caught the three no-op navigations.
-

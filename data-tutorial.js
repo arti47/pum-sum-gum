@@ -100,7 +100,100 @@ export const QUICK_START = [
   },
 ];
 
-// --- Part 1: learning it in the order you will meet it ---------------------
+// --- Part 1: how to actually play ------------------------------------------
+// The rest of the guide teaches the app. This part teaches the play: how to
+// start when the page is blank, how to keep going for an hour, and how to end
+// a scene, a session and a story so they feel finished rather than abandoned.
+// Reported from play twice: every control was findable and correctly named,
+// and the player still did not know what to do.
+const PLAYING = [
+  {
+    id: "first-ten",
+    title: "Your first ten minutes",
+    blocks: [
+      { p: "The hard part of solo play is not the rules. It is the blank page — the moment where you are supposed to say something and nothing comes. Everything below exists to get you past that in under ten minutes." },
+
+      { p: "1 · Do not invent a story. Invent a situation and a want, in one sentence: somebody wants something, and something is in the way. \u201cA courier has to reach the far station before the storm closes the pass, and the road is watched.\u201d That sentence is your plot scope. It is enough. A story is what happens when you play it; you cannot write it in advance and you are not supposed to." },
+      { tap: "More → Home → Prepare a game" },
+
+      { p: "2 · Write three plot nodes, not thirty. One potential problem, one useful finding, one pending question — taken straight out of the sentence you just wrote. For the courier: \u201cthe watchers on the road\u201d, \u201ca shelter no one has burned yet\u201d, \u201cwho pays the watchers?\u201d. Empty slots are the machine's invitation to invent later, and whatever you invent stays in the list." },
+      { note: "The single commonest way to stall before you start is filling every list. Sixty entries is an afternoon of homework, and the game rolls d10 on lists that are mostly blank anyway." },
+
+      { p: "3 · Write the starting point as one sentence you would actually say out loud, and open in the middle of something: \u201cThe pass is an hour behind you and the light is going.\u201d Not \u201cthe courier is a woman of thirty who grew up in the valley\u201d — that is a character sheet, not an opening." },
+
+      { p: "4 · Now say two or three sentences of narration, out loud or in the journal, describing what your protagonist can see and hear. Then have them DO something physical in the first minute — knock, climb, hide, call out. Not think, not remember. Do. Action creates the first question, and a question is what the machine answers." },
+
+      { p: "5 · Only now ask the app anything. Your first roll should be a real uncertainty raised by that action: is there smoke from the shelter? Are the watchers still there? That is Oracles → Yes or No, in the register that matches who is answering." },
+      { tap: "Oracles → Yes or No" },
+      { warn: "If you have opened the app and rolled four things before saying a single sentence of story, you are playing the machine instead of the game. Close the app, narrate a paragraph, and come back with a question." },
+    ],
+  },
+  {
+    id: "keep-going",
+    title: "Keeping it going for an hour",
+    blocks: [
+      { p: "Play has a rhythm, and the rhythm is not \u201croll, read, roll\u201d. It is: narrate until you hit something you genuinely do not know → ask the app → say the answer back into the fiction in your own words → keep narrating. The middle step is the short one." },
+
+      { p: "Roll when both of these are true: you do not know, and the answer changes what happens next. If only one is true, decide it yourself and keep moving — the books are explicit that you may ignore, re-roll or reinterpret anything." },
+      { ref: "PUM p.8 · p.10" },
+
+      { p: "Two ways a session dies, and the fix for each:" },
+      { bullets: [
+        "Dice soup — every sentence becomes a roll, the fiction thins out, and the answers start contradicting each other. Fix: one or two questions per matter. If your last three actions were rolls, narrate two sentences before the next one.",
+        "Drift — you are talking, but nothing is at stake and no box has crossed in twenty minutes. Fix: call a plot beat. A beat is the machine's way of making the world act on you instead of waiting for you.",
+      ] },
+
+      { p: "When you are properly stuck, do not ask another oracle — oracles answer questions, and being stuck means you have run out of questions. Roll a random prompt instead. If it lands on an empty node slot, invent the thing on the spot; it becomes a permanent entry in that list." },
+      { tap: "Play → Random prompt" },
+
+      { p: "A scene is about five to fifteen minutes, or three to six exchanges. When a scene stops producing change, that is what the intervention check is for — and if the check does not revive it, close the scene rather than letting it fizzle." },
+      { tap: "Scene → Roll an intervention check" },
+
+      { p: "Cross a box only when something changed for your protagonists: they learned it, lost it, committed to it, or it got worse. A beat that turned out to be scenery is a beat you played and did not confirm. The track is a measure of the story, not of how often you rolled." },
+
+      { p: "Write one line of your own in the journal per scene, in your words, not the app's. The rolls are recorded automatically; what is not recorded is what any of it meant. That line is what makes it possible to pick the game up a week later." },
+      { tap: "Journal → Write an entry" },
+    ],
+  },
+  {
+    id: "ending-well",
+    title: "Ending a scene, a session, and a story",
+    blocks: [
+      { p: "Three different endings, three different moves. Most solo games that die do so because one of these was never made." },
+
+      { p: "A scene ends on a change, not on a lull. Close it the moment something has shifted — someone decided, something was learned, something got worse — and let the closure roll tell you how the world responds and what it hands you next. That hook is your opening for the following scene, which means you never start from nothing again." },
+      { tap: "Scene → Roll a scene closure" },
+
+      { p: "A session ends best while you still want to keep going. Stop on a hook rather than at a natural pause, mark the break, and write one line about what you expect to happen next — not what will happen, what you expect. Next session begins by finding out whether you were right, which is the easiest possible restart." },
+      { tap: "Journal → Session break" },
+
+      { p: "A story ends when the plot track fills — and the last third of the track is where you stop introducing and start paying off. Once you are in the final section, no new questions: use the beats to answer the pending ones, and let the useful findings you wrote in prep be what the protagonists actually get." },
+      { note: "An ending that lands has three parts: it answers the question the scope was about, it costs something, and it leaves exactly one thing open. The open thing is the seed of the next plot sheet — a new scope in the same game, with the same cast." },
+
+      { p: "And a scope can end before the track fills. If the real question has been answered and the remaining boxes are just more incident, say so and end it — the app records that you ended it rather than pretending the track resolved. Sandbox and Improvised sheets have no track at all, so this is the only way they ever finish." },
+      { tap: "Play → Plot track → End this scope" },
+      { ref: "PUM p.7" },
+    ],
+  },
+  {
+    id: "stuck-now",
+    title: "If you are stuck right now",
+    blocks: [
+      { p: "In order. Stop at the first one that unsticks you." },
+      { steps: [
+        "Say out loud what your protagonist can see. Two sentences. Do not roll anything.",
+        "Have them do one physical thing about it.",
+        "Ask one Yes or No question that action raises — and take the first answer.",
+        "Still nothing? Roll a random prompt and read it as loosely as you like. It is inspiration, not instruction.",
+        "Still nothing? Close the scene, take the closure's hook, and open a new scene somewhere else.",
+        "Still nothing? Stop for today and write one line about what you wish would happen. That line is tomorrow's opening.",
+      ] },
+      { ref: "PUM p.10 — the advice chapter says the same thing at more length, and is in the app under More → Rules." },
+    ],
+  },
+];
+
+// --- Part 2: learning it in the order you will meet it ---------------------
 const WALKTHROUGH = [
   {
     id: "machines",
@@ -421,7 +514,7 @@ WALKTHROUGH.push(
   },
 );
 
-// --- Part 2: four scenarios, one per structural class ----------------------
+// --- Part 3: four scenarios, one per structural class ----------------------
 const SCENARIOS = [
   {
     id: "vault",
@@ -573,7 +666,7 @@ SCENARIOS.push(
   },
 );
 
-// --- Part 3: complete reference, screen by screen --------------------------
+// --- Part 4: complete reference, screen by screen --------------------------
 // Every labelled control and dialog in the app appears here. tests/harness.mjs
 // scans src/ for control labels and asserts each one is named in this part, so
 // "nothing is left out" is checked rather than claimed.
@@ -704,7 +797,7 @@ const REFERENCE = [
         "Errata (folded) — where the books disagree with themselves.",
         "Where the app does not roll (folded) — the eight fields with no inspiration block, and why.",
       ] },
-      { p: "Tutorial — this document. Settings — see Part 1." },
+      { p: "Tutorial — this document. Settings — see Part 2." },
       { bullets: [
         "Your data: Export JSON (also pinned, with Import beside it) · Import JSON · Export readable · Check my data · Undo.",
         "Export and import dialogs: Copy · Download · Close · Import · Cancel.",
@@ -776,7 +869,7 @@ const REFERENCE = [
   },
 ];
 
-// --- Part 4: what the app deliberately does not do -------------------------
+// --- Part 5: what the app deliberately does not do --------------------------
 const LIMITS = [
   {
     id: "limits",
@@ -798,16 +891,19 @@ const LIMITS = [
 ];
 
 export const PARTS = [
-  { id: "walkthrough", title: "Part 1 · Learning it in play order",
+  { id: "playing", title: "Part 1 · How to actually play",
+    blurb: "Starting when the page is blank, keeping a session moving, and ending a scene, a session and a story so they feel finished.",
+    sections: PLAYING },
+  { id: "walkthrough", title: "Part 2 · Learning it in play order",
     blurb: "Every function, introduced where you would first meet it, with the reason the rule exists.",
     sections: WALKTHROUGH },
-  { id: "scenarios", title: "Part 2 · Four scenarios",
+  { id: "scenarios", title: "Part 3 · Four scenarios",
     blurb: "Four games on four structurally different plot sheets. Every quoted result is the real row at that die value.",
     sections: SCENARIOS },
-  { id: "reference", title: "Part 3 · Complete reference",
+  { id: "reference", title: "Part 4 · Complete reference",
     blurb: "Every screen and every control, for looking something up.",
     sections: REFERENCE },
-  { id: "limits", title: "Part 4 · What the app does not do",
+  { id: "limits", title: "Part 5 · What the app does not do",
     blurb: "The deliberate omissions, and the reasoning behind each.",
     sections: LIMITS },
 ];

@@ -1,7 +1,7 @@
 // Mixed strategy per template §5: the app shell and data files are cache-first against a
 // versioned cache; navigation requests are network-first so a stale shell never outlives a
 // deploy. Bump CACHE_VERSION on ANY shipped-file change.
-const CACHE_VERSION = "um-v35";
+const CACHE_VERSION = "um-v36";
 
 const APP_SHELL = [
   "./",
