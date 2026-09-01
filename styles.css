@@ -569,6 +569,18 @@ details.acc:target > summary, details.acc.flash > summary { background: var(--ac
 .notice { border-left: 3px solid var(--accent); }
 .notice h3 { margin-top: 0; }
 
+/* The coach's literal steps — the part that tells a stranger what to actually
+   do, as opposed to what the game is. */
+.coach-steps { margin: .5rem 0 .2rem; padding-left: 1.2rem; }
+.coach-steps li { margin: .3rem 0; }
+.coach-eg {
+  border-left: 3px solid var(--rule-2); padding: .35rem .6rem;
+  margin: .5rem 0 .6rem; color: var(--ink-2); font-style: italic;
+}
+.coach-eg-lead { font-style: normal; font-weight: 700; color: var(--ink-3); font-size: .8rem; }
+.coach-strip { border-left-width: 2px; }
+.coach-strip p { margin: 0 0 .4rem; font-size: .9rem; }
+
 /* The session coach: the one card that is always correct about what to do next.
    Marked like the beginner notice, because it is the same promise kept. */
 .coach-card { border-left: 3px solid var(--accent); }

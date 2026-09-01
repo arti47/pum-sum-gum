@@ -1512,3 +1512,47 @@ guides the gap rather than leaving them on a screen whose next move they cannot 
 Three standing guards did their job unprompted: the app-shell check caught `src/coach.js`
 missing from the service worker, the control-completeness check caught all nine new controls
 before they could ship undocumented, and the deep audit caught the three no-op navigations.
+
+---
+
+## Reported again, in the same words — the coach named buttons, not moves
+
+The identical message twice: *"I still don't know how to start playing, sustaining play and
+ending the game well. Need lots of handholding for someone too lazy to read the manual."*
+
+The coach shipped last round was the right shape and still failed, one level down. Its
+sustaining-play stage read:
+
+> A scene is running. This is most of the game: you play your protagonists and narrate what
+> happens. **Next:** Keep playing. Ask an oracle when you genuinely do not know something.
+
+That is a *description of solo roleplaying*, not an instruction anybody can follow. "Keep
+playing" tells a person who does not know how to play exactly nothing, and "narrate what
+happens" is the thing they are asking how to do.
+
+**F-70 · Every stage gave advice where it needed to give moves.** Each stage now carries
+`steps` — literal, numbered, mechanical — and, where "say something" is the instruction, an
+`example` in the player's own voice, because a stranger has no idea what that sounds like. The
+scene stage is now the loop itself:
+
+> 1. Say what your protagonist does. Two sentences is plenty.
+> 2. Ask yourself one question: do I know what happens next?
+> 3. If you DO — say it, and go back to step 1. You do not need to roll anything.
+> 4. If you DO NOT — tap Ask an oracle. If you are not uncertain but *stuck*, Call a plot beat.
+>
+> *Like this:* "Nell pushes the door open and steps into the smoke." Do I know what she finds in
+> there? No — so ask the oracle.
+
+Step 3 matters as much as the rest: a beginner's commonest failure is rolling when they already
+know, and nothing had ever told them not to.
+
+**F-71 · The coach existed on one screen out of twenty.** It rendered only on Play → track, and
+playing happens on the Scene and Oracles tabs as much as there. A coach you have to remember to
+go and consult is a document again. `coachStrip()` is the short form — same stage, same action,
+no steps — and follows the player onto both.
+
+**F-72 · The strip broke "guidance before action" on four routes.** Mounted above each Scene
+screen's own heading, it made those screens lead with a control. The novice audit caught it on
+`scene/arc`, `scene/explore`, `scene/battle` and `scene/discovery` in the same run it was
+introduced. It now sits under each screen's note, where the rule wants it.
+

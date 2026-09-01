@@ -10,6 +10,7 @@ import { sectionNav, render, go } from "./router.js";
 import { openRule } from "./screens.js";
 import { SUM_TABLES, SUM_SECTIONS, BIAS_NOTE } from "../data-sum.js";
 import { registerClearer } from "./viewstate.js";
+import { coachStrip } from "./coach.js";
 
 let last = null;      // the last SUM roll, held so re-render never re-rolls it
 let bias = "none";    // none | low | high — the Rule of Bias, declared before rolling
@@ -24,8 +25,6 @@ export function renderScene(host, section) {
   const scope = store.currentScope();
   add(host, sectionNav("scene", section, { arc: !!(scope && scope.openScene) }));
 
-  // The arc screen has its own empty state; the table screens roll happily with
-  // no game and would otherwise discard every result in silence.
   if (!store.activeGame() && section !== "arc") {
     add(host, noGameNotice({
       what: "these SUM tables",
@@ -46,6 +45,7 @@ function renderArc(host, scope) {
     "SUM's three boundary rolls, in play order: an opener when you don't know how to start, an intervention check mid-scene, and a closure to see how the world responds.",
     "None of them fires on its own — you decide when a scene needs one. Each writes a journal entry you can undo in one step.",
   ], "scene-arc", openRule));
+  if (store.activeGame()) add(host, coachStrip());
 
   if (!store.activeGame()) {
     add(host, emptyState("No game yet", "Scenes belong to a plot scope. Prepare a game first.",
@@ -284,6 +284,7 @@ function renderTableGroup(host, section) {
     titles[section][1],
     "Every SUM table is ordered so low rolls favour your protagonists and high rolls bring trouble. Declare your expectation before rolling and the app keeps the right die for you.",
   ], "sum-bias", openRule));
+  if (store.activeGame()) add(host, coachStrip());
 
   add(host, biasCard());
   if (last && ids.includes(last.tableId)) add(host, renderLast());
@@ -355,6 +356,7 @@ function renderPeopleTables(host) {
     "SUM reads non-protagonists in four depths of acquaintance. Roll only the depth the scene has actually reached.",
     "To keep a result attached to someone, roll it from their entry in the cast instead — it is stored with them.",
   ], "sum-characters", openRule));
+  if (store.activeGame()) add(host, coachStrip());
   add(host, biasCard());
   if (last && ["first-contact", "shallow", "trust", "deep"].includes(last.result.table.section)) {
     add(host, renderLast());

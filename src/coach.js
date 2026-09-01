@@ -160,7 +160,30 @@ function endingDialog(game, scope) {
   });
 }
 
-// The card. One stage, one sentence of where you are, one next action.
+// A short form for screens that are not the plot sheet: the same stage and the
+// same action, without the steps. Playing happens on the Scene and Oracles tabs
+// as much as on Play, and a coach that only exists on one screen is a coach you
+// have to remember to go and consult.
+export function coachStrip() {
+  const game = store.activeGame();
+  const scope = store.currentScope();
+  if (!game || !scope) return null;
+  const stage = stageOf(game, scope);
+  const copy = SESSION_STAGES[stage];
+  if (!copy) return null;
+  const act = actionFor(stage, game, scope);
+  const strip = el("div", { class: "card coach-card coach-strip" });
+  add(strip, el("p", null,
+    el("strong", { text: copy.title + ". " }),
+    copy.next
+  ));
+  if (act) {
+    add(strip, el("button", { class: "btn small", onclick: act.run }, act.label));
+  }
+  return strip;
+}
+
+// The card. One stage, where you are, the literal steps, one next action.
 export function coachCard() {
   const game = store.activeGame();
   const scope = store.currentScope();
@@ -174,7 +197,22 @@ export function coachCard() {
     el("span", { class: "cite", text: "what now" })
   ));
   add(card, el("p", { text: copy.say }));
-  add(card, el("p", { class: "coach-next" }, el("strong", { text: "Next: " }), copy.next));
+
+  // The steps are the point. An earlier version gave only the button and a line
+  // of advice — "keep playing, ask an oracle when you do not know" — which
+  // describes solo roleplaying rather than telling anyone how to do it. These
+  // are literal: say this, then ask yourself this, then tap that.
+  if (copy.steps && copy.steps.length) {
+    const ol = el("ol", { class: "coach-steps" });
+    for (const step of copy.steps) add(ol, el("li", { text: step }));
+    add(card, ol);
+  }
+  // One worked line, in the player's own voice, for the stages where "say
+  // something" is the instruction and a stranger has no idea what that sounds like.
+  if (copy.example) {
+    add(card, el("p", { class: "coach-eg" },
+      el("span", { class: "coach-eg-lead", text: "Like this: " }), copy.example));
+  }
 
   const act = actionFor(stage, game, scope);
   if (act) {
