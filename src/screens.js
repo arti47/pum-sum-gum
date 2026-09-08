@@ -8,6 +8,7 @@ import { Settings, applyTheme, cycleTheme } from "./settings.js";
 import { plotSheet } from "./rules.js";
 import {
   scopeSummary, crossed, trackLength, hasTrack, isResolved, nodeList, currentSection,
+  categoryName,
 } from "./derived.js";
 import { sectionNav, go, render } from "./router.js";
 import { startWizard, inWizard, renderWizard, addScopeDialog } from "./wizard.js";
@@ -716,37 +717,166 @@ function exportData() {
   showTextDump("Export", json, "unfolding-machines.json");
 }
 
+// The readable export is the artefact that outlives the app: the one file a
+// player keeps, prints, or sends to someone who has never heard of PUM. It used
+// to be a flat bullet list of 263 log lines with the internal kind keys on the
+// front ("yesno:", "custom1:") and a whole paragraph of the player's own prose
+// crammed into a bullet's title, four-space-indented so most Markdown renderers
+// drew it as a code block. Reported from play. It is now a document: grouped by
+// storyline and then by scene, the player's words as prose and the machine's as
+// compact roll lines beside them, with every die face shown, because that is the
+// app's own discipline everywhere else.
+
+const DASH = "—";
+
+function mdDice(dice) {
+  if (!dice || !dice.length) return "";
+  // A die the Rule of Bias discarded is shown struck, exactly as the entry does.
+  return dice.map((d) => `\`${d.label} ${d.value}${d.kept === false ? " (dropped)" : ""}\``).join(" ");
+}
+
+// One journal entry, rendered as what it actually is. The player's own writing
+// is a paragraph; a roll is one line with its dice; a note attached to a roll is
+// the quotation under it.
+function mdEntry(e, out) {
+  const note = e.note ? e.note.trim() : "";
+  if (e.kind === "note") {
+    if (e.detail) out.push(...para(e.detail), "");
+    if (note) out.push(`> ${note.replace(/\n+/g, " ")}`, "");
+    return;
+  }
+  if (e.kind === "session") {
+    out.push("---", "", `**${e.title || "Session break"}**`, "");
+    if (e.detail) out.push(`*${e.detail.trim()}*`, "");
+    return;
+  }
+  const dice = mdDice(e.dice);
+  // A crossed box is a one-line event, not a heading with a paragraph under it.
+  if (e.kind === "track" || e.kind === "node") {
+    out.push(`*${[e.title, e.detail].filter(Boolean).join(` ${DASH} `)}*${dice ? "  " + dice : ""}`, "");
+    return;
+  }
+  // The detail often restates the title, or is only the dice again, which are
+  // already shown beside it.
+  const detail = (e.detail || "").trim();
+  const diceText = (e.dice || []).map((d) => `${d.label} ${d.value}`).join(" ");
+  const adds = detail && detail !== (e.title || "").trim() && detail !== diceText
+    && !(e.title || "").includes(detail);
+  // What the machine said and what the player wrote must be tellable apart at a
+  // glance, or the document is a transcript rather than a story: a roll is one
+  // block led by its bold name, the player's own writing is a plain paragraph,
+  // and a note written about a roll is quoted beneath it.
+  if (e.title || dice) {
+    out.push(`**${e.title || ""}**${dice ? "  " + dice : ""}${adds ? "  " : ""}`
+      + (adds ? "\n" + para(detail).join("\n\n") : ""), "");
+  } else if (adds) {
+    out.push(...para(detail), "");
+  }
+  if (note) out.push(...note.split(/\n+/).map((l) => `> ${l.trim()}`), "");
+}
+
+// A stored field can hold several paragraphs; keeping them is the difference
+// between a record and a wall.
+function para(text) {
+  return String(text).trim().split(/\n{2,}/).map((b) => b.replace(/\n/g, "  \n").trim());
+}
+
+// A labelled field: inline when it is one line, its own paragraph when it is not.
+function field(label, value, out) {
+  const v = String(value || "").trim();
+  if (!v) return;
+  if (v.includes("\n")) out.push(`**${label}**`, "", ...para(v), "");
+  else out.push(`**${label}.** ${v}`, "");
+}
+
+// Scenes are the reader's chapters. The opener and closer carry no sceneId of
+// their own, so the cut is made on them rather than on the field.
+function mdScope(game, scope, index, out) {
+  const sheet = plotSheet(scope.sheetId);
+  out.push(`## ${index}. ${scope.name}`, "");
+  const state = hasTrack(scope)
+    ? `${crossed(scope)}/${trackLength(scope)}${isResolved(scope) ? " — resolved" : (scope.closedAt ? " — ended here" : "")}`
+    : (scope.closedAt ? "no track — ended here" : "no track");
+  out.push(`*${sheet ? sheet.name : scope.sheetId} sheet ${DASH} ${state}*`, "");
+  field("Mission", scope.mission, out);
+  field("Starting point", scope.startingPoint, out);
+
+  const nodes = [];
+  for (const cat of NODE_CATEGORIES) {
+    const filled = (nodeList(scope, cat.id) || []).filter((x) => x && x.trim());
+    if (filled.length) nodes.push(`- **${categoryName(scope, cat.id)}** ${DASH} ${filled.join(" · ")}`);
+  }
+  if (nodes.length) out.push("**Plot nodes**", "", ...nodes, "");
+  field("Notes", scope.notes, out);
+
+  const entries = game.journal.filter((e) => e.scopeId === scope.id).slice().reverse();
+  // The epilogue is written when the player is ready, which is not always last
+  // in the log — a stray roll after it would otherwise bury it mid-storyline.
+  const endings = entries.filter((e) => e.kind === "ending");
+  let sceneNo = 0;
+  let heading = false;
+  for (const e of entries) {
+    if (e.kind === "ending") continue;
+    if (e.kind === "scene" && /opened/i.test(e.title || "")) {
+      sceneNo += 1;
+      heading = true;
+      out.push(`### Scene ${sceneNo}`, "");
+      out.push(`*Opened: ${e.detail || "written by hand"}*  ${mdDice(e.dice)}`.trim(), "");
+      continue;
+    }
+    if (e.kind === "scene" && /closed/i.test(e.title || "")) {
+      out.push(`*Closed: ${e.detail || ""}*  ${mdDice(e.dice)}`.trim(), "");
+      continue;
+    }
+    if (!heading) { out.push("### Before the first scene", ""); heading = true; }
+    mdEntry(e, out);
+  }
+  for (const e of endings) {
+    out.push("### How it ended", "");
+    if (e.detail) out.push(...para(e.detail), "");
+  }
+  out.push("");
+}
+
 function exportReadable() {
   const game = store.activeGame();
   if (!game) { toast("No game to export."); return; }
-  const lines = [];
-  lines.push(`# ${game.title}`, "");
-  if (game.universe) lines.push(`Universe: ${game.universe}`);
-  if (game.tone) lines.push(`Tone: ${game.tone}`);
-  lines.push("");
-  lines.push("## Protagonists");
-  for (const p of game.protagonists) lines.push(`- ${p.name}${p.notes ? " — " + p.notes : ""}`);
-  lines.push("");
-  for (const s of game.scopes) {
-    const sheet = plotSheet(s.sheetId);
-    lines.push(`## Plot sheet: ${s.name} (${sheet ? sheet.name : "?"})`);
-    if (s.mission) lines.push(`Mission: ${s.mission}`);
-    if (s.startingPoint) lines.push(`Starting point: ${s.startingPoint}`);
-    if (hasTrack(s)) lines.push(`Track: ${crossed(s)}/${trackLength(s)}${isResolved(s) ? " — resolved" : ""}`);
-    if (s.closedAt && !isResolved(s)) lines.push("Ended by the player.");
-    for (const [key, list] of Object.entries(s.nodes)) {
-      const filled = list.filter((x) => x && x.trim());
-      if (filled.length) lines.push(`  ${key}: ${filled.join(" · ")}`);
+  const out = [];
+  out.push(`# ${game.title}`, "");
+  if (game.universe) out.push(`**Universe.** ${game.universe.trim()}`, "");
+  if (game.tone) out.push(`**Tone.** ${game.tone.trim()}`, "");
+  if (game.inspiration) out.push(`**Inspiration.** ${game.inspiration.trim()}`, "");
+  const sheets = game.scopes.length;
+  out.push(`*${sheets} plot sheet${sheets === 1 ? "" : "s"} · ${game.journal.length} journal entries · exported ${fmtTime(Date.now())}*`, "");
+
+  if (game.protagonists.length) {
+    out.push("## Protagonists", "");
+    for (const p of game.protagonists) {
+      out.push(`- **${p.name}**${p.notes ? ` ${DASH} ${p.notes.trim()}` : ""}`);
     }
-    lines.push("");
+    out.push("");
   }
-  lines.push("## Journal");
-  for (const e of [...game.journal].reverse()) {
-    lines.push(`- [${fmtTime(e.ts)}] ${e.kind}: ${e.title || e.detail}`);
-    if (e.title && e.detail) lines.push(`    ${e.detail}`);
-    if (e.note) lines.push(`    "${e.note}"`);
+  if (game.cast.length) {
+    out.push("## Cast", "");
+    for (const c of game.cast) {
+      const traits = (c.traits || []).map((t) => `${t.label}: ${t.text}`).join(" · ");
+      out.push(`- **${c.name}** *(${c.kind})*${c.notes ? ` ${DASH} ${c.notes.trim()}` : ""}`);
+      if (traits) out.push(`  - SUM: ${traits}`);
+    }
+    out.push("");
   }
-  showTextDump("Readable export", lines.join("\n"), `${game.title}.md`);
+
+  out.push("## The storylines", "");
+  for (const [i, scope] of game.scopes.entries()) {
+    out.push(`${i + 1}. **${scope.name}** ${DASH} ${plotSheet(scope.sheetId)?.name || scope.sheetId}`);
+  }
+  out.push("");
+  for (const [i, scope] of game.scopes.entries()) mdScope(game, scope, i + 1, out);
+
+  // Collapse the blank lines the builders leave behind, so the file reads the
+  // way it will render.
+  const text = out.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
+  showTextDump("Readable export", text, `${game.title}.md`);
 }
 
 function showTextDump(title, text, filename) {

@@ -1714,3 +1714,42 @@ beside them needs Save.
   not print the list, the node die switching to 1d20 past half.
 - Timed beats: marked on box 3 of the Dungeon scope, fired once on arrival.
 - All fourteen "Keep it →" destinations, the Endings journal filter, both exports.
+
+
+---
+
+## Reported from play — the readable export was a log
+
+**F-80 · The one file that outlives the app read like a debug dump.** "Export readable" is what
+a player keeps, prints, or sends to someone who has never heard of PUM. It emitted 263 journal
+entries as a flat bullet list:
+
+    - [07:36] note: SCENE ONE — Feldpost, the morning after. The opener told me to point at who is here, so: …
+        "Wren goes behind the weighing-table expecting a hiding place. …"
+      custom1: 400 crowns to the Voss house · Bram's sister's passage south
+
+Four defects in three lines. The internal kind key (`note:`, `yesno:`, `gum:`, `prep:`) led every
+entry. A five-sentence paragraph of the player's own writing was crammed into a bullet's *title*.
+The four-space continuation renders as an **indented code block** in most Markdown parsers, so
+the prose came out monospaced in a grey box. And node lists printed under their storage keys —
+`custom1:` for a list the player had named "The eleven weights", which every screen in the app
+calls by its right name.
+
+*Fix:* a document. Front matter, protagonists, the cast with their SUM traits, a list of the
+storylines, then one section per scope with its sheet, track state, mission, starting point and
+node lists under `derived.categoryName()` — and under that the play itself, cut into `### Scene N`
+on the scene-opened/closed entries, with the epilogue always last in its storyline rather than
+wherever the player happened to write it. Machine and author are tellable apart at a glance: a
+roll is one block led by its bold name with its dice in code ticks (a die the Rule of Bias
+dropped is marked), the player's own writing is a plain paragraph, and a note about a roll is
+quoted beneath it. Track crossings and node invocations collapse to one italic line.
+
+*Guard:* `tests/smoke.mjs` §8 drives the export through the app and asserts it names the
+storylines, cuts into scenes, uses category names rather than storage keys, carries dice, indents
+nothing into a code block, and writes no `- [hh:mm]` bullets. Watched failing on four assertions
+at once.
+
+*Not changed:* the dialog's own words ("Select all and copy, or use the download button.
+Downloads are blocked in some embedded viewers — copying always works.") and the filename. The
+guide's two descriptions of the export were rewritten to match, and the doc, page and PDF
+regenerated.

@@ -495,7 +495,7 @@ WALKTHROUGH.push(
       { bullets: [
         "Export JSON — the complete state, as text you can copy or download.",
         "Import JSON — replaces everything on this device. Export first.",
-        "Export readable — a Markdown summary of the current game: protagonists, each plot sheet, its nodes, and the journal.",
+        "Export readable — the game written out as a document: protagonists and cast, then each storyline with its mission, starting point and plot nodes, and under it the play itself broken into scenes, your own writing as prose and every roll beside it with its dice, ending with how it ended.",
         "Check my data — re-runs normalisation and reports what, if anything, needed repair.",
         "Undo — the last twenty actions, most recent first. You will rarely need it here: every mutating action raises a toast with its own Undo button.",
       ] },
@@ -660,7 +660,7 @@ SCENARIOS.push(
       { p: "Deliberate invocation. Later you want the story to answer something rather than complicate it. Play → Plot nodes → Pending questions → Roll this list. You chose the list on purpose; the die chose the entry; it still counts as a beat and can still cross a box. The alternative, Invoke on a specific written entry, skips the die entirely — also allowed, also a beat." },
       { ref: "PUM p.9" },
 
-      { p: "Export before you stop. Settings → Export readable gives a Markdown summary of the game: protagonists, each plot sheet with its track position, every filled node list, and the whole journal in order. Export JSON gives the restorable copy. Downloads are blocked in some embedded viewers, so both dialogs also offer Copy, and say so." },
+      { p: "Export before you stop. Settings → Export readable writes the game out as a document you could hand to someone who has never heard of PUM: protagonists and cast, then each storyline with its track position, its filled node lists under the names you gave them, and the play itself grouped into scenes — your own writing as prose, each roll beside it with its dice, and the epilogue last. Export JSON gives the restorable copy. Downloads are blocked in some embedded viewers, so both dialogs also offer Copy, and say so." },
       { p: "Functions this scenario used: Customized sheet · pre-drawn track, sections added and removed · + box mid-play · the custom prompt column and its reset · both player-named lists · rolling a list you pointed a face at · the “leave it to destiny” compulsion · deliberate invocation, rolled and chosen · readable and JSON export." },
     ],
   },

@@ -566,6 +566,46 @@ for (const theme of ["light", "dark"]) {
   await ctx2.close();
 }
 
+// --- 8. the readable export is a document, not a log ----------------------
+// Reported from play: it was a flat bullet list of every entry with the
+// internal kind keys on the front, the player's own paragraphs crammed into a
+// bullet title, and four-space indents that most renderers draw as code.
+{
+  const { ctx, page, errors } = await newPage(FIXTURES.mid);
+  // The fixture is mid-session but has never opened a formal scene, and scenes
+  // are the document's chapters, so open one through the app first.
+  await goto(page, "scene", "arc");
+  // The fixture carries an open scene with no "Scene opened" entry behind it,
+  // so close it and open one through the app: scenes are the document's
+  // chapters, and a chapter needs the entry that starts it.
+  const closer = page.locator("#screen button", { hasText: "Roll a scene closure" }).first();
+  if (await closer.count()) {
+    await closer.click();
+    await page.waitForTimeout(200);
+    await page.locator(".modal button", { hasText: "Open the next scene" }).first().click();
+    await page.waitForTimeout(150);
+  }
+  const opener = page.locator("#screen button", { hasText: "Roll a scene opener" }).first();
+  if (await opener.count()) { await opener.click(); await page.waitForTimeout(200); }
+  await goto(page, "more", "settings");
+  await page.locator("button", { hasText: "Export readable" }).first().click();
+  await page.waitForTimeout(200);
+  const md = await page.locator(".modal textarea").inputValue();
+
+  ok("the export names the storylines", md.includes("## The storylines"));
+  ok("play is grouped into scenes", /\n### Scene 1\n/.test(md), md.slice(0, 80));
+  ok("node lists carry their category name, not the stored key",
+    !/\n- \*\*custom[12]\*\*/.test(md) && !/^\s+(world|problems|findings|questions):/m.test(md));
+  ok("rolls carry their dice", /`d\d+ \d+`/.test(md));
+  // A four-space indent after a list line renders as a code block in most
+  // parsers, which is how the player's own prose used to come out.
+  ok("nothing is indented into a code block", !/^ {4}\S/m.test(md));
+  ok("the player's prose is a paragraph, not a bullet",
+    !/^- \[\d\d:\d\d\]/m.test(md));
+  ok("the export produced no console errors", errors.length === 0, errors.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
 // --- report ---------------------------------------------------------------
 await browser.close();
 server.close();
