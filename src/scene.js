@@ -95,6 +95,9 @@ function renderArc(host, scope) {
       }),
     }, "Open it myself"));
   }
+  // Anchored so the coach's "Open a scene" can scroll here rather than
+  // navigating to the screen its own strip is rendered on.
+  c1.id = "scene-controls";
   add(host, c1);
 
   // 2 — Intervene

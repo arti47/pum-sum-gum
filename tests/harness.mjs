@@ -1001,12 +1001,32 @@ const core = await import("../src/core.js");
   store.removeTrackSection(0);
   eq("removing a section clamps the crossing", derived.crossed(store.currentScope()), 0);
 
-  const column = Array.from({ length: 10 }, () => ({ label: "Meet someone", node: "characters" }));
+  const column = Array.from({ length: 10 }, (_, i) => (i === 2
+    ? { label: "Complication (A)", event: "A" }
+    : { label: "Meet someone", node: "characters" }));
   store.setCustomPrompts(column);
   const sc = store.currentScope();
   eq("a custom column persists", sc.customPrompts.length, 10);
   const p = roller.rollPrompt(sc);
-  eq("a custom column is what gets rolled", p.text, "Meet someone");
+  ok("a custom column is what gets rolled",
+    p.text === "Meet someone" || p.text === "Complication (A)", p.text);
+
+  // The column has to survive being written to storage and read back, which is
+  // the one thing this test never did: normalize() ran every entry through
+  // str(), so a saved column came back as ten empty strings and every face
+  // rolled "(empty prompt slot)" for good. Found in play, not here.
+  const reloaded = derived.normalizeScope(JSON.parse(JSON.stringify(store.currentScope())));
+  eq("a custom column survives a save and a reload", reloaded.customPrompts.length, 10);
+  eq("its node faces survive", reloaded.customPrompts[0].node, "characters");
+  eq("its event faces survive", reloaded.customPrompts[2].event, "A");
+  eq("and it still rolls something", roller.rollPrompt(reloaded).text === "(empty prompt slot)", false);
+  const broken = derived.normalizeScope({
+    ...JSON.parse(JSON.stringify(store.currentScope())),
+    customPrompts: ["not", "a", "column", 4, 5, 6, 7, 8, 9, 10],
+  });
+  ok("a column that is not ten usable entries is dropped whole, not half-kept",
+    broken.customPrompts === null);
+
   store.setCustomPrompts(null);
   ok("a custom column can be cleared", store.currentScope().customPrompts === null);
 }
@@ -1159,6 +1179,25 @@ const core = await import("../src/core.js");
     }
   }
   eq("the flat index covers every alias", lib.GLOSSARY_INDEX.size, claims.size);
+}
+
+// --- the coach's action must be a move, not a trip to where you already are --
+// F-67 fixed this for the Play tab by scrolling to the beat instead of
+// navigating. coachStrip() then put the same card on the Scene tab, where the
+// scene actions still ran go("scene","arc") — so on scene/arc the button the
+// coach hands you does nothing at all. Found in play, twice: openScene stayed
+// null and the screen did not move.
+{
+  const coach = readFileSync(join(root, "src", "coach.js"), "utf8");
+  const body = coach.slice(coach.indexOf("function actionFor"), coach.indexOf("function extrasFor"));
+  ok("the coach never navigates to a screen its own strip is rendered on",
+    !/go\("scene",\s*"arc"\)/.test(body) && !/go\("play",\s*"track"\)/.test(body),
+    "actionFor still calls go() for a screen that carries the strip");
+  const scene = readFileSync(join(root, "src", "scene.js"), "utf8");
+  ok("the scene screen carries the anchor the coach scrolls to",
+    scene.includes('id = "scene-controls"'));
+  ok("the plot sheet carries the anchor the coach scrolls to",
+    readFileSync(join(root, "src", "sheet.js"), "utf8").includes('beats.id = "beat-controls"'));
 }
 
 // --- report -----------------------------------------------------------------

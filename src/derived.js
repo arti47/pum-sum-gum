@@ -182,6 +182,27 @@ function str(v, fallback = "") {
   return fallback;
 }
 
+// A prompt column entry is an object — { label, node } or { label, event } —
+// not a string. Running each one through str() emptied every face of a
+// customised column the first time the app booted after it was saved: the array
+// was still ten long, so rules.promptAt preferred it over the sheet's own
+// column and every random prompt came back "(empty prompt slot)", silently and
+// for good. Found in play (§8, 2026-09-08). A column that is not ten usable
+// entries is dropped whole, so the sheet's printed column takes over rather
+// than half a custom one surviving.
+function promptColumn(raw) {
+  if (!Array.isArray(raw) || raw.length !== 10) return null;
+  const out = [];
+  for (const entry of raw) {
+    const p = obj(entry);
+    const label = str(p.label);
+    if (typeof p.event === "string" && p.event) out.push({ label, event: p.event });
+    else if (typeof p.node === "string" && p.node) out.push({ label, node: p.node });
+    else return null;
+  }
+  return out;
+}
+
 function blankNodes() {
   const n = {};
   for (const id of NODE_IDS) n[id] = [];
@@ -205,8 +226,7 @@ export function normalizeScope(input = {}) {
       fired: { ...obj(track.fired) },
       custom: Array.isArray(track.custom) ? track.custom : null,
     },
-    customPrompts: Array.isArray(raw.customPrompts) && raw.customPrompts.length === 10
-      ? raw.customPrompts.map((p) => str(p)) : null,
+    customPrompts: promptColumn(raw.customPrompts),
     customNames: {
       custom1: str(obj(raw.customNames).custom1),
       custom2: str(obj(raw.customNames).custom2),

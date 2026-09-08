@@ -25,6 +25,16 @@ function scrollToBeat() {
   const el = document.getElementById("beat-controls");
   if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
 }
+// The same defect as scrollToBeat, in the place coachStrip() created: the strip
+// now renders ON scene/arc, and these three actions ran go("scene","arc") — a
+// button that navigates to the screen you are already looking at does nothing at
+// all. Found in play: "Open a scene" pressed on the Scene tab left openScene
+// null and moved nothing.
+function goToScene() {
+  const anchor = document.getElementById("scene-controls");
+  if (anchor) { anchor.scrollIntoView({ block: "start", behavior: "smooth" }); return; }
+  go("scene", "arc");
+}
 import { SESSION_STAGES, ENDING_PROMPTS } from "../data-guidance.js";
 
 // Journal kinds that mean play actually happened, as opposed to preparing to
@@ -76,11 +86,11 @@ function actionFor(stage, game, scope) {
     case "no-start":
       return { label: "Write the starting point", run: () => startingPointDialog(scope) };
     case "first-scene":
-      return { label: "Open a scene", run: () => go("scene", "arc") };
+      return { label: "Open a scene", run: goToScene };
     case "scene-over":
-      return { label: "Open the next scene", run: () => go("scene", "arc") };
+      return { label: "Open the next scene", run: goToScene };
     case "scene-open":
-      return { label: "Back to the scene", run: () => go("scene", "arc") };
+      return { label: "Back to the scene", run: goToScene };
     case "beat-open":
       return { label: "Go to the beat", run: scrollToBeat };
     case "endgame":

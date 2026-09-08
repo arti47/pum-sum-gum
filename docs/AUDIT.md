@@ -1612,3 +1612,105 @@ reports.
 The empty *Choose from …* dialog (already reported by the seeded audit, still unfixed by
 choice); the disruption die; timed beats; GUM; any sheet but Standard; and whether the fiction
 the oracles produced was any *good* — only that play always had somewhere to go.
+
+
+---
+
+## Played a second story, exhaustively — "The Salt Between Us"
+
+Mode PLAY. One game, four plot scopes on four structurally different sheets (Journey 20 boxes ·
+Customized with a track drawn by hand · Dungeon 7 · Sandbox, trackless), 255 journal entries,
+prose after essentially every beat, every scope ended with an epilogue written into the record.
+**The session played, start to finish, four times over.** Six findings; two fixed here, four
+reported. The full session, with the app's own words quoted, is `.playtest/session-2.md`.
+
+**F-74 · A customised Random Prompt column was silently emptied by the first reload.**
+*Rule:* the twelfth Permission — customise the Random Prompt column (PUM p.21). On the
+Customized sheet it is the only prompt column there is.
+*Target:* `derived.js` — `customPrompts: … raw.customPrompts.map((p) => str(p))`.
+*Symptom:* verified stored immediately after **Customize → Edit the prompt column → Save the
+column**:
+
+    [{"label":"Useful findings","node":"findings"},{"label":"Notable characters","node":"characters"}, …]
+
+Next sitting, the card in the app's own words:
+
+    Random prompt
+    5
+    (empty prompt slot)
+    Confirm — cross a box · Not this time · Re-roll · Add a note
+
+Every face, not one. The Customize dialog still showed ten rows, all reading the first option,
+so nothing on screen said the column was gone — and the track still offered to cross a box for
+a beat that said nothing. This is a stall in the playbook's first sense: the app offered nothing
+that moves play forward.
+*Cause:* a column entry is an object (`{label, node}` / `{label, event}`); `str()` returns `""`
+for anything that is not a string or number. The array stayed ten long, so `rules.promptAt`
+preferred it over the sheet's own column and `column[roll-1] || null` was null for every face.
+*How it got in:* the cycle-8 hostile-input pass (v27) made `normalize()` total by applying
+`obj()`/`str()` "to every raw field". It was applied to a field whose elements are objects.
+*Why nothing caught it for twelve days:* the unit test set a column with `store.setCustomPrompts`
+and rolled it **in memory**; it never went through a save. The browser passes press Customize
+but never reload and then roll. This is the mistake the playbook warns about in its own words —
+"a test that constructs state by hand can assert a function works perfectly while the path to
+that state is impossible" — with the twist that here the path was fine and the *round trip* was
+not.
+*Fix:* `derived.promptColumn()` normalizes each entry by shape and drops a column that is not
+ten usable entries **whole**, so an already-damaged save falls back to the sheet's printed
+column rather than half-working. Verified against this game's own broken state: the corrupted
+column now rolls the Customized sheet's printed ABCD column, and a freshly saved column
+survives three reloads and rolls its own faces.
+*Guard:* the unit test now round-trips the column through `normalize()` and asserts a malformed
+one is dropped whole. Watched failing — four assertions, including "and it still rolls
+something".
+
+**F-75 · On the Scene tab, the coach's own button did nothing.**
+*Rule:* the coach names the one next move and attaches the button. F-67 already fixed three
+actions that navigated to the screen they were already on.
+*Target:* `coach.js` `actionFor` — `first-scene`, `scene-over` and `scene-open` all ran
+`go("scene","arc")`, and F-71 then rendered `coachStrip()` **on** `scene/arc`.
+*Symptom:* fresh Sandbox scope, nothing played, standing on Scene → Scene arc. The strip says
+the next move is **"Open a scene"** and gives the button. Pressing it opens nothing, moves
+nothing, and leaves `openScene` null. The controls that work — **"Roll a scene opener"** and
+**"Open it myself"** — are further down the same screen.
+*Fix:* a `#scene-controls` anchor and scroll-or-navigate, exactly as F-67 did for the beat.
+*Guard:* a source assertion that `actionFor` never calls `go()` for a screen that carries the
+strip, plus that both anchors exist. Watched failing.
+
+### Reported, not fixed
+
+- **F-76 · A biased Yes/No left unpicked is stranded in the record.** The PUM bias rule works —
+  both answers offered, the player picks, and the entry becomes
+  `Yes/No (subjective) — No, apparently not · Chose 2 of 2 and 10`. But the two chips live only
+  on the transient result card, so navigating away leaves
+  `Yes/No (conversation) — bias, awaiting your pick | 7: Yes, I think so | 6: It's complicated`
+  in the journal with no control anywhere that can complete it. Four such entries in this game.
+  Same shape as F-73, which was fixed for beats.
+- **F-77 · The disruption die is rolled, fires, and is never journalled.** With the die on and
+  volatile, roughly half the descriptive rolls fire one; the strip works and the beat it
+  produces is recorded as `Disruption → modified proposal … d10 1`. The disruption d10 itself
+  appears in no entry — the oracle it interrupted records `dice=[{"d10":8}]`. The ledger's claim
+  is "Every roll is journalled with its dice".
+- **F-78 · The empty "Choose from …" dialog is still a dead end.** Confirmed unchanged:
+  "Nothing is written in this list yet. Add a new node instead." with only **Cancel**. It names
+  a capability and gives no way to take it.
+- **F-79 · A player-named list loses its name in one dialog.** The list is "The eleven weights"
+  on the nodes screen, the beat card and the node header; the Choose dialog says **"Choose from
+  My list"**. One stored field, two labels — the class the 2026-08-21 guard exists for, in a
+  place that guard does not look.
+
+Smaller, recorded and not acted on: the Add-to-plot-nodes dialog reads "… into Notable
+characters ." with a space before the stop; every Forge roll button is visibly labelled just
+"d20", with the table named in the row above it; the scene-closure summary does not show the die
+it rolled; and in the character dialog SUM trait rolls persist immediately while the Notes field
+beside them needs Save.
+
+### Verified clean this pass
+
+- **A rolled beat survives closing the app** (F-73's fix), across many sittings in all four
+  scopes, including one rolled in one sitting and confirmed in the next.
+- Editing a written plot node — the entry's own text is the button that opens it.
+- The four empty-slot routes, deliberate node and list invocation, Recall on a sheet that does
+  not print the list, the node die switching to 1d20 past half.
+- Timed beats: marked on box 3 of the Dungeon scope, fired once on arrival.
+- All fourteen "Keep it →" destinations, the Endings journal filter, both exports.
