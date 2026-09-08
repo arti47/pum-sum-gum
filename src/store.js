@@ -464,8 +464,14 @@ export function closeScene() {
   return closed;
 }
 
-export function setLastBeat(beat) {
-  mutate("Record last beat", () => {
+// The beat currently on the table, written so it survives a reload — and the
+// same call closes it again once it has been judged. This is a re-record of
+// something the player has already done (the roll took its own snapshot, and
+// confirming happens inside `transact`), so like a preference it emits without
+// pushing onto a capped undo stack: choosing a node inside one beat must not
+// evict a real action.
+export function markBeat(beat) {
+  prefer(() => {
     const sc = currentScope();
     if (sc) sc.lastBeat = beat;
   });

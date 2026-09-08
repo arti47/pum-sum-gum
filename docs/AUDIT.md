@@ -1556,3 +1556,59 @@ screen's own heading, it made those screens lead with a control. The novice audi
 `scene/arc`, `scene/explore`, `scene/battle` and `scene/discovery` in the same run it was
 introduced. It now sits under each screen's note, where the rule wants it.
 
+
+
+---
+
+## Played a session — the beat did not survive closing the app
+
+Mode PLAY, run through `tests/playtest.mjs`: one game ("The Long Thaw"), a Standard sheet, two
+scenes, six beats, three oracle questions, the player's own prose after every beat, ended by
+declaration at 5/11 with an epilogue written into the record. **The session played start to
+finish.** One finding, and it cost four beats before it was diagnosed.
+
+**F-73 · A beat rolled and not yet judged did not survive a reload.**
+*Rule:* PUM's Gate — a beat may only be confirmed after it has been played out and judged
+relevant. "Played out" is minutes of narration, and the app is a phone: the tab will be closed,
+the screen will lock, the session will be resumed tomorrow.
+*Target:* `sheet.js`'s `openBeat` was module state, while the *fact* of a beat being on the
+table was stored (`scope.lastBeat.open`). The two disagreed the moment the page reloaded.
+*Symptom, in the app's own words:* the session coach said
+
+> **A beat is on the table** — what now
+> The machine has offered something. It is a prompt, not an instruction.
+
+with the action **"Go to the beat"**, which scrolls to `#beat-controls` — where the only
+controls are *Modified proposal · Random prompt · Last beat: Bring someone quite inconvenient*.
+The beat is already in the journal, the box is never crossed, and the only way on is to roll a
+different beat. Class 3, a described capability with no control, and class 5 in the record: the
+journal ends up holding beats that were narrated and never resolved. The played session shows
+four of them.
+*Fix:* the whole rolled beat is persisted beside the flag and the card is rebuilt from it on
+boot (`persistBeat`/`rehydrateBeat`); node choices made inside a beat persist the same way.
+`store.setLastBeat()` is replaced by `store.markBeat()`, which emits without snapshotting —
+the move was the roll, and confirming already runs inside `transact`, so re-recording must not
+consume the capped undo stack. That is F-46 in a new place. The function audit caught the
+leftover on the first cycle after the fix: with the four roll sites moved off it, `setLastBeat`
+was reachable by no sequence of clicks. State written before this keeps only `key`/`text` and falls
+back to the chooser rather than drawing half a card.
+*Guard:* `tests/smoke.mjs` §7 rolls a beat, boots a **second browser context from exactly what
+the first left in `localStorage`**, and asserts the card is there, is the same beat, and can be
+confirmed. Watched failing — and then rewritten, because the first version threw a locator
+timeout instead of naming the missing control; a pass that crashes says less than one that
+reports.
+
+### Two things this pass looked at and did not find
+
+- **The record does not lie.** Read back oldest-first, the journal matches the session beat for
+  beat, dice and all, including the four beats that were rolled and never confirmed — it records
+  what happened, which is exactly why the defect was visible in it.
+- **Ending is complete.** "End this scope" → "End the scope" → the coach switches to
+  **"Write how it ended"** → an `ending` journal entry → **"Read the whole story"**. Nothing is
+  gated behind it, and nothing is missing from it.
+
+### What the session did not cover
+
+The empty *Choose from …* dialog (already reported by the seeded audit, still unfixed by
+choice); the disruption die; timed beats; GUM; any sheet but Standard; and whether the fiction
+the oracles produced was any *good* — only that play always had somewhere to go.

@@ -282,7 +282,6 @@ function fireBeatFromOracle(kind, why) {
     linkedTo: last ? last.entryId : null,
   });
   setOpenBeat({ ...beat, journalId: entry.id });
-  store.setLastBeat({ key: beat.key, text: beat.text, open: true });
   go("play", "track");
 }
 
@@ -378,7 +377,6 @@ function disruptionBlock(result) {
         detail: diceText(beat.dice),
       });
       setOpenBeat({ ...beat, journalId: entry.id });
-      store.setLastBeat({ key: beat.key, text: beat.text, open: true });
       go("play", "track");
     },
   }, d.fires === "prompt" ? "Roll the random prompt" : "Roll the modified proposal"));

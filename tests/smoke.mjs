@@ -510,6 +510,62 @@ for (const theme of ["light", "dark"]) {
   await ctx.close();
 }
 
+// --- 7. a beat on the table survives closing the app ----------------------
+// Found in play: the card was module state while `lastBeat.open` was stored, so
+// reopening the app left the coach announcing "A beat is on the table" over a
+// screen with no way to confirm it. The fixture is whatever the app itself
+// rolls — building one by hand would assert the card renders from state the
+// player has no way to reach.
+{
+  const { ctx, page } = await newPage(FIXTURES.mid);
+  await goto(page, "play", "track");
+  await page.locator("#action-bar button", { hasText: "Random prompt" }).first().click();
+  await page.waitForTimeout(160);
+  const named = async (pg) => pg.evaluate(() => [...document.querySelectorAll("button")]
+    .filter((n) => n.offsetParent && !n.classList.contains("term"))
+    .map((n) => n.textContent.trim()));
+  ok("rolling a beat puts a card on the table",
+    (await named(page)).includes("Confirm — cross a box"));
+
+  const raw = await page.evaluate(() => localStorage.getItem("umState"));
+  const stored = (() => {
+    const st = JSON.parse(raw);
+    const g = st.games.find((x) => x.id === st.activeGameId);
+    return g.scopes.find((x) => x.id === g.activeScopeId).lastBeat;
+  })();
+  ok("the beat is written down, not just displayed",
+    !!(stored && stored.open && stored.beatType && stored.text));
+  await ctx.close();
+
+  // Boot a second time from exactly what the first left behind: the player
+  // closing the tab and coming back.
+  const { ctx: ctx2, page: page2, errors } = await newPage(JSON.parse(raw));
+  await goto(page2, "play", "track");
+  const after = await named(page2);
+  ok("the beat is still there after reopening, and can be confirmed",
+    after.includes("Confirm — cross a box"), after.join(" | ").slice(0, 140));
+  ok("it is the same beat, not a fresh roll",
+    (await page2.locator("#screen").innerText()).includes(stored.text));
+
+  // Conditional so a regression is reported as a finding rather than thrown as
+  // a locator timeout: a pass that crashes says less than one that names what
+  // is missing.
+  let closed = "never offered";
+  if (after.includes("Confirm — cross a box")) {
+    await page2.locator("button", { hasText: "Confirm — cross a box" }).first().click();
+    await page2.waitForTimeout(160);
+    closed = await page2.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem("umState"));
+      const g = st.games.find((x) => x.id === st.activeGameId);
+      return g.scopes.find((x) => x.id === g.activeScopeId).lastBeat.open;
+    });
+  }
+  ok("confirming the restored beat closes it", closed === false, String(closed));
+  ok("reopening on an open beat produced no console errors",
+    errors.length === 0, errors.slice(0, 3).join(" | "));
+  await ctx2.close();
+}
+
 // --- report ---------------------------------------------------------------
 await browser.close();
 server.close();

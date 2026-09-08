@@ -34,7 +34,30 @@ function clearOpenBeat() { openBeat = null; expandedLists = {}; }
 registerClearer(clearOpenBeat);
 
 // The disruption cascade hands a beat over from the Oracles tab (PUM p.9).
-export function setOpenBeat(beat) { openBeat = beat; }
+export function setOpenBeat(beat) { openBeat = beat; persistBeat(); }
+
+// A beat that has been rolled and not yet judged is the one piece of "transient"
+// view state that is not transient at all. The roll has already been announced,
+// already written to the journal, and the store already records that a beat is
+// on the table — the coach reads `lastBeat.open` and says so. Holding the card
+// itself in module scope meant a reload left the app asserting a beat was open
+// with no control anywhere that could confirm it: a beat journalled, a box never
+// crossed, and the only way on was to roll a different one. Found in play, where
+// four beats were lost that way in one session. So the whole beat is written
+// beside the flag, and the card is rebuilt from it.
+function persistBeat() {
+  // Re-recording the beat is not a move in the game — the move was the roll, and
+  // it is already on the undo stack — so it must not take a snapshot of its own.
+  if (openBeat) store.markBeat({ ...openBeat, open: true });
+}
+
+function rehydrateBeat(scope) {
+  if (openBeat || !scope || !scope.lastBeat || !scope.lastBeat.open) return;
+  // State written before the beat itself was persisted keeps only key and text,
+  // which is not enough to draw the card. Those scopes fall back to the chooser.
+  if (!scope.lastBeat.beatType) return;
+  openBeat = { ...scope.lastBeat };
+}
 
 export function renderPlay(host, section) {
   const game = store.activeGame();
@@ -48,6 +71,7 @@ export function renderPlay(host, section) {
     return;
   }
   const scope = store.currentScope();
+  rehydrateBeat(scope);
   add(host, sectionNav("play", section, {
     track: !!openBeat || isEnded(scope),
   }));
@@ -527,7 +551,7 @@ function doProposal(scope) {
     kind: "beat", title: `Modified proposal — ${r.text}`, detail: diceText(r.dice),
   });
   openBeat.journalId = entry.id;
-  store.setLastBeat({ key: r.key, text: r.text, open: true });
+  persistBeat();
   announce(`Modified proposal: ${r.text}`);
   render();
 }
@@ -543,7 +567,7 @@ function doPrompt(scope, opts = {}) {
     kind: "beat", title: `Random prompt — ${r.text}`, detail: detailBits.join(" · "),
   });
   openBeat.journalId = entry.id;
-  store.setLastBeat({ key: r.key, text: r.text, open: true });
+  persistBeat();
   announce(`Random prompt: ${r.text}`);
   render();
 }
@@ -581,7 +605,7 @@ function beatCard(scope) {
       onClick: () => store.transact("Confirm beat", () => {
         const out = store.confirmBeat({ label: b.text });
         openBeat = null;
-        store.setLastBeat({ key: b.key, text: b.text, open: false });
+        store.markBeat({ key: b.key, text: b.text, open: false });
         reportAdvance(out, `Beat confirmed — ${b.text}`);
       }),
     });
@@ -590,7 +614,7 @@ function beatCard(scope) {
     label: hasTrack(scope) ? "Not this time" : "Played it",
     onClick: () => store.transact("Beat played, track unchanged", () => {
       openBeat = null;
-      store.setLastBeat({ key: b.key, text: b.text, open: false });
+      store.markBeat({ key: b.key, text: b.text, open: false });
       store.addJournal({
         kind: "beat", title: "Beat played, track unchanged", detail: b.text, linkedTo: b.journalId,
       });
@@ -646,6 +670,7 @@ function nodeBlock(scope, beat) {
             if (!v) return;
             store.setCustomListName(n.categoryId, v);
             openBeat.node = invokeNode(store.currentScope(), n.categoryId);
+            persistBeat();
             render();
           },
         }),
@@ -678,6 +703,7 @@ function nodeBlock(scope, beat) {
         const slots = nodeSlots(scope, n.categoryId);
         const at = store.writeNodeToFirstEmpty(n.categoryId, v, slots);
         openBeat.node = { ...n, text: v, empty: false, slot: at >= 0 ? at : n.slot };
+        persistBeat();
         store.addJournal({ kind: "node", title: "Plot node invented", detail: `${cat ? cat.name : ""}: ${v}`, linkedTo: beat.journalId });
         render();
       },
@@ -690,6 +716,7 @@ function nodeBlock(scope, beat) {
     class: "btn small",
     onclick: () => {
       openBeat.node = invokeNode(scope, n.categoryId);
+      persistBeat();
       render();
     },
   }, "Reroll"));
@@ -700,6 +727,7 @@ function nodeBlock(scope, beat) {
       const forced = invokeNode(scope, n.categoryId, { force: true });
       if (forced.empty) { toast("This list is still empty — write a node first."); return; }
       openBeat.node = forced;
+      persistBeat();
       render();
     },
   }, "Leave it to destiny"));
@@ -723,6 +751,7 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
   const keep = (name, notes = "") => {
     store.addCast(kind, name, notes);
     openBeat.node = { ...n, unavailable: false, empty: false, text: name, chosen: true, slot: -1 };
+    persistBeat();
     store.addJournal({
       kind: "node", title: kind === "location" ? "Location brought in" : "Character brought in",
       detail: name, linkedTo: beat.journalId,
@@ -756,6 +785,7 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
             onclick: () => {
               closeModal();
               openBeat.node = { ...n, unavailable: false, empty: false, text: c.name, chosen: true, slot: -1 };
+              persistBeat();
               store.addJournal({ kind: "node", title: "Recalled from the cast", detail: c.name, linkedTo: beat.journalId });
               render();
             },
@@ -784,6 +814,7 @@ function chooseNodeDialog(scope, n, beat) {
       class: "btn wide", onclick: () => {
         closeModal();
         openBeat.node = invokeNode(scope, n.categoryId, { chosen: i });
+        persistBeat();
         store.addJournal({ kind: "node", title: "Plot node chosen", detail: t, linkedTo: beat.journalId });
         render();
       },
@@ -992,7 +1023,7 @@ function invokeDeliberately(scope, cat, index, text) {
             kind: "beat", title: "Plot node invoked deliberately", detail: `${cat.name}: ${text}`,
           });
           openBeat.journalId = entry.id;
-          store.setLastBeat({ key: openBeat.key, text: openBeat.text, open: true });
+          persistBeat();
           go("play", "track");
         },
       },
@@ -1029,7 +1060,7 @@ function invokeListDeliberately(scope, cat) {
             dice: node.dice.map((d) => ({ label: d.label, value: d.value, kept: d.kept })),
           });
           openBeat.journalId = entry.id;
-          store.setLastBeat({ key: openBeat.key, text: openBeat.text, open: true });
+          persistBeat();
           announce(`${name}: ${node.text || "empty slot"}`);
           go("play", "track");
         },
