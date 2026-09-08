@@ -15,6 +15,8 @@
     "audit:deep": "node tests/audit-deep.mjs",
     "audit:novice": "node tests/audit-novice.mjs",
     "audit:guide": "node tests/audit-guide.mjs",
+    "playtest": "node tests/playtest.mjs",
+    "playtest:audit": "node tests/playtest-audit.mjs",
     "tutorial": "node tests/tools/gen-tutorial.mjs",
     "pdf": "node tests/tools/gen-pdf.mjs",
     "audit:reach": "node tests/audit-reach.mjs",
