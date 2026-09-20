@@ -86,6 +86,11 @@ const SKIP = [
 // an unreachable feature.
 const EXPECTED_UNREACHED = new Map([
   ["importJSON", "needs a pasted export; the unit harness round-trips it instead"],
+  ["base64ToBlob", "only runs on importing a bundle, which is importJSON's path above"],
+  ["unavailableReason", "only when the browser refuses IndexedDB; no click can refuse it"],
+  ["sweep", "garbage collection, fired by deleteGame and resetAll — both in SKIP as destructive"],
+  ["sweepFiles", "same: the store's side of that collection, reached only by deleting a game"],
+  ["revokeAll", "fired by resetAll, which wipes the fixture every later route stands on"],
   ["importData", "opens the import dialog, which is in SKIP for the same reason"],
   ["resetAll", "wipes the fixture every later route stands on (in SKIP)"],
   ["deleteGame", "same — destructive, covered by the unit harness"],
@@ -282,6 +287,20 @@ async function tapText(re, where = "#screen button, #action-bar button, .modal b
   }, [where, re.source]);
   if (hit) { clicks += 1; await page.waitForTimeout(90); }
   return hit;
+}
+
+// seed() writes (or clears) storage. Moving between screens inside one journey
+// must do neither — the first version of the files journey re-seeded to get back
+// to the shelf and wiped the file it had just added, then reported the controls
+// that file would have carried as unreachable.
+async function goTo(tab, section) {
+  await page.evaluate(async ([t, s]) => {
+    for (const b of document.querySelectorAll(".modal-back")) b.remove();
+    const r = await import("./src/router.js");
+    r.go(t, s);
+    for (const d of document.querySelectorAll("#screen details")) d.open = true;
+  }, [tab, section]);
+  await page.waitForTimeout(60);
 }
 
 const journeys = [];
@@ -576,6 +595,105 @@ const journeys = [];
   await page.waitForTimeout(60);
   await seed(null, "more", "home");
   journeys.push("two games: seeded for the switch control");
+}
+
+// 10. Files: add one, look at it, re-file it, attach it, remove it. Choosing a
+// file is the one player action that is not a click — the OS dialog is not ours
+// — so the click opens the picker and Playwright supplies the file, which is
+// exactly the division of labour a real pick has.
+{
+  await seed(MID, "play", "files");
+  await tapText(/^add a file$/);
+  const input = await page.$("input[type=file]");
+  if (input) {
+    // A one-pixel PNG, produced here rather than read from disk: a fixture the
+    // audit builds itself cannot drift from what the app actually accepts.
+    await input.setInputFiles({
+      name: "battle-map.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+        "base64"
+      ),
+    });
+    await page.waitForTimeout(400);
+  }
+  await goTo("play", "files");
+  const shown = await page.$$eval("#screen .file-preview img", (n) => n.length).catch(() => 0);
+  await tapText(/^rename$/);
+  await followDialog(0);
+  await tapText(/^file it under$/);
+  await followDialog(0);
+  await tapText(/^open$/);
+  await page.waitForTimeout(120);
+  // The chooser, from both of its callers, and an attachment from the journal.
+  await goTo("play", "cast");
+  await tapText(/^character sheet$/);
+  await followDialog(0);
+  await goTo("journal", "entries");
+  await tapText(/^attach a file$/);
+  await followDialog(0);
+  // A portrait, which is the chooser's other caller.
+  await goTo("play", "cast");
+  await tapText(/^open$/);
+  await tapText(/^portrait$/, ".modal button");
+  await followDialog(0);
+  // Both exports, with files present: the plain one reports what it leaves
+  // behind, the bundle carries them.
+  await goTo("more", "settings");
+  await tapText(/^export json$/);
+  await page.waitForTimeout(200);
+  await followDialog(-1);
+  await tapText(/^export everything$/);
+  await followDialog(0);
+  await page.waitForTimeout(500);
+  await followDialog(-1);
+  // And finally take it away again.
+  await goTo("play", "files");
+  await tapText(/^remove$/);
+  await followDialog(0);
+  journeys.push(`files: added, ${shown} preview(s) rendered, re-filed, attached, exported, removed`);
+}
+
+// 11. A voice note, as far as a headless browser goes: the dialog opens, Start
+// finds no microphone and says so in place. That IS the path most players on a
+// desktop without a mic will take, so it is worth walking.
+{
+  await seed(MID, "play", "files");
+  await tapText(/^record a voice note$/);
+  await followDialog(0);
+  await page.waitForTimeout(150);
+  await followDialog(-1);
+  journeys.push("voice note: dialog opened and answered");
+}
+
+// 12. The player's own tables: write one, roll it, keep the roll.
+{
+  await seed(MID, "more", "tables");
+  await tapText(/^new table$/);
+  await page.evaluate(() => {
+    const m = document.querySelector(".modal");
+    if (!m) return;
+    const name = m.querySelector("input[type=text]");
+    const rows = m.querySelector("textarea");
+    if (name) { name.value = "Audit table"; name.dispatchEvent(new Event("input", { bubbles: true })); }
+    if (rows) {
+      rows.value = "1. first row\n2) second row\n3 - third row";
+      rows.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  });
+  await tapText(/^save$/, ".modal button");
+  await page.waitForTimeout(120);
+  await tapText(/^roll 1d/);
+  await page.waitForTimeout(120);
+  await tapText(/^keep it/);
+  await followDialog(0);
+  await goTo("more", "tables");
+  await tapText(/^edit$/);
+  await followDialog(0);
+  await tapText(/^delete$/);
+  await followDialog(0);
+  journeys.push("my tables: written, rolled, kept, edited, deleted");
 }
 
 const coverage = await page.coverage.stopJSCoverage();

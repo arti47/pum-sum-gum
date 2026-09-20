@@ -7,6 +7,7 @@ import * as store from "./store.js";
 import { sectionNav, render, go } from "./router.js";
 import { openRule } from "./screens.js";
 import { registerClearer } from "./viewstate.js";
+import { filePreview, chooseFile } from "./files.js";
 
 // 40 entries was 97 controls and the tallest screen in the app under the stress
 // fixture. A log is read from the top; the page is smaller and says how much
@@ -21,7 +22,7 @@ const FILTERS = [
   ["all", "All"], ["beat", "Beats"], ["oracle", "Oracles"], ["yesno", "Yes/No"],
   ["sum", "SUM"], ["gum", "GUM"], ["scene", "Scenes"], ["node", "Nodes"],
   ["track", "Track"], ["timed", "Timed"], ["note", "Notes"], ["prep", "Prep"],
-  ["session", "Sessions"], ["ending", "Endings"],
+  ["session", "Sessions"], ["ending", "Endings"], ["table", "My tables"],
 ];
 
 export function renderJournal(host, section) {
@@ -132,6 +133,16 @@ function entryEl(e) {
   }
   if (e.linkedTo) add(wrap, el("div", { class: "cite", text: "↳ follows an earlier roll" }));
   if (e.note) add(wrap, el("div", { class: "entry-note", text: e.note }));
+  // Text, image and voice in any combination: an entry can carry all three, and
+  // the pictures and the recordings sit with the words rather than in a folder
+  // somewhere else.
+  const game = store.activeGame();
+  for (const id of e.attachments || []) {
+    const meta = game && game.files.find((f) => f.id === id);
+    if (!meta) continue;
+    if (meta.form === "image" || meta.form === "audio") add(wrap, filePreview(meta, { max: "14rem" }));
+    else add(wrap, el("div", { class: "cite", text: `Attached: ${meta.name}` }));
+  }
   // Two permanent buttons per entry meant 40 controls of furniture around 20
   // entries — the second-densest screen in the app, most of it not content.
   // They live behind the entry's own disclosure now.
@@ -145,6 +156,13 @@ function entryEl(e) {
       onSubmit: (v) => { store.updateJournal(e.id, { note: v }); render(); },
     }),
   }, e.note ? "Edit note" : "Add note"));
+  add(tools, el("button", {
+    class: "btn small ghost",
+    onclick: () => chooseFile({
+      title: "Attach a file",
+      onPick: (f) => { store.attachToJournal(e.id, f.id); toast("Attached."); },
+    }),
+  }, "Attach a file"));
   add(tools, el("button", {
     class: "btn small ghost",
     onclick: () => confirmModal({

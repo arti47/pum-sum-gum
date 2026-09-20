@@ -793,3 +793,18 @@ details.acc.group > summary .pill {
 .tut-roll-head .cite { margin-left: auto; white-space: nowrap; }
 .tut-roll-result { font-size: .95rem; margin: .2rem 0; }
 .tut-roll-then { font-size: .86rem; color: var(--ink-2); margin: .35rem 0 0; }
+
+/* --- files ---------------------------------------------------------------
+   A preview is filled asynchronously (the blob comes from IndexedDB), so it
+   must occupy no space until it has something to show, or every entry carrying
+   an attachment jumps as the page settles. */
+.file-preview { margin: .4rem 0; }
+.file-preview:empty { margin: 0; }
+.file-preview img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+.file-preview audio { width: 100%; margin-top: .2rem; }

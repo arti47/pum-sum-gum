@@ -19,6 +19,7 @@ import { openRule } from "./screens.js";
 import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-plot.js";
 import { BEAT_TRIGGERS, FIRST_BEAT_COACH } from "../data-guidance.js";
 import { renderCast } from "./cast.js";
+import { renderFiles } from "./files.js";
 import { coachCard } from "./coach.js";
 import { registerClearer } from "./viewstate.js";
 
@@ -78,6 +79,7 @@ export function renderPlay(host, section) {
 
   if (section === "nodes") return renderNodes(host, scope);
   if (section === "cast") return renderCast(host);
+  if (section === "files") return renderFiles(host);
   return renderTrack(host, scope);
 }
 

@@ -417,6 +417,16 @@ export const RULES_LIBRARY = [
         automated: false,
       },
       {
+        id: "files", title: "Files: maps, sheets, portraits and voice notes", page: "app",
+        body: "The record is JSON and lives in this browser's local storage; files are too big for that, so they live in the browser's file storage instead and the record keeps only their names and sizes. Two consequences worth knowing: Export JSON does not carry them — Export everything does — and clearing this site's data clears them. A character sheet here is the PDF from your own RPG, filed and handed back; PUM models no stats, so the app never reads what is inside it.",
+        automated: false,
+      },
+      {
+        id: "my-tables", title: "Your own random tables", page: "not in either book",
+        body: "Neither PUM, SUM nor GUM has a rule for tables you wrote yourself — this is the app's own, and it is deliberately not behind the GUM switch, because turning GUM off means you do not own that book and says nothing about a table you typed in. Paste a numbered list, the numbers are stripped, and the app rolls it, journals the answer with its die, and offers it to the same fourteen destinations a GUM roll reaches. The die defaults to one face per row; set it higher for a d66 or a d100 with gaps, and a roll past the last row says so rather than pretending.",
+        automated: false,
+      },
+      {
         id: "errata", title: "Where the books disagree with themselves", page: "PUM pp.9, 11",
         body: "Two worked examples cite prompt numbers that do not match the printed plot sheets. The sheets are the play surface and win. The app rolls the sheet's ordering and records the discrepancy rather than quietly correcting it.",
       },

@@ -268,7 +268,12 @@ export function normalizeGame(input = {}) {
     protagonists: Array.isArray(raw.protagonists)
       ? raw.protagonists.map((x) => {
           const p = obj(x);
-          return { id: str(p.id) || uid("pc"), name: str(p.name) || "Unnamed", notes: str(p.notes) };
+          return {
+            id: str(p.id) || uid("pc"), name: str(p.name) || "Unnamed", notes: str(p.notes),
+            // The sheet is a PDF you brought from your own RPG, not stats this
+            // app models — PUM has none (§1.0).
+            sheetId: str(p.sheetId) || null,
+          };
         })
       : [],
     cast: Array.isArray(raw.cast)
@@ -279,6 +284,7 @@ export function normalizeGame(input = {}) {
             kind: c.kind === "location" ? "location" : "character",
             name: str(c.name) || "Unnamed",
             notes: str(c.notes),
+            portraitId: str(c.portraitId) || null,
             traits: Array.isArray(c.traits)
               ? c.traits.map((y) => {
                   const t = obj(y);
@@ -305,15 +311,51 @@ export function normalizeGame(input = {}) {
             scopeId: str(e.scopeId) || null,
             sceneId: str(e.sceneId) || null,
             linkedTo: str(e.linkedTo) || null,
+            attachments: Array.isArray(e.attachments)
+              ? e.attachments.map((a) => str(a)).filter(Boolean) : [],
           };
         })
       : [],
   };
+  // The file shelf: metadata only. The bytes live in IndexedDB (`src/media.js`),
+  // so the record stays a single readable paste and a 4MB map cannot take the
+  // campaign down with it.
+  game.files = Array.isArray(raw.files)
+    ? raw.files.map((x) => {
+        const f = obj(x);
+        const name = str(f.name) || "Untitled file";
+        return {
+          id: str(f.id) || uid("file"),
+          name,
+          type: str(f.type),
+          form: ["image", "audio", "pdf", "file"].includes(f.form) ? f.form : "file",
+          size: Math.max(0, Number(f.size) || 0),
+          addedAt: Number(f.addedAt) || Date.now(),
+          // What the player filed it under. Free text would be a second name;
+          // these four are what the shelf sorts by.
+          tag: ["map", "sheet", "portrait", "note"].includes(f.tag) ? f.tag : "note",
+        };
+      })
+    : [];
   if (!game.scopes.length) game.scopes = [normalizeScope({ name: game.title })];
   if (!game.scopes.some((s) => s.id === game.activeScopeId)) {
     game.activeScopeId = game.scopes[0].id;
   }
   return game;
+}
+
+// Every file id the record still points at, anywhere. `media.sweep()` deletes
+// what is not in here, so a miss in this function is a file that vanishes while
+// something still shows it — it must stay exhaustive as fields are added.
+export function referencedFileIds(state) {
+  const ids = [];
+  for (const g of (state && state.games) || []) {
+    for (const f of g.files || []) ids.push(f.id);
+    for (const c of g.cast || []) if (c.portraitId) ids.push(c.portraitId);
+    for (const p of g.protagonists || []) if (p.sheetId) ids.push(p.sheetId);
+    for (const e of g.journal || []) for (const a of e.attachments || []) ids.push(a);
+  }
+  return [...new Set(ids)];
 }
 
 export function normalize(input = {}) {
@@ -333,6 +375,22 @@ export function normalize(input = {}) {
       seenTutorial: !!set.seenTutorial,
     },
     activeGameId: str(raw.activeGameId) || null,
+    // Tables the player typed in from a book this app has never read. They sit
+    // beside the games rather than inside one: a table you copied out of your
+    // own RPG is worth having in the next campaign too.
+    tables: Array.isArray(raw.tables) ? raw.tables.map((x) => {
+      const t = obj(x);
+      const rows = Array.isArray(t.rows) ? t.rows.map((r) => str(r)).filter(Boolean) : [];
+      return {
+        id: str(t.id) || uid("tbl"),
+        name: str(t.name) || "Untitled table",
+        // The die is the row count unless the player said otherwise; a d66 or a
+        // d100 with gaps is their business, and rolling past the end is not.
+        die: Math.max(1, Number(t.die) || rows.length || 1),
+        rows,
+        createdAt: Number(t.createdAt) || Date.now(),
+      };
+    }).filter((t) => t.rows.length) : [],
     games: Array.isArray(raw.games) ? raw.games.map((g) => normalizeGame(obj(g))) : [],
   };
   if (state.games.length && !state.games.some((g) => g.id === state.activeGameId)) {

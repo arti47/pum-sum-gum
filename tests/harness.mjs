@@ -1045,7 +1045,8 @@ const core = await import("../src/core.js");
   const json = store.exportJSON();
   const count = store.games().length;
   const n = store.importJSON(json);
-  eq("an export re-imports the same number of games", n, count);
+  eq("an export re-imports the same number of games", n.games, count);
+  eq("a plain export carries no files", n.files, 0);
   ok("the export is human-readable JSON", json.includes('"app": "unfolding-machines"'));
 }
 

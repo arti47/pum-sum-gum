@@ -4,6 +4,7 @@
 import { el, add, announce } from "./core.js";
 import { explain, modal, closeModal, promptModal, confirmModal, toast, inspireBlock } from "./ui.js";
 import * as store from "./store.js";
+import { filePreview, chooseFile } from "./files.js";
 import { rollSum, journalRoll, diceText } from "./roller.js";
 import { sumTable, plotSheet } from "./rules.js";
 import { render, go } from "./router.js";
@@ -40,7 +41,8 @@ export function renderCast(host) {
           onclick: () => editProtagonist(p),
         }, "Edit")
       ),
-      p.notes ? el("div", { class: "entry-detail", text: p.notes }) : null
+      p.notes ? el("div", { class: "entry-detail", text: p.notes }) : null,
+      sheetRow(p)
     ));
   }
   add(pcs, el("button", {
@@ -107,6 +109,9 @@ function castEntry(c) {
       onclick: () => openCast(c),
     }, "Open")
   ));
+  const game = store.activeGame();
+  const portrait = c.portraitId && game && game.files.find((f) => f.id === c.portraitId);
+  if (portrait) add(wrap, filePreview(portrait, { max: "8rem" }));
   if (c.notes) add(wrap, el("div", { class: "entry-detail", text: c.notes }));
   if (c.traits.length) {
     const ul = el("ul", { style: "margin:.3rem 0 0;padding-left:1.1rem" });
@@ -118,6 +123,26 @@ function castEntry(c) {
     add(wrap, ul);
   }
   return wrap;
+}
+
+// The character sheet from the player's own RPG. PUM models no stats (§1.0), so
+// this app files the PDF and hands it back; it does not read it, and nothing in
+// the app depends on what is inside it.
+function sheetRow(p) {
+  const game = store.activeGame();
+  const sheet = p.sheetId && game && game.files.find((f) => f.id === p.sheetId);
+  const row = el("div", { class: "btn-row", style: "margin-top:.3rem;align-items:center" });
+  if (sheet) add(row, el("span", { class: "cite", text: `Sheet: ${sheet.name}` }));
+  add(row, el("button", {
+    class: "btn small ghost",
+    onclick: () => chooseFile({
+      title: "Character sheet",
+      current: p.sheetId,
+      onPick: (f) => store.setProtagonistSheet(p.id, f.id),
+      onClear: () => store.setProtagonistSheet(p.id, null),
+    }),
+  }, "Character sheet"));
+  return row;
 }
 
 function editProtagonist(p) {
@@ -231,6 +256,21 @@ function openCast(c) {
             // no-inspire: renaming something that exists is a correction.
             title: "Rename", label: "Name", value: c.name,
             onSubmit: (v) => { if (v) { store.updateCast(c.id, { name: v }); render(); } },
+          });
+          return true;
+        },
+      },
+      {
+        // A face for someone the story keeps meeting. Stored like any other
+        // file, so removing it from the shelf removes it from here too.
+        label: "Portrait",
+        onClick: () => {
+          chooseFile({
+            title: "Portrait",
+            form: "image",
+            current: c.portraitId,
+            onPick: (f) => store.setCastPortrait(c.id, f.id),
+            onClear: () => store.setCastPortrait(c.id, null),
           });
           return true;
         },

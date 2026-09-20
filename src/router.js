@@ -8,19 +8,19 @@ import { plotSheet } from "./rules.js";
 import { Settings } from "./settings.js";
 
 export const TABS = [
-  { id: "play",    icon: "▤", label: "Play",    sections: ["track", "nodes", "cast"] },
+  { id: "play",    icon: "▤", label: "Play",    sections: ["track", "nodes", "cast", "files"] },
   { id: "scene",   icon: "◗", label: "Scene",   sections: ["arc", "explore", "battle", "discovery", "people"] },
   { id: "oracles", icon: "◇", label: "Oracles", sections: ["yesno", "descriptive", "story", "granular", "quantifiers"] },
   { id: "journal", icon: "✎", label: "Journal", sections: ["entries", "dice"] },
   // The Forge is prep, not play: it lives under More so the tab bar stays five
   // wide. At 320px six tabs are 53px each; five are 64px, and the tab bar is the
   // most-used control in the app.
-  { id: "more",    icon: "≡", label: "More",    sections: ["home", "forge", "library", "tutorial", "settings"], gatedSections: { forge: "gum" } },
+  { id: "more",    icon: "≡", label: "More",    sections: ["home", "forge", "tables", "library", "tutorial", "settings"], gatedSections: { forge: "gum" } },
 ];
 
 const SECTION_LABELS = {
-  track: "Plot track", nodes: "Plot nodes", cast: "Cast",
-  forge: "Forge",
+  track: "Plot track", nodes: "Plot nodes", cast: "Cast", files: "Files",
+  forge: "Forge", tables: "My tables",
   seed: "Plot seed", world: "World", character: "Characters", grand: "Grand oracle",
   yesno: "Yes or No", descriptive: "Descriptive", story: "Story",
   granular: "Granular", quantifiers: "Quantifiers",

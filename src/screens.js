@@ -13,7 +13,8 @@ import {
 import { sectionNav, go, render } from "./router.js";
 import { startWizard, inWizard, renderWizard, addScopeDialog } from "./wizard.js";
 import { renderTutorial } from "./tutorial.js";
-import { renderForge } from "./forge.js";
+import { renderForge, renderTables } from "./forge.js";
+import * as media from "./media.js";
 import { RULES_LIBRARY, GLOSSARY } from "../data-rules-library.js";
 import { PLAY_STATES, FLOWCHART, ADVICE, ADVANCED, MACHINES, NEW_TO_SOLO } from "../data-guidance.js";
 import { PUM_ERRATA, NODE_CATEGORIES } from "../data-pum-plot.js";
@@ -37,6 +38,7 @@ export function renderMore(host, section) {
     ));
   }
   if (section === "forge") return renderForge(host);
+  if (section === "tables") return renderTables(host);
   if (section === "library") return renderLibrary(host);
   if (section === "tutorial") return renderTutorial(host);
   if (section === "settings") return renderSettings(host);
@@ -564,11 +566,24 @@ function renderSettings(host) {
   const data = el("div", { class: "card" });
   add(data, el("h2", { text: "Your data" }));
   add(data, el("p", { class: "muted", text: "Everything lives in this browser's local storage. Nothing is sent anywhere. Export regularly — a game you cannot take with you is a rental." }));
+  // Files are the one thing a plain export leaves behind, so the size of what
+  // would be left behind is stated here rather than discovered on another device.
+  const storage = el("p", { class: "cite", text: "Checking file storage…" });
+  add(data, storage);
+  media.usage().then((u) => {
+    if (!u.ok) { storage.textContent = media.unavailableReason(); return; }
+    storage.textContent = u.count
+      ? `${u.count} file${u.count === 1 ? "" : "s"} · ${media.fmtBytes(u.bytes)}`
+        + (u.quota ? ` of roughly ${media.fmtBytes(u.quota)} this browser allows` : "")
+        + ". Export everything carries them; Export JSON does not."
+      : "No files stored. Export JSON carries the whole record.";
+  });
   add(data, el("div", { class: "btn-row" },
     el("button", { class: "btn", onclick: exportData }, "Export JSON"),
     el("button", { class: "btn", onclick: importData }, "Import JSON")
   ));
   add(data, el("div", { class: "btn-row", style: "margin-top:.4rem" },
+    el("button", { class: "btn small", onclick: exportEverything }, "Export everything"),
     el("button", { class: "btn small", onclick: exportReadable }, "Export readable"),
     el("button", {
       class: "btn small",
@@ -715,6 +730,32 @@ function toggle(label, description, checked, onChange) {
 function exportData() {
   const json = store.exportJSON();
   showTextDump("Export", json, "unfolding-machines.json");
+  // What this export leaves behind, said at the moment it is taken rather than
+  // discovered on the other device.
+  store.fileReport().then((r) => {
+    if (!r.wanted) return;
+    toast(`${r.wanted} file${r.wanted === 1 ? " is" : "s are"} not in this export — use Export everything for those.`);
+  });
+}
+
+// The record with its files inside it. Much larger, so it is a second control
+// rather than a replacement, and it says how large before it builds one.
+function exportEverything() {
+  store.fileReport().then((r) => {
+    if (!r.wanted) { exportData(); return; }
+    const missing = r.wanted - r.present;
+    confirmModal({
+      title: "Export everything",
+      message: `This carries the record and ${r.present} file${r.present === 1 ? "" : "s"} inside it, as text. Files roughly a third larger than they are on disk, so it can be many megabytes — slow to copy, and some viewers will not paste it.`
+        + (missing ? ` ${missing} file${missing === 1 ? " is" : "s are"} not in this browser and cannot be carried.` : ""),
+      confirmLabel: "Build it",
+      onConfirm: async () => {
+        toast("Building the bundle…");
+        const json = await store.exportBundle();
+        showTextDump("Export everything", json, "unfolding-machines-with-files.json");
+      },
+    });
+  });
 }
 
 // The readable export is the artefact that outlives the app: the one file a
@@ -944,7 +985,8 @@ function importData() {
           try {
             const n = store.importJSON(area.value);
             applyTheme();
-            toast(`Imported ${n} game${n === 1 ? "" : "s"}.`);
+            toast(`Imported ${n.games} game${n.games === 1 ? "" : "s"}`
+              + (n.files ? ` and ${n.files} file${n.files === 1 ? "" : "s"}.` : "."));
             go("more", "home");
           } catch (err) {
             toast("That doesn't look like an export file.");

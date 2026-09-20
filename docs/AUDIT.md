@@ -1753,3 +1753,62 @@ at once.
 Downloads are blocked in some embedded viewers — copying always works.") and the filename. The
 guide's two descriptions of the export were rewritten to match, and the doc, page and PDF
 regenerated.
+
+
+---
+
+## Measured against a rival, not against the books
+
+A feature list for another PUM app was put beside this one. Most of it was already
+here — multiple games, a guided setup, oracles, plot and character tracking, dice and event
+tracking — and two things were not.
+
+**F-81 · The app stored no bytes at all.** Three of the four gaps were one gap: no images, no
+audio, no PDFs, no portraits, nowhere for a battle map. It followed from §1.1's `localStorage`
+decision rather than from an oversight, but the consequence was a solo play aid that could not
+hold the map you were playing on.
+*Fix:* the decision is amended, not abandoned. The record stays one readable JSON paste in
+`localStorage`; the bytes go to IndexedDB (`src/media.js`) and `umState` keeps metadata only.
+The reason for the split is the record's own health — base64 inflates a blob by a third into a
+~5MB string store, so one map would have filled it and a quota error on save is how a solo
+player loses a year of play. `src/files.js` carries the Files screen and the three attach
+points; `Export everything` carries the bundle that `Export JSON` cannot, and says how large
+before it builds one.
+*Not invented while doing it:* a character-sheet **model**. §1.0 omits the whole stat slot
+because PUM has none, and that still holds — a "character sheet" here is the PDF from the
+player's own RPG, filed and handed back, never read.
+
+**F-82 · A table the player typed in had nowhere to live.** The app shipped 86 of the books'
+tables and no way to add the d66 out of your own rulebook.
+*Fix:* **My tables**, the app's own feature and recorded as such. A pasted numbered list has its
+`1.`/`2)`/`3 -` numbering stripped, rolls with its own die (defaulting to one face per row, so a
+d66 or a d100 with gaps is the player's business and a roll past the end says so), journals under
+a new `table` kind — which needed a filter, and the harness said so before it shipped — and
+reaches the same fourteen "Keep it →" destinations a GUM roll does. It sits outside the GUM
+toggle on purpose: turning GUM off means "I do not own that book" and says nothing about a
+table you wrote yourself.
+
+### What the passes caught that the feature work did not
+
+- **deadcode:** five exports nothing imported (`tagLabel`, `addFile`, `recordVoice`, `revoke`,
+  `sweepFiles`). `tagLabel` was deleted outright; the rest became module-private. Writing an
+  export "because a screen might want it later" is how a dead surface starts.
+- **the function audit:** every new function unreachable, because its twelve journeys never
+  visited the new screens. Three journeys added. **The first version of the files journey
+  re-seeded mid-way to get back to the shelf, and `seed(null, …)` clears storage** — so it wiped
+  the file it had just added and then reported that file's own controls as unreachable. A
+  navigate-only `goTo()` fixes it, and it is the eighth distinct way this audit has been
+  watched to lie.
+- **the journal-kind guard:** the file metadata's type field was called `kind`, and the harness
+  reads every `kind: "..."` in `src/` as a journal kind needing a filter. Renamed to `form`
+  rather than weakening the guard — the guard is worth more than the nicer word.
+
+### Guards, watched failing
+
+`tests/smoke.mjs` §9 drives a real file in through the app's own picker (Playwright supplies the
+file, which is the division of labour a real pick has), asserts it renders, reloads the context so
+the blob has to come back out of IndexedDB, and asserts that removing it empties **both** stores.
+§10 pastes a list numbered three different ways, asserts the numbering is stripped, the die
+defaults to the row count, the roll journals with its die, and My tables is still there with GUM
+switched off. Broken on purpose in two places — the blob write, and the numbering strip — and
+three assertions failed before they were trusted.

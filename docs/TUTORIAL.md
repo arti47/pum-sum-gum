@@ -756,6 +756,15 @@ Cast
 - Add a character · Add a location (name + what GUM says about them).
 - Open a cast entry → Notes, the twelve SUM character tables on a character, Save · Rename · Add to plot nodes · Remove. Rolled traits list with Remove per trait.
 - Add to plot nodes → Write it in / Cancel, or an explanation and Back to the cast when this sheet prints no such list.
+- Character sheet, on each protagonist, and Portrait, inside a cast entry — both open the same chooser: what is already filed, Add a file, Remove, Cancel.
+
+Files
+
+- Four drawers — Maps · Character sheets · Portraits · Other files — and a file appears in exactly one.
+- Add a file is pinned, with Record a voice note beside it; the context line carries the count and the total size.
+- Per file: Open · Rename · File it under, which is the four drawers again · Remove.
+- Record a voice note → Start recording · Stop · Save the recording · Cancel. The microphone is asked for when you press Start, not when the dialog opens, and if the browser will not record it says so and points at Add a file.
+- Images show, audio plays, anything else opens in a new tab. A file the record names but this browser does not have says so where it would have appeared.
 
 ### Scene
 
@@ -819,9 +828,17 @@ Rules
 - Errata (folded) — where the books disagree with themselves.
 - Where the app does not roll (folded) — the eight fields with no inspiration block, and why.
 
+My tables
+
+- New table is pinned. Per table: Roll 1dN · Edit · Delete.
+- New table / Edit table — Table name, Rows (one per line; a pasted “1. …” list has its numbering stripped for you), and Die, which defaults to one face per row.
+- A roll shows its die and offers Re-roll · Keep it → · Dismiss — the same fourteen destinations a GUM roll reaches, journalled as “Kept from my tables — <the table>”.
+- Not behind the GUM switch: turning GUM off says you do not own that book, and says nothing about a table you typed in yourself.
+
 Tutorial — this document. Settings — see Part 2.
 
-- Your data: Export JSON (also pinned, with Import beside it) · Import JSON · Export readable · Check my data · Undo.
+- Your data: Export JSON (also pinned, with Import beside it) · Import JSON · Export everything · Export readable · Check my data · Undo. A line under them says how many files are stored and roughly how much room this browser allows.
+- Export JSON carries the record and not the files; Export everything carries both, as one much larger paste, and says how large before it builds one. Import takes either.
 - Export and import dialogs: Copy · Download · Close · Import · Cancel.
 - Optional rules: Disruption die · Volatile situation · Game Unfolding Machine (GUM v2.2) · Enrich descriptive and story oracles · Show the “What this does” notes expanded.
 - Appearance: Theme · Text size — N%, which the label carries as you drag it.
@@ -846,7 +863,9 @@ Each of these opens over the screen, traps focus, closes on Escape, and returns 
 - Keep this (the Forge) — Name them / Name the place, or “Open Settings” when GUM is off.
 - Write in the journal · Mark a session break (“A line about where you stopped (optional)”) · Delete this entry? · Clear the journal?
 - This game · Plot sheet — the two edit dialogs on Home.
-- Export / Readable export — Copy, Download, Close. Import. Data check. Erase everything?
+- Export / Readable export / Export everything — Copy, Download, Close. Import. Data check. Erase everything?
+- Attach a file, inside a journal entry's Edit fold, and Portrait and Character sheet on the Cast — all three open the same chooser, whose primary is Add a file.
+- Record a voice note · New table · Edit table · File it under · Remove <file>? · Delete <table>?
 - Rules → “Clear the search” when a search matches nothing. Journal → “Go to the oracles” and “Go to the plot sheet” when it is empty. Plot nodes → “Back to the track” on a sheet with no nodes.
 - Tutorial → “Mark as read”, which stops the quick start offering it again; “Open the guide as a page →”, which opens this same guide as a web page for a second screen; and “Download the guide as a PDF”, the same guide paginated — a title page, a numbered contents, bookmarks, one part per page break — for a tablet at the table or for paper. Both ship with the app and are cached with it, so both work offline.
 

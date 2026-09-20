@@ -2,8 +2,9 @@
 // export/import. One undo snapshot stack shared by every mutating action (§14.1.2).
 
 import { STORAGE_KEY, uid } from "./core.js";
-import { normalize, normalizeGame, normalizeScope, activeScope, trackLength, crossed }
-  from "./derived.js";
+import { normalize, normalizeGame, normalizeScope, activeScope, trackLength, crossed,
+  referencedFileIds } from "./derived.js";
+import * as media from "./media.js";
 
 let state = null;
 const listeners = new Set();
@@ -157,6 +158,17 @@ export function deleteGame(id) {
     s.games = s.games.filter((g) => g.id !== id);
     if (s.activeGameId === id) s.activeGameId = s.games.length ? s.games[0].id : null;
   });
+  sweepFiles();
+}
+
+// Garbage collection for the blob store: whatever the record no longer points
+// at is deleted. Deliberately not awaited — it is housekeeping, and a player
+// waiting on it would be waiting for nothing they can see. Undo is the reason
+// it runs on deletion rather than on every write: a file swept a moment after a
+// delete that is then undone would come back as a broken reference, so this is
+// called only where the deletion is the point.
+function sweepFiles() {
+  try { media.sweep(referencedFileIds(getState())); } catch { /* housekeeping */ }
 }
 
 // --- scopes (plot sheets) ---------------------------------------------------
@@ -477,6 +489,96 @@ export function markBeat(beat) {
   });
 }
 
+// --- files ------------------------------------------------------------------
+// The bytes are already in IndexedDB by the time any of these run; this is the
+// record's side of it. Removing a file removes every reference to it in the same
+// transaction, because a dangling id renders as a broken thumbnail and there is
+// no screen on which that is better than the file simply being gone.
+
+export function addFile(meta) {
+  mutate("Add a file", () => {
+    const g = activeGame();
+    if (g) g.files.unshift(meta);
+  });
+  return meta;
+}
+
+export function updateFile(id, patch) {
+  mutate("Rename a file", () => {
+    const g = activeGame();
+    const f = g && g.files.find((x) => x.id === id);
+    if (f) Object.assign(f, patch);
+  });
+}
+
+export function removeFile(id) {
+  mutate("Remove a file", () => {
+    const g = activeGame();
+    if (!g) return;
+    g.files = g.files.filter((f) => f.id !== id);
+    for (const c of g.cast) if (c.portraitId === id) c.portraitId = null;
+    for (const pc of g.protagonists) if (pc.sheetId === id) pc.sheetId = null;
+    for (const e of g.journal) {
+      if (e.attachments && e.attachments.includes(id)) {
+        e.attachments = e.attachments.filter((a) => a !== id);
+      }
+    }
+  });
+}
+
+export function setCastPortrait(castId, fileId) {
+  mutate(fileId ? "Set a portrait" : "Clear the portrait", () => {
+    const g = activeGame();
+    const c = g && g.cast.find((x) => x.id === castId);
+    if (c) c.portraitId = fileId;
+  });
+}
+
+export function setProtagonistSheet(pcId, fileId) {
+  mutate(fileId ? "Attach a character sheet" : "Detach the character sheet", () => {
+    const g = activeGame();
+    const pc = g && g.protagonists.find((x) => x.id === pcId);
+    if (pc) pc.sheetId = fileId;
+  });
+}
+
+export function attachToJournal(entryId, fileId) {
+  mutate("Attach a file", () => {
+    const g = activeGame();
+    const e = g && g.journal.find((x) => x.id === entryId);
+    if (e && !e.attachments.includes(fileId)) e.attachments.push(fileId);
+  });
+}
+
+// --- the player's own random tables -----------------------------------------
+// App-level, not per-game (§4.3): a table copied out of your own rulebook is
+// worth having in the next campaign too.
+
+export function tables() { return getState().tables; }
+
+export function addTable(table) {
+  const entry = {
+    id: uid("tbl"),
+    name: table.name || "Untitled table",
+    die: table.die || table.rows.length,
+    rows: table.rows,
+    createdAt: Date.now(),
+  };
+  mutate("Add a table", (s) => { s.tables.unshift(entry); });
+  return entry;
+}
+
+export function updateTable(id, patch) {
+  mutate("Edit a table", (s) => {
+    const t = s.tables.find((x) => x.id === id);
+    if (t) Object.assign(t, patch);
+  });
+}
+
+export function removeTable(id) {
+  mutate("Delete a table", (s) => { s.tables = s.tables.filter((t) => t.id !== id); });
+}
+
 // --- settings & theme -------------------------------------------------------
 export function setSetting(key, value) {
   prefer((s) => { s.settings[key] = value; });
@@ -495,6 +597,32 @@ export function exportJSON() {
   return JSON.stringify({ app: "unfolding-machines", exportedAt: new Date().toISOString(), state }, null, 2);
 }
 
+// The same record with the files inside it, base64'd. Much larger — a bundle
+// with one map in it is megabytes where the plain export is kilobytes — so it
+// is a second control rather than a replacement, and the plain one says what it
+// leaves behind.
+export async function exportBundle() {
+  const files = [];
+  for (const id of referencedFileIds(state)) {
+    const blob = await media.getBlob(id);
+    if (!blob) continue;
+    const data = await media.blobToBase64(blob);
+    if (data) files.push({ id, type: blob.type || "", data });
+  }
+  return JSON.stringify({
+    app: "unfolding-machines", exportedAt: new Date().toISOString(), state, files,
+  }, null, 2);
+}
+
+// How many of the record's files are actually in this browser. An export that
+// silently drops three of five is worse than one that says so.
+export async function fileReport() {
+  const wanted = referencedFileIds(state);
+  if (!wanted.length) return { wanted: 0, present: 0 };
+  const have = new Set(await media.storedIds());
+  return { wanted: wanted.length, present: wanted.filter((id) => have.has(id)).length };
+}
+
 export function importJSON(text) {
   const parsed = JSON.parse(text);
   const incoming = parsed && parsed.state ? parsed.state : parsed;
@@ -503,7 +631,16 @@ export function importJSON(text) {
   snapshot("Import");
   state = next;
   emit();
-  return next.games.length;
+  // A bundle carries its files with it. Restored after the state, so a failure
+  // here leaves a readable campaign with missing pictures rather than no
+  // campaign at all.
+  const files = parsed && Array.isArray(parsed.files) ? parsed.files : [];
+  let restored = 0;
+  for (const f of files) {
+    const blob = media.base64ToBlob(f.data, f.type);
+    if (blob) { media.putFile(f.id, blob); restored += 1; }
+  }
+  return { games: next.games.length, files: restored };
 }
 
 // Data-integrity action: re-run normalization and report what moved (§14.1.9).
@@ -525,6 +662,8 @@ export function checkData() {
 }
 
 export function resetAll() {
+  media.revokeAll();
+  try { media.sweep([]); } catch { /* housekeeping */ }
   snapshot("Reset everything");
   state = normalize({});
   emit();

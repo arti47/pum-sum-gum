@@ -6,8 +6,8 @@
 // table" (GUM p.3). So the unit of this screen is a *set* of rolls read together,
 // not a single answer.
 
-import { el, add, announce } from "./core.js";
-import { explain, actionBar, resultCard, toast, modal, closeModal, promptModal, emptyState,
+import { el, add, announce, die } from "./core.js";
+import { explain, actionBar, resultCard, toast, modal, closeModal, promptModal, emptyState, confirmModal,
   registerInspire, noGameNotice } from "./ui.js";
 import * as store from "./store.js";
 import { rollGum, rollGumSet, journalRoll, diceText } from "./roller.js";
@@ -343,7 +343,7 @@ function appendInto(existing, text) {
   return was ? `${was}\n\n${text}` : text;
 }
 
-function keepDialog(parts, label) {
+function keepDialog(parts, label, source = "GUM") {
   const text = parts.map((p) => p.answer).join(" · ");
   const scope = store.currentScope();
   const game = store.activeGame();
@@ -478,7 +478,7 @@ function keepDialog(parts, label) {
     });
   });
   dest("Just keep it in the journal", () => {
-    store.addJournal({ kind: "note", title: `Kept from GUM — ${label}`, detail: text });
+    store.addJournal({ kind: "note", title: `Kept from ${source} — ${label}`, detail: text });
     toast("Kept in the journal.", { undo: true });
   });
 
@@ -615,3 +615,148 @@ function inspireFor(fieldId, append, multiline = false) {
 }
 
 registerInspire(inspireFor);
+
+// --- the player's own tables -------------------------------------------------
+// A table typed in from a book this app has never read. Deliberately NOT behind
+// the GUM toggle: switching GUM off means "I do not own that book", and it must
+// not take away a table the player wrote themselves. They live at app level
+// (§4.3) rather than inside a game, because a table copied out of your own
+// rulebook is worth having in the next campaign too.
+
+let lastTable = null;
+
+function resetTables() { lastTable = null; }
+registerClearer(resetTables);
+
+export function renderTables(host) {
+  add(host, el("h1", { text: "My tables" }));
+  add(host, explain([
+    "Your own random tables, typed or pasted in — the d66 from your rulebook, a list of tavern names, whatever this game keeps reaching for.",
+    "They are not PUM, SUM or GUM: the app rolls them and files the answer, and makes no claim about what is in them.",
+    "They belong to you rather than to one game, so a table written for one campaign is there for the next.",
+  ], "my-tables", openRule));
+
+  const list = store.tables();
+  if (lastTable) add(host, tableResult());
+
+  if (!list.length) {
+    add(host, emptyState(
+      "No tables of your own yet",
+      "Paste in a numbered list — one row per line — and the app will roll on it, journal the answer, and let you keep it where the game reaches for it.",
+      { label: "New table", onClick: () => tableDialog(null) }
+    ));
+  }
+
+  for (const t of list) {
+    const card = el("div", { class: "card" });
+    add(card, el("div", { class: "card-head" },
+      el("h2", { text: t.name }),
+      el("span", { class: "cite", text: `d${t.die} · ${t.rows.length} rows` })
+    ));
+    add(card, el("p", { class: "muted", text: t.rows.slice(0, 3).join(" · ") + (t.rows.length > 3 ? " …" : "") }));
+    add(card, el("div", { class: "btn-row" },
+      el("button", { class: "btn primary", onclick: () => rollTable(t) }, `Roll 1d${t.die}`),
+      el("button", { class: "btn small ghost", onclick: () => tableDialog(t) }, "Edit"),
+      el("button", {
+        class: "btn small ghost",
+        onclick: () => confirmModal({
+          title: `Delete ${t.name}?`,
+          message: "The table is removed. Anything you already rolled from it stays in the journal.",
+          confirmLabel: "Delete", danger: true,
+          onConfirm: () => { store.removeTable(t.id); toast("Deleted.", { undo: true }); render(); },
+        }),
+      }, "Delete")
+    ));
+    add(host, card);
+  }
+
+  actionBar({
+    label: "New table",
+    context: list.length ? `${list.length} of your own` : "paste a numbered list",
+    onClick: () => tableDialog(null),
+  });
+}
+
+function rollTable(t) {
+  const roll = die(t.die);
+  // A die bigger than the list — a d66 written as 36 rows, a d100 with gaps —
+  // is the player's business. Rolling past the end says so rather than pretending.
+  const answer = t.rows[roll - 1] || "(no row at that number — roll again, or say what it means)";
+  const entry = store.addJournal({
+    kind: "table", title: `${t.name} — ${answer}`, detail: `d${t.die} ${roll}`,
+    dice: [{ label: `d${t.die}`, value: roll, kept: true }],
+  });
+  lastTable = { table: t, roll, answer, journalId: entry ? entry.id : null };
+  render();
+}
+
+function tableResult() {
+  const { table, roll, answer } = lastTable;
+  return resultCard({
+    kind: `My tables · ${table.name}`,
+    answer,
+    dice: [{ label: `d${table.die}`, value: roll, kept: true }],
+    actions: [
+      { label: "Re-roll", primary: true, onClick: () => rollTable(table) },
+      {
+        label: "Keep it →",
+        onClick: () => keepDialog(
+          [{ answer, table: { die: table.die, name: table.name }, roll, tableId: table.id }],
+          table.name, "my tables"
+        ),
+      },
+      { label: "Dismiss", onClick: () => { lastTable = null; render(); } },
+    ],
+  });
+}
+
+// One dialog for new and for edit: a name, and the rows as text. Pasting is how
+// a table actually arrives — out of a PDF, a web page, a friend's message — so
+// the box takes what a paste looks like and strips the numbering rather than
+// asking for one row at a time.
+function tableDialog(existing) {
+  const name = el("input", { type: "text", placeholder: "What goes wrong in the market" });
+  name.value = existing ? existing.name : "";
+  const rows = el("textarea", { placeholder: "1. A pickpocket, already gone\n2. The watch, asking for papers\n3. Someone calls you by a name you used to have" });
+  rows.value = existing ? existing.rows.join("\n") : "";
+  const dieBox = el("input", { type: "number", min: "1", max: "1000" });
+  dieBox.value = existing ? String(existing.die) : "";
+
+  const parse = () => rows.value.split(/\r?\n/)
+    // "1. foo", "1) foo", "1 - foo", "01 foo" — every way a table is printed.
+    .map((l) => l.replace(/^\s*\d+\s*[.)\-:—]?\s*/, "").trim())
+    .filter(Boolean);
+
+  return modal({
+    title: existing ? "Edit table" : "New table",
+    body: el("div", null,
+      el("p", { class: "muted", text: "Paste a numbered list and the numbers are stripped for you. One row per line." }),
+      el("label", { class: "field" }, el("span", { class: "lbl", text: "Table name" }), name),
+      el("label", { class: "field" }, el("span", { class: "lbl", text: "Rows" }), rows),
+      el("label", { class: "field" },
+        el("span", { class: "lbl", text: "Die" }),
+        dieBox,
+        el("div", { class: "hint", text: "Leave it blank to roll one die per row. Set it higher if your table is a d66 or a d100 with gaps." })
+      )
+    ),
+    actions: [
+      {
+        label: "Save", primary: true,
+        onClick: () => {
+          const parsed = parse();
+          if (!parsed.length) { toast("Type or paste at least one row."); return true; }
+          const patch = {
+            name: name.value.trim() || "Untitled table",
+            rows: parsed,
+            die: Math.max(1, Number(dieBox.value) || parsed.length),
+          };
+          if (existing) store.updateTable(existing.id, patch);
+          else store.addTable(patch);
+          toast(existing ? "Table saved." : "Table added.", { undo: true });
+          render();
+        },
+      },
+      { label: "Cancel" },
+    ],
+  });
+}

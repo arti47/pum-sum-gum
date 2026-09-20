@@ -606,6 +606,130 @@ for (const theme of ["light", "dark"]) {
   await ctx.close();
 }
 
+// --- 9. a file goes in through the app and comes back after a reload -------
+// The record is localStorage and the bytes are IndexedDB (§1.1), so the two can
+// disagree in a way no other feature here can: metadata with no blob renders as
+// a broken picture, a blob with no metadata is invisible rubbish holding quota.
+// The fixture is what the app itself stores, not a hand-built one.
+{
+  const { ctx, page, errors } = await newPage(FIXTURES.mid);
+  await goto(page, "play", "files");
+  ok("the Files screen is reachable from the Play tab",
+    (await page.locator("#screen h1").first().textContent()) === "Files");
+
+  await page.locator("#action-bar button", { hasText: "Add a file" }).first().click();
+  const input = await page.$("input[type=file]");
+  ok("Add a file opens a picker", !!input);
+  await input.setInputFiles({
+    name: "battle-map.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+      "base64"
+    ),
+  });
+  await page.waitForTimeout(500);
+  await goto(page, "play", "files");
+
+  const meta = await page.evaluate(() => {
+    const st = JSON.parse(localStorage.getItem("umState"));
+    const g = st.games.find((x) => x.id === st.activeGameId);
+    return g.files[0] || null;
+  });
+  ok("the record keeps the file's metadata", !!meta && meta.name === "battle-map.png");
+  ok("and reads its form from the file, not the caller", meta && meta.form === "image", String(meta && meta.form));
+  ok("the metadata carries no bytes", meta && !("blob" in meta) && !("data" in meta));
+  ok("the picture is on the screen", await page.locator("#screen .file-preview img").count() === 1);
+
+  const raw = await page.evaluate(() => localStorage.getItem("umState"));
+  // Reload the same context: module state is gone and the blob has to come back
+  // out of IndexedDB, which is the thing under test. The fixture's init script
+  // re-seeds localStorage on every load, so the record is put back by hand —
+  // IndexedDB is untouched by that, which is exactly the asymmetry being tested.
+  await page.reload({ waitUntil: "networkidle" });
+  await page.evaluate(async (st) => {
+    localStorage.setItem("umState", st);
+    const store = await import("./src/store.js");
+    store.load();
+    const r = await import("./src/router.js");
+    r.go("play", "files");
+  }, raw);
+  await page.waitForTimeout(500);
+  ok("the picture is still there after a reload",
+    await page.locator("#screen .file-preview img").count() === 1);
+
+  await page.locator("#screen button", { hasText: "Remove" }).first().click();
+  await page.waitForTimeout(150);
+  await page.locator(".modal button", { hasText: "Remove" }).first().click();
+  await page.waitForTimeout(400);
+  const after = await page.evaluate(async () => {
+    const st = JSON.parse(localStorage.getItem("umState"));
+    const g = st.games.find((x) => x.id === st.activeGameId);
+    const media = await import("./src/media.js");
+    return { metas: g.files.length, blobs: (await media.storedIds()).length };
+  });
+  ok("removing a file takes the record entry with it", after.metas === 0, String(after.metas));
+  ok("and the bytes too, rather than leaving them holding quota", after.blobs === 0, String(after.blobs));
+  ok("the file round trip produced no console errors", errors.length === 0, errors.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
+// --- 10. a table the books never printed -----------------------------------
+// Pasting is how a table actually arrives, so the paste is the test: the sample
+// deliberately mixes the three ways a printed list numbers itself.
+{
+  const { ctx, page, errors } = await newPage(FIXTURES.mid);
+  await goto(page, "more", "tables");
+  await page.locator("#action-bar button", { hasText: "New table" }).first().click();
+  await page.waitForTimeout(150);
+  await page.evaluate(() => {
+    const m = document.querySelector(".modal");
+    const name = m.querySelector("input[type=text]");
+    const rows = m.querySelector("textarea");
+    name.value = "What goes wrong in the market";
+    name.dispatchEvent(new Event("input", { bubbles: true }));
+    rows.value = "1. A pickpocket, already gone\n2) The watch, asking for papers\n3 - A name you used to have";
+    rows.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await page.locator(".modal button", { hasText: "Save" }).first().click();
+  await page.waitForTimeout(200);
+
+  const t = await page.evaluate(() => JSON.parse(localStorage.getItem("umState")).tables[0]);
+  ok("a pasted list becomes a table", !!t && t.rows.length === 3, JSON.stringify(t && t.rows));
+  ok("every way of numbering a printed row is stripped",
+    t && t.rows[0] === "A pickpocket, already gone" && t.rows[1] === "The watch, asking for papers"
+      && t.rows[2] === "A name you used to have");
+  ok("the die defaults to one face per row", t && t.die === 3, String(t && t.die));
+  ok("tables are kept beside the games, not inside one",
+    await page.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem("umState"));
+      return !st.games.some((g) => "tables" in g);
+    }));
+
+  await page.locator("#screen button", { hasText: "Roll 1d" }).first().click();
+  await page.waitForTimeout(250);
+  const entry = await page.evaluate(() => {
+    const st = JSON.parse(localStorage.getItem("umState"));
+    const g = st.games.find((x) => x.id === st.activeGameId);
+    return g.journal[0];
+  });
+  ok("rolling it writes one journal entry of its own kind", entry && entry.kind === "table");
+  ok("with the die that was rolled", entry && entry.dice.length === 1 && entry.dice[0].label === "d3",
+    JSON.stringify(entry && entry.dice));
+  ok("the answer is one of the rows the player typed",
+    t.rows.some((r) => entry.title.includes(r)), entry && entry.title);
+
+  // Switching GUM off says "I do not own that book" and must say nothing about
+  // a table the player wrote themselves.
+  await goto(page, "more", "settings");
+  await page.evaluate(async () => (await import("./src/settings.js")).Settings.setGum(false));
+  await goto(page, "more", "tables");
+  ok("My tables survives turning GUM off",
+    (await page.locator("#screen h1").first().textContent()) === "My tables");
+  ok("the tables round trip produced no console errors", errors.length === 0, errors.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
 // --- report ---------------------------------------------------------------
 await browser.close();
 server.close();
