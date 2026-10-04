@@ -1152,7 +1152,12 @@ export const GUM_FOR_FIELDS = {
   world: ["location-archetype", "background-problem", "faction-focus", "faction-society", "faction-politics"],
   problems: ["opposition", "caveat", "nemesis-intentions", "creature-type", "evil-deeds"],
   findings: ["object-function", "object-form", "location-worth", "location-content"],
-  questions: ["plot-hook", "initial-lead", "mission", "motivation"],
+  // Pending questions are open threads, unresolved leads and mysteries (PUM
+  // p.28). Chosen by their rows: a lead to follow, a thing not yet known, an
+  // unexplained deed with a who or a why behind it. Hooks, missions and
+  // motivations were mapped here once by name, and read as events, goals and
+  // reasons — none of them a question.
+  questions: ["initial-lead", "caveat", "nemesis-deeds"],
   characters: ["archetypes-1", "archetypes-2", "character-edge", "character-flaw", "good-purposes"],
   locations: ["location-archetype", "location-feature", "location-purpose", "location-worth"],
   // The two player-named lists (PUM p.27) hold whatever this game needs, so the

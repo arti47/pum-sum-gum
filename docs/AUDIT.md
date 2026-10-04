@@ -1921,3 +1921,18 @@ Name this game with the rest folded; Suggest a starting situation rolls the plot
 and `applyRoll` writes each line into its own field (also used for rolls carried in from the
 Forge), marking what it filled and showing the dice. *Why it mattered:* the first screen is the
 only one every player sees; a player who leaves there never reaches a single rule.
+
+---
+
+## Reported from play — the Pending questions rolls do not fit
+
+**F-89 · Three of the four tables offered to Pending questions produce no questions.** *Rule:*
+PUM p.28 — pending questions are open threads, unresolved leads, mysteries. *Target:*
+`GUM_FOR_FIELDS.questions` rolled `plot-hook` (events: "Someone in power gives you an order"),
+`mission` (goals: "Capture an enemy, dead or alive") and `motivation` (reasons: "A matter of
+money, debt, wrong people") beside `initial-lead`, the one table whose rows are leads. Mapped by
+the tables' names — "plot seed" sounds like threads — not by their rows: the F-44/F-45/F-63 defect
+in a fourth place. *Fix:* `initial-lead`, `caveat` (what you do not know yet: "We don't know where
+the target is") and `nemesis-deeds` (an unexplained act with a who or why behind it: "Found, or
+stole something of importance"), chosen by reading all 43 tables' rows. `caveat` is shared with
+Potential problems; a caveat is both. No rule, roll or table changed.
