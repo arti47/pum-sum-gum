@@ -1781,3 +1781,42 @@ details.acc.group > summary .pill {
 .which-row > .cite { flex: none; font-style: italic; }
 .which-row.here .which-text strong { color: var(--ink); }
 .machines > .which-body { margin-bottom: .4rem; }
+
+/* The beat card's own steps: read, play, judge — the two answers under the
+   third, so the card is in the order of play. */
+.beat-steps { margin: .9rem 0 .4rem; padding: 0; list-style: none; counter-reset: bs; }
+.beat-steps li {
+  counter-increment: bs; position: relative; padding: .15rem 0 .35rem 2rem;
+  font-size: .95rem; color: var(--ink-2); line-height: 1.4;
+}
+.beat-steps li::before {
+  content: counter(bs); position: absolute; left: 0; top: .1rem;
+  width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--serif); font-size: .78rem; font-weight: 700;
+  border: 1.5px solid var(--accent-text); color: var(--accent-text); background: var(--paper);
+}
+.beat-steps li.judge { color: var(--ink); font-weight: 600; }
+.beat-answer { margin: .1rem 0 .2rem 2rem; }
+.beat-answer > .btn { flex: 1 1 auto; }
+@media (max-width: 380px) { .beat-answer { margin-left: 0; } }
+
+/* Under the track: what a box is, and the loop that crosses one. */
+.track-caption { margin: .5rem 0 .2rem; font-family: var(--serif); font-size: .98rem; color: var(--ink); }
+.track-loop { list-style: none; padding: 0; margin: .2rem 0; counter-reset: tl; }
+.track-loop li {
+  counter-increment: tl; position: relative; padding: .1rem 0 .55rem 2rem;
+  display: flex; flex-direction: column; gap: .05rem;
+}
+.track-loop li::before {
+  content: counter(tl); position: absolute; left: 0; top: 0;
+  width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--serif); font-size: .78rem; font-weight: 700;
+  background: var(--accent-soft); color: var(--accent-text); border: 1.5px solid var(--accent-text);
+}
+.track-loop li:not(:last-child)::after {
+  content: ""; position: absolute; left: calc(.7rem - 1px); top: 1.5rem; bottom: 0;
+  border-left: 2px dotted var(--rule-2);
+}
+.track-loop li strong { font-family: var(--sans); font-size: .85rem; color: var(--ink); }
+.track-loop li span { font-size: .88rem; color: var(--ink-2); line-height: 1.35; }
+.track-card .loop-fold { margin: .4rem 0 .2rem; }

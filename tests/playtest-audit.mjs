@@ -218,7 +218,7 @@ for (const seed of seeds) {
 
     await page.evaluate(async () => (await import("./src/router.js")).go("play", "track"));
     await page.waitForTimeout(70);
-    const open = (await screenText()).includes("Confirm");
+    const open = (await screenText()).includes("cross a box");
     if (!open) {
       await step(`call a beat (${i + 1})`, pick() < 0.5 ? "Random prompt" : "Modified proposal");
     }
@@ -236,7 +236,7 @@ for (const seed of seeds) {
       else await step("leave it to destiny", "Leave it to destiny");
     }
     if (/bring one in|Recall/i.test(await screenText())) {
-      await step("bring someone in", "Bring one in", { optional: true });
+      await step("bring someone in", "Make up a new one", { optional: true });
       await fill(`A watcher ${i}`);
       if (!(await step("keep them", "^Save$", { optional: true }))) {
         await escapeDialog("bringing a character in from the beat card");
@@ -244,8 +244,8 @@ for (const seed of seeds) {
     }
 
     // Confirm it, or decline — both are legal, and both must work.
-    if (pick() < 0.7) await step(`confirm the beat (${i + 1})`, "Confirm", { optional: true });
-    else await step(`decline the beat (${i + 1})`, "(Not this time|Played it)", { optional: true });
+    if (pick() < 0.7) await step(`confirm the beat (${i + 1})`, "It mattered", { optional: true });
+    else await step(`decline the beat (${i + 1})`, "(It didn't matter|Played it)", { optional: true });
     await step("dismiss a fired dialog", "(Play it|Stay here|Close)", { optional: true });
   }
 

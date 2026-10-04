@@ -79,7 +79,7 @@ await step("oracles → ask", "Ask", "oracles");
 await step("answer → the beat it triggers", "random prompt", "play");
 
 // 5. the beat is on the table; confirm it
-await step("beat → confirm", "Confirm", "play");
+await step("beat → confirm", "It mattered", "play");
 await tap("Play it");          // dismiss a timed-beat modal if one fired
 await tap("Stay here");        // or a resolved-scope modal
 

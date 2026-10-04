@@ -21,9 +21,13 @@ import { go, render } from "./router.js";
 // scroll, not a navigation. Three coach actions used go("play","track") from
 // play/track — controls that changed nothing, which is exactly what the deep
 // audit reported on all ten plot sheets.
+// From any other tab — the coach strip on Oracles or Scene says "Go to the
+// beat" too — there is nothing here to scroll to, so it navigates; the scroll
+// alone made that button do nothing at all off the plot sheet (F-93).
 function scrollToBeat() {
   const el = document.getElementById("beat-controls");
-  if (el) el.scrollIntoView({ block: "start", behavior: "smooth" });
+  if (el) { el.scrollIntoView({ block: "start", behavior: "smooth" }); return; }
+  go("play", "track");
 }
 // The same defect as scrollToBeat, in the place coachStrip() created: the strip
 // now renders ON scene/arc, and these three actions ran go("scene","arc") — a
@@ -201,7 +205,9 @@ export function coachStrip({ onScene = false } = {}) {
 // button stay in view; the literal steps fold beneath them, open for a
 // newcomer — the steps are the point for someone who has never played, and
 // furniture above the track for someone who has.
-export function coachCard({ compact = false, newcomer = false, newcomerLine = null } = {}) {
+// `brief` is the form shown while a beat is on the table: the beat card below
+// carries its own steps, so the coach keeps only where you are.
+export function coachCard({ compact = false, brief = false, newcomer = false, newcomerLine = null } = {}) {
   const game = store.activeGame();
   const scope = store.currentScope();
   const stage = stageOf(game, scope);
@@ -231,6 +237,10 @@ export function coachCard({ compact = false, newcomer = false, newcomerLine = nu
   if (copy.example) {
     steps.push(el("p", { class: "coach-eg" },
       el("span", { class: "coach-eg-lead", text: "Like this: " }), copy.example));
+  }
+  if (brief) {
+    // nothing more: no steps, no button — the beat card is the next move.
+    return card;
   }
   if (compact && steps.length) {
     add(card, el("details", { class: "rows-fold coach-fold", open: newcomer || undefined },

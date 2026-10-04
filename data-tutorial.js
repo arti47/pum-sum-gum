@@ -84,7 +84,7 @@ export const QUICK_START = [
   {
     title: "9 · Confirm the beat — or don't",
     why: "Calling a beat authorises you to cross a box; it does not oblige you. Cross one only once the outcome turned out to matter.",
-    act: "Confirm — cross a box, or Not this time. Both are journalled. The track in the header is the honest answer to 'how close is this to over?'",
+    act: "Play it out first, then answer the beat card's third step — It mattered — cross a box, or It didn't matter. Both are journalled. The track in the header is the honest answer to 'how close is this to over?'",
   },
   {
     title: "10 · Close the scene",
@@ -205,7 +205,7 @@ const WALKTHROUGH = [
         "SUM — Scene Unfolding Machine. A supplement. Once PUM says a beat happens, SUM tells you what the scene offers, how the fight goes, and how the people in it behave.",
         "GUM — Game Unfolding Machine. Prep. Worlds, factions, objects, a nemesis, characters as concepts. Use it before you play, and when a blank field stops you mid-play.",
       ] },
-      { p: "In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its three rows are Call a plot beat (what happens next, stuck, drifting, nearly over?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. It folds with the What this does notes. Home's machines card opens on the same three rows." },
+      { p: "In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its four rows are Call a plot beat (what happens next, stuck, drifting?), See the track (where am I in the story, how long until it ends?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. It folds with the What this does notes. Home's machines card opens on the same three rows." },
       { note: "The division that matters: GUM creates a character as a concept — an archetype, an edge, a flaw. SUM decides how that character behaves when you actually meet them. If you find yourself asking 'what is this person like', you want SUM. If you are asking 'who even is this person', you want GUM." },
       { p: "None of the three resolves a task. No book here tells you whether you picked the lock, hit the guard, or convinced the magistrate. Bring your own RPG's rules for that, or simply decide. The app will never report success or failure — it reports what the world offers." },
       { ref: "PUM p.2 · SUM p.3 · GUM p.3" },
@@ -355,7 +355,7 @@ const WALKTHROUGH = [
         "Leave it to destiny — reroll until a written entry comes up. This is the 'still stuck' rule, and it can never hand you an empty slot back.",
       ] },
       { ref: "PUM p.6" },
-      { warn: "On an all-in-one sheet, faces 5 and 6 reach for a notable character and an interesting location — lists that sheet does not print. The app says so and offers to bring one in, recall one from your cast, or roll one from GUM. It does not quietly roll on a list you cannot see." },
+      { warn: "On an all-in-one sheet, faces 5 and 6 reach for a notable character and an interesting location — lists that sheet does not print. The app says so and offers to make up a new one, pick one from your cast, or roll one from GUM. It does not quietly roll on a list you cannot see." },
       { p: "If a beat repeats the last one, the card flags it and offers a re-roll. Flagged, never forced: sometimes a repeat is exactly right." },
     ],
   },
@@ -367,10 +367,11 @@ WALKTHROUGH.push(
     title: "Confirming a beat, and the track",
     blocks: [
       { p: "Calling a beat authorises you to cross a box. It does not oblige you to. Play the answer out in the fiction first — for minutes, not seconds — and cross a box only if the outcome turned out to matter to the bigger picture." },
+      { p: "The beat card says this in its own three numbered steps — 1 Read it, 2 Play it out, 3 Did it change where the story is going? — with the two answers under the third, so the card reads in the order you play it. Under the track, one line says what a box is: each box is one beat that mattered; cross them all and this storyline ends. How the track and beats fit, folded beside it, draws the whole loop as five stations: Play → Call a beat → Play it out → Judge it → The end." },
       { ref: "PUM p.7" },
       { bullets: [
-        "Confirm — cross a box. The box crosses, the header updates, the journal records it.",
-        "Not this time — the beat is journalled as played, and the track stays where it is.",
+        "It mattered — cross a box. The box crosses, the header updates, the journal records it.",
+        "It didn't matter — the beat is journalled as played, and the track stays where it is.",
         "Re-roll — try again.",
         "Add a note — write what actually happened onto the beat's journal entry.",
       ] },
@@ -539,7 +540,7 @@ const SCENARIOS = [
 
       { p: "Second beat, and the awkward one. Prompt face 5:" },
       { roll: { what: "Random prompt", die: "d10", value: 5, result: "Meet or recall a notable character", page: "PUM p.14",
-        then: "This sheet prints no notable-characters list. The app says so plainly and offers three things: bring one in, recall one from the cast, or roll one from GUM. It does not roll on a list you cannot see." } },
+        then: "This sheet prints no notable-characters list. The app says so plainly and offers three things: make up a new one, pick one from your cast, or roll one from GUM. It does not roll on a list you cannot see." } },
       { p: "You take “roll one from GUM” and get archetype 42, “Dark Jester: A joker hiding dark intentions in sarcasm”. Sixty metres down, in a flooding vault, in folk horror. A joker." },
       { note: "This is the moment the book's advice chapter exists for. PUM p.10: re-roll for a better fit, or downplay it, or go with whatever came to mind first whether or not it matches. What came to mind first was Brother Aldo — already on your problems list as a liar — and the realisation that his lying is not fear. He is enjoying this. The roll did not describe a new person; it re-described one you already had. Kept, named him in the cast, notes carry the archetype." },
       { p: "Confirm. 2/7." },
@@ -603,7 +604,7 @@ SCENARIOS.push(
       { roll: { what: "Background problem", die: "d20", value: 7, result: "Punishment: Plague, curse, damnation, sickness, disease, we are helpless, we are dying", page: "GUM p.5",
         then: "Read together: a failing edge-of-town street where something is making people ill and nobody official is coming. “Keep it →” wrote both into the world-elements list so a prompt can reach them later." } },
 
-      { p: "Because there is no track, the beat controls behave differently: the beat card offers “Played it” instead of “Confirm — cross a box”, since there is no box to cross. Everything else is the same. Beats still shape what happens; they just do not measure progress." },
+      { p: "Because there is no track, the beat controls behave differently: the beat card offers “Played it” instead of “It mattered — cross a box”, since there is no box to cross. Everything else is the same. Beats still shape what happens; they just do not measure progress." },
 
       { p: "The awkward roll, and the useful lesson in it. You have built to a confrontation on the landing and you want the house to do something. Intervention check, bias Trouble:" },
       { roll: { what: "Intervention check · bias high", die: "2d100 → 5", result: "Remains silent — nothing really happens (peaceful)", page: "SUM p.4",
@@ -690,10 +691,11 @@ const REFERENCE = [
     blocks: [
       { p: "Plot track" },
       { bullets: [
-        "Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · Ask an oracle · Go to the scene, or you are here.",
+        "Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.",
         "Random prompt (pinned) / Proposal — the two beat controls. The card above repeats them as Modified proposal and Random prompt.",
-        "On a beat card: Confirm — cross a box · Not this time (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged.",
-        "On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Bring one in · Recall (N), on a list this sheet does not print — the count is how many are in the cast.",
+        "On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged. While a beat is open the track card moves to the top and the coach keeps only its heading.",
+        "Under the track: Each box is one beat that mattered — cross all N and this storyline ends; and How the track and beats fit, a fold of five stations.",
+        "On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Make up a new one · Pick from your cast (N), on a list this sheet does not print — the count is how many are in the cast.",
         "Track: any box opens Box N — Mark a timed beat / Edit the timed beat / Clear the mark / Close.",
         "Track options → Advance without a beat · Step back · End this scope; Reopen this scope once it has ended.",
         "Customize (Customized sheet only) → Add a section · + box · Remove · Edit the prompt column → Save the column / Reset to the standard column · Done.",
@@ -733,7 +735,7 @@ const REFERENCE = [
     title: "Scene",
     blocks: [
       { bullets: [
-        "Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · Ask an oracle · Go to the scene, or you are here.",
+        "Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.",
         "This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), Roll an intervention check · Roll a scene closure. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action becomes Intervention check with Close beside it.",
         "Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.",
         "While it runs: Call a plot beat · Ask an oracle · Who is here? · Roll a SUM table.",
@@ -748,7 +750,7 @@ const REFERENCE = [
     title: "Oracles",
     blocks: [
       { bullets: [
-        "Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · Ask an oracle · Go to the scene, or you are here.",
+        "Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.",
         "Your question — optional, stamped on the result card and into the journal.",
         "Yes or No — three registers, an “I have a bias” checkbox, Ask.",
         "Granular — three registers, seven likelihood bands, Ask.",
@@ -780,7 +782,7 @@ const REFERENCE = [
         "The current game card: Go to the plot sheet · Open a scene / Continue the scene · Edit → Name this game, Universe or RPG, World, tone and theme, Inspiration.",
         "Plot sheets in this game: Switch to this · Edit (scope name, mission, starting point) · Delete · New plot sheet.",
         "Your games: Open · Archive / Restore · Prepare another game.",
-        "The machines — which do I need? (the three rows: Call a plot beat · Ask an oracle · Go to the scene), then what PUM, SUM and GUM each do.",
+        "The machines — which do I need? (the four rows: Call a plot beat · See the track · Ask an oracle · Go to the scene), then what PUM, SUM and GUM each do.",
         "With no game: Never played solo before? — three lines saying you narrate, the app answers, and your own RPG resolves · Prepare a game (pinned) · Read the first-session walkthrough.",
       ] },
       { p: "Forge (hidden when GUM is off)" },

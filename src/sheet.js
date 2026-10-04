@@ -4,20 +4,19 @@
 import { el, add, announce, fmtRange } from "./core.js";
 import {
   explain, actionBar, modal, closeModal, toast, confirmModal, promptModal,
-  resultCard, emptyState,
+  resultCard, emptyState, noteFold,
 } from "./ui.js";
 import * as store from "./store.js";
 import {
   sectionsOf, crossed, trackLength, hasTrack, isResolved, isEnded, currentSection,
   nodeList, nodeDie, nodeFill, nodeSlots, slotRange, categoryName, customListName,
-  expandedSheetSentence,
 } from "./derived.js";
 import { plotSheet, nodeCategory, sectionOfBox, proposalNote, abcd } from "./rules.js";
 import { rollProposal, rollPrompt, invokeNode, journalRoll, diceText } from "./roller.js";
 import { sectionNav, go, render } from "./router.js";
 import { openRule } from "./screens.js";
 import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-plot.js";
-import { BEAT_TRIGGERS, FIRST_BEAT_COACH } from "../data-guidance.js";
+import { BEAT_TRIGGERS, FIRST_BEAT_COACH, BEAT_STEPS, TRACK_CAPTION, TRACK_LOOP } from "../data-guidance.js";
 import { renderCast } from "./cast.js";
 import { renderFiles } from "./files.js";
 import { coachCard, whichMachine, bookTag } from "./coach.js";
@@ -97,15 +96,25 @@ function renderTrack(host, scope) {
   // confirmed, when the newcomer line that used to sit apart joins them.
   const game = store.activeGame();
   const newcomer = !!game && !game.journal.some((e) => e.kind === "track");
-  add(host, coachCard({ compact: true, newcomer, newcomerLine: newcomer ? FIRST_BEAT_COACH : null }));
-  add(host, explain([
+  const note = explain([
     "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
     "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
-  ], "confirm", openRule));
-  add(host, whichMachine("play"));
-
-  // The sheet itself: the track, and the beat called on it, in one card.
-  add(host, trackCard(scope));
+  ], "confirm", openRule);
+  if (openBeat) {
+    // A beat on the table is the one thing to deal with, and its card carries
+    // its own steps: the sheet leads, and the coach shrinks to its heading
+    // and sentence, with the teaching folds after the sheet.
+    add(host, trackCard(scope));
+    add(host, coachCard({ compact: true, brief: true }));
+    add(host, note);
+    add(host, whichMachine("play"));
+  } else {
+    add(host, coachCard({ compact: true, newcomer, newcomerLine: newcomer ? FIRST_BEAT_COACH : null }));
+    add(host, note);
+    add(host, whichMachine("play"));
+    // The sheet itself: the track, and the beat called on it, in one card.
+    add(host, trackCard(scope));
+  }
 
   // Context the player re-reads occasionally, not every beat — folded (§6.5).
   // A missing starting point is the coach's next step, so it is not repeated
@@ -230,6 +239,15 @@ function trackCard(scope) {
     ));
   }
 
+  // What the boxes are for, and how a beat reaches them — said under the track
+  // itself, where "2/11" otherwise stood with nothing to say what it counts.
+  if (!isEnded(scope)) {
+    add(card, el("p", { class: "track-caption", text: TRACK_CAPTION.replace("{n}", String(total)) }));
+    // While a beat is open its card carries the steps; the loop would only
+    // stand between the track and the beat.
+    if (!openBeat) add(card, trackLoopFold());
+  }
+
   if (isEnded(scope)) {
     add(card, el("p", { class: "muted" },
       el("strong", { text: isResolved(scope) ? "This scope has resolved. " : "This scope is finished. " }),
@@ -263,6 +281,15 @@ function trackCard(scope) {
   add(opts, endScopeRow(scope));
   add(card, opts);
   return card;
+}
+
+// How the track and the beats fit, as five stations. It folds with the notes.
+function trackLoopFold() {
+  const ol = el("ol", { class: "track-loop" });
+  for (const st of TRACK_LOOP) {
+    add(ol, el("li", null, el("strong", { text: st.k }), el("span", { text: st.text })));
+  }
+  return noteFold("How the track and beats fit", el("div", { class: "body" }, ol), "loop-fold");
 }
 
 // The beat, called on the track it would cross: the two calls, or the beat
@@ -606,21 +633,28 @@ function beatCard(scope) {
     ));
   }
 
-  const actions = [];
+  // The gate (PUM p.9, p.11), printed where the beat is: read it, play it out,
+  // then judge it. The two answers sit under the third step, so the order on
+  // the card is the order of play — a Confirm directly under the roll invited
+  // crossing a box before anything had happened.
+  const steps = el("ol", { class: "beat-steps" });
+  BEAT_STEPS.forEach((t, i) => add(steps, el("li", { text: t, class: i === 2 ? "judge" : null })));
+  add(extra, steps);
+  const answer = el("div", { class: "btn-row beat-answer" });
   if (hasTrack(scope) && !isEnded(scope)) {
-    actions.push({
-      label: "Confirm — cross a box", primary: true,
-      onClick: () => store.transact("Confirm beat", () => {
+    add(answer, el("button", {
+      class: "btn primary",
+      onclick: () => store.transact("Confirm beat", () => {
         const out = store.confirmBeat({ label: b.text });
         openBeat = null;
         store.markBeat({ key: b.key, text: b.text, open: false });
         reportAdvance(out, `Beat confirmed — ${b.text}`);
       }),
-    });
+    }, "It mattered — cross a box"));
   }
-  actions.push({
-    label: hasTrack(scope) ? "Not this time" : "Played it",
-    onClick: () => store.transact("Beat played, track unchanged", () => {
+  add(answer, el("button", {
+    class: "btn",
+    onclick: () => store.transact("Beat played, track unchanged", () => {
       openBeat = null;
       store.markBeat({ key: b.key, text: b.text, open: false });
       store.addJournal({
@@ -629,7 +663,10 @@ function beatCard(scope) {
       toast(hasTrack(scope) ? "The track stays where it is." : "Noted in the journal.", { undo: true });
       render();
     }),
-  });
+  }, hasTrack(scope) ? "It didn't matter" : "Played it"));
+  add(extra, answer);
+
+  const actions = [];
   actions.push({
     label: "Re-roll",
     onClick: () => isProposal ? doProposal(scope) : doPrompt(scope),
@@ -669,7 +706,7 @@ function nodeBlock(scope, beat) {
     if (n.reason === "unnamed-list") {
       add(wrap, el("div", { text: "A face of your prompt column points at a list of your own that has no name yet — so it has no slots." }));
       add(wrap, el("button", {
-        class: "btn small primary",
+        class: "btn small",
         onclick: () => promptModal({
           // no-inspire: a list's name is a category you choose, not fiction.
           title: "Name your list", label: "What is this list of?",
@@ -700,7 +737,7 @@ function nodeBlock(scope, beat) {
   add(wrap, el("div", { class: "cite", text: `Rolled ${n.rolls[n.rolls.length - 1]} → empty slot ${n.slot + 1}` }));
   const row = el("div", { class: "btn-row" });
   add(row, el("button", {
-    class: "btn small primary",
+    class: "btn small",
     onclick: () => promptModal({
       title: "Add a new plot node",
       label: cat ? cat.name : "New node",
@@ -752,8 +789,9 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
   const game = store.activeGame();
   const known = game ? game.cast.filter((c) => c.kind === kind) : [];
   const sheet = plotSheet(scope.sheetId);
-  add(wrap, el("div", { text: `${sheet ? sheet.name : "This sheet"} does not print this list — the prompt stands on its own. Bring one in, or recall one you have already met.` }));
-  add(wrap, el("div", { class: "cite", text: `The extension sheet (PUM p.27) adds these lists; the ${expandedSheetSentence()} sheets use it.` }));
+  // The extension-sheet detail (which sheets print this list) is reference,
+  // not play; it lives in the rules library, not on the card mid-beat.
+  add(wrap, el("div", { text: `${sheet ? sheet.name : "This sheet"} has no list for this, so the prompt stands on its own: make up a new one, or pick one you have already met.` }));
 
   const row = el("div", { class: "btn-row" });
   const keep = (name, notes = "") => {
@@ -768,7 +806,7 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
   };
 
   add(row, el("button", {
-    class: "btn small primary",
+    class: "btn small",
     onclick: () => promptModal({
       // no-inspire: the name is yours; the rolled concept lands in the notes.
       title: kind === "location" ? "An interesting location" : "A notable character",
@@ -780,7 +818,7 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
       },
       onSubmit: (v, notes) => { if (v) keep(v, notes); },
     }),
-  }, "Bring one in"));
+  }, "Make up a new one"));
 
   if (known.length) {
     add(row, el("button", {
@@ -801,7 +839,7 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
         }
         modal({ title: kind === "location" ? "Recall a location" : "Recall a character", body, actions: [{ label: "Cancel" }] });
       },
-    }, `Recall (${known.length})`));
+    }, `Pick from your cast (${known.length})`));
   }
 
   // The roll lives inside the naming dialog now — one dialog, not two.

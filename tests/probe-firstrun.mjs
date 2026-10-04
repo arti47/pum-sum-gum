@@ -125,7 +125,7 @@ await step("roll the opener", "Roll a scene opener");
 await step("ask an oracle", "Ask an oracle");
 await step("ask it", "Ask");
 await step("the beat the answer triggers", "random prompt");
-await step("confirm the beat", "Confirm");
+await step("confirm the beat", "It mattered");
 await tap("Play it"); await tap("Stay here");
 await step("back to the scene", "Back to the scene");
 await step("close the scene", "Roll a scene closure");

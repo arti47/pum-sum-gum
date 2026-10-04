@@ -477,7 +477,7 @@ for (const theme of ["light", "dark"]) {
   const dice = await page.locator("#screen .result .die").count();
   ok("the beat shows its dice", dice >= 1, `${dice} dice shown`);
 
-  const confirm = page.getByRole("button", { name: "Confirm — cross a box" });
+  const confirm = page.getByRole("button", { name: "It mattered — cross a box" });
   if (await confirm.count()) {
     await confirm.first().click();
     await page.waitForTimeout(120);
@@ -531,7 +531,7 @@ for (const theme of ["light", "dark"]) {
     .filter((n) => n.offsetParent && !n.classList.contains("term"))
     .map((n) => n.textContent.trim()));
   ok("rolling a beat puts a card on the table",
-    (await named(page)).includes("Confirm — cross a box"));
+    (await named(page)).includes("It mattered — cross a box"));
 
   const raw = await page.evaluate(() => localStorage.getItem("umState"));
   const stored = (() => {
@@ -549,7 +549,7 @@ for (const theme of ["light", "dark"]) {
   await goto(page2, "play", "track");
   const after = await named(page2);
   ok("the beat is still there after reopening, and can be confirmed",
-    after.includes("Confirm — cross a box"), after.join(" | ").slice(0, 140));
+    after.includes("It mattered — cross a box"), after.join(" | ").slice(0, 140));
   ok("it is the same beat, not a fresh roll",
     (await page2.locator("#screen").innerText()).includes(stored.text));
 
@@ -557,8 +557,8 @@ for (const theme of ["light", "dark"]) {
   // a locator timeout: a pass that crashes says less than one that names what
   // is missing.
   let closed = "never offered";
-  if (after.includes("Confirm — cross a box")) {
-    await page2.locator("button", { hasText: "Confirm — cross a box" }).first().click();
+  if (after.includes("It mattered — cross a box")) {
+    await page2.locator("button", { hasText: "It mattered — cross a box" }).first().click();
     await page2.waitForTimeout(160);
     closed = await page2.evaluate(() => {
       const st = JSON.parse(localStorage.getItem("umState"));

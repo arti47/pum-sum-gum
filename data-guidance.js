@@ -166,6 +166,10 @@ export const WHICH_MACHINE = {
       use: "PUM · a plot beat", go: ["play", "track"], button: "Call a plot beat",
     },
     {
+      ask: "Where am I in the story? How long until this storyline ends?",
+      use: "PUM · the plot track", go: ["play", "track"], button: "See the track",
+    },
+    {
       ask: "One question I cannot answer myself — is it true? what is it like?",
       use: "PUM · an oracle", go: ["oracles", "yesno"], button: "Ask an oracle",
     },
@@ -175,6 +179,28 @@ export const WHICH_MACHINE = {
     },
   ],
 };
+
+// --- The beat and the track, in the app's own words -----------------------
+// PUM p.9 and p.11 state the gate — a beat crosses a box only once it has been
+// played and judged relevant — but no surface said it where the beat is. These
+// are the three steps printed on the beat card itself, above its two answers.
+export const BEAT_STEPS = [
+  "Read it. Decide what it means in your story — a vague line is doing its job; you supply the specifics.",
+  "Play it out. Say what happens now that this is true.",
+  "Did it change where the story is going?",
+];
+
+// Under the track. {n} is the track's length.
+export const TRACK_CAPTION = "Each box is one beat that mattered. Cross all {n} and this storyline ends.";
+
+// The loop that joins the two, drawn as stations beside the track.
+export const TRACK_LOOP = [
+  { k: "Play", text: "Narrate the scene. Most of the game is this — no roll needed." },
+  { k: "Call a beat", text: "Stuck, drifting, or a moment that should matter? Roll a modified proposal or a random prompt." },
+  { k: "Play it out", text: "Say what the beat means and what happens because of it." },
+  { k: "Judge it", text: "Did it change where the story is going? Yes crosses one box; no leaves the track alone." },
+  { k: "The end", text: "When every box is crossed, this storyline is over. Tell its ending." },
+];
 
 // The book each in-play tab belongs to, on its title line.
 export const BOOK_TAGS = {
@@ -251,7 +277,7 @@ export const SESSION_STAGES = {
     steps: [
       "Read it and decide what it means in YOUR story. A vague line is doing its job — you supply the specifics.",
       "Play it out: say what happens now that this is true.",
-      "Then ask: did that change where the story is going? Confirm crosses a box. Not this time does not. Both are correct answers.",
+      "Then ask: did that change where the story is going? It mattered crosses a box. It didn't matter does not. Both are correct answers.",
     ],
     next: "Play the beat out in the fiction, then confirm it or say it did not matter.",
   },

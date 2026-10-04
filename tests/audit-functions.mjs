@@ -420,12 +420,13 @@ const journeys = [];
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
-// 6a. With a beat on the table, the coach's own button scrolls to it. Its
-// "Call a plot beat" extra used to reach the same scroll; on the plot sheet it
-// now sits directly above the controls, so that extra is left off.
+// 6a. With a beat on the table, the coach strip on another tab offers "Go to
+// the beat". On the plot sheet itself the beat card now leads and the coach is
+// brief, so the strip on Oracles is where that button lives.
 {
   await seed(MID, "play", "track");
   await tapText(/^random prompt$/);
+  await goTo("oracles", "yesno");
   const went = await tapText(/^go to the beat$/);
   journeys.push(`beat open → coach "Go to the beat": ${went ? "pressed" : "NOT OFFERED"}`);
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });

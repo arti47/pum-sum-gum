@@ -1991,3 +1991,28 @@ are in"), then three rows, each a question, its answer and a button to that plac
 reading "you are here" rather than offering a button to itself (F-67). It shares the notes' open
 state through a new `ui.noteFold()`, so closing it closes them all. Home's machines card opens on
 the same rows above the three books' descriptions.
+
+---
+
+## Reported from play — "I still don't know how to use the plot beat and track"
+
+**F-93 · The beat card did not say what to do with a beat, and the track did not say what it
+counts.** *Rule:* PUM's gate (p.9, p.11) and the track — unchanged. *Target:* walked as a
+newcomer at 390×844. The card put **Confirm — cross a box** directly under the roll, while
+"play it out first" lived only in the coach card ~1,400px above; two orange buttons competed on
+one card ("Bring one in" and Confirm); the track read "Plot track 2/11" with nothing saying what
+a box is or what filling them does; the card carried extension-sheet reference text mid-beat;
+"Bring one in" / "Recall (1)" did not say what they do; with a beat open the coach, note and
+Which strip stood ~900px between the title and the track. *Plus a defect found on the way:* the
+coach strip's **Go to the beat** on Oracles and Scene ran a scroll to `#beat-controls`, which only
+exists on the plot sheet — off it the button did nothing at all. *Fix:* `BEAT_STEPS` printed on the
+card — 1 Read it · 2 Play it out · 3 Did it change where the story is going? — with **It mattered
+— cross a box** / **It didn't matter** under the third (Re-roll and Add a note stay in the foot);
+one orange per card, so node choices are plain, renamed **Make up a new one** and **Pick from your
+cast (N)**; the extension-sheet sentence goes (it stays in the rules library); `TRACK_CAPTION`
+under the track and a **How the track and beats fit** fold of five stations (`TRACK_LOOP`), hidden
+while a beat is open; while a beat is open the track card leads and the coach is brief; `WHICH_MACHINE`
+gains "Where am I in the story? → See the track"; `scrollToBeat` navigates when there is nothing to
+scroll to. *Found by the cycle:* the guide audit read the Part 4 bullet's quoted step headings ("Read it",
+"Play it out") as labels the app never renders alone; the bullet now names the steps as steps and
+lists only the controls.
