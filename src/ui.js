@@ -318,7 +318,10 @@ export function noGameNotice({ what, onPrepare, onWalkthrough }) {
 function diceRow(dice) {
   const row = el("div", { class: "dice" });
   for (const d of dice) {
+    // Which die it is, so it can be drawn as that die rather than a square.
+    const size = d.size || Number(String(d.label || "").match(/d(\d+)/i)?.[1]) || null;
     add(row, el("span", {
+      "data-d": size ? String(size) : null,
       class: `die ${d.kept === false ? "dropped" : "kept"}`,
       title: `${d.label}: ${d.value}`,
     }, String(d.value)));
@@ -326,8 +329,15 @@ function diceRow(dice) {
   return row;
 }
 
+// The last card drawn, so a re-render of the same answer (a note added, a fold
+// opened) does not tumble its dice again: only a new roll arrives.
+let lastCardSig = "";
+
 export function resultCard({ kind, answer, second, question = "", dice = [], strip = null, actions = [], extra = null }) {
-  const card = el("div", { class: "result", role: "group", "aria-label": kind });
+  const sig = [kind, answer, ...dice.map((d) => `${d.label}:${d.value}`)].join("|");
+  const fresh = sig !== lastCardSig;
+  lastCardSig = sig;
+  const card = el("div", { class: `result${fresh ? " fresh" : ""}`, role: "group", "aria-label": kind });
   const head = el("div", { class: "result-head" },
     el("span", { class: "result-kind", text: kind })
   );

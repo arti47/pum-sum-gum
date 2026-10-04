@@ -78,7 +78,7 @@ function renderEntries(host, game) {
     const day = fmtDay(e.ts);
     if (day !== lastDay) {
       lastDay = day;
-      add(host, el("h3", { text: day, style: "color:var(--ink-3);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em" }));
+      add(host, el("h3", { class: "jday", text: day }));
     }
     add(host, entryEl(e));
   }

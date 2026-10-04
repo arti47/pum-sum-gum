@@ -1851,3 +1851,23 @@ and the paper grain sits above the page without changing one); every tap target 
 the new **More**; landscape chrome under 45%; the playtest spine on seeds 7, 23 and 101 reaches an
 ending with 0 stalls (its one note — the empty *Choose from…* dialog offering only Cancel — is
 the already-recorded content finding, left as it was).
+
+---
+
+## Engravings, and the link graph
+
+**F-82 · The sheet had no pictures of its own.** Every surface was type and rules. *Fix:* a
+one-colour engraved set stored as mask custom properties: a vignette per screen title, the
+machine on the cold open, a blank scroll in empty states, plot-node emblems after PUM p.28, a
+compass on the coach, a laurel over the Threshold box, dice drawn as their solids. All of it
+decoration — `aria-hidden` or pseudo-elements, no word added.
+
+**F-83 · Dice were squares.** *Fix:* `data-d` on each face from the die's size; d10, d20 and
+percentile are drawn as such. A new roll tumbles onto the face already chosen; the same answer
+re-rendered does not tumble again. *Rule check:* the animation is applied after
+`crypto.getRandomValues` has decided the face, so no outcome depends on it.
+
+**Link graph — verified, nothing added.** Every tab reaches every other through in-page
+controls (`go()` call sites), and `probe-flow` walks the p.5 loop without the tab bar. The one
+candidate link — the coach strip on the Journal — was rejected: two coach stages route to the
+Journal, and on the Journal those would navigate to the screen they are on (the F-67 class).

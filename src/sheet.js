@@ -896,7 +896,7 @@ function renderNodes(host, scope) {
 }
 
 function nodeCard(scope, cat, slots) {
-  const card = el("div", { class: "card" });
+  const card = el("div", { class: "card node-card", "data-cat": cat.custom ? "custom" : cat.id });
   const list = nodeList(scope, cat.id);
   const fill = nodeFill(scope, cat.id);
   const dieSize = nodeDie(scope, cat.id);

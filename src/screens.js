@@ -308,6 +308,8 @@ function gamesCard(current) {
 
 function newToSoloCard() {
   const card = el("div", { class: "card" });
+  // The unfolding machine itself — decoration, so it says nothing to a reader.
+  add(card, el("div", { class: "hero", "aria-hidden": "true" }));
   add(card, el("div", { class: "card-head" },
     el("h2", { text: NEW_TO_SOLO.title }),
     el("span", { class: "cite", text: "the app's own words" })

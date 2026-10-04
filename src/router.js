@@ -183,6 +183,9 @@ export function render() {
   const fn = renderers.get(current.tab);
   renderTabs();
   renderPlotHeader();
+  // The route, as a hook for the per-tab engraving beside each screen's title.
+  document.body.dataset.tab = current.tab;
+  document.body.dataset.section = current.section || "";
   if (fn) fn(screen, current.section);
   const sub = $("#brand-sub");
   const game = store.activeGame();

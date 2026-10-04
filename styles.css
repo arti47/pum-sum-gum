@@ -744,6 +744,9 @@ label.check .ct small { display: block; color: var(--ink-3); font-size: .8rem; }
 }
 .node-txt { flex: 1; min-width: 0; word-break: break-word; }
 .node-txt.empty { color: var(--ink-3); font-style: italic; }
+/* An entry is the player's own writing, so it is set in the sheet's face even
+   though it is also the button that opens it. */
+.node-txt.btn { font-family: var(--serif); font-weight: 400; font-size: .98rem; box-shadow: none; }
 
 .entry { border-bottom: 1px solid var(--rule); padding: .6rem 0; }
 /* The journal reads as a timeline: a rule down the left, a mark per entry.
@@ -969,6 +972,8 @@ table.rows tr.hit td { background: var(--accent-soft); font-weight: 700; }
 .dist { display: flex; align-items: flex-end; gap: 3px; height: 60px; margin-top: .4rem; }
 .dist i {
   flex: 1; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 2px;
+  /* Engraver's hatching, so the bars read as printed rather than flat. */
+  background-image: repeating-linear-gradient(135deg, transparent 0 3px, rgba(255, 250, 240, .28) 3px 4px);
   position: relative;
 }
 .dist-labels {
@@ -983,6 +988,260 @@ table.rows tr.hit td { background: var(--accent-soft); font-weight: 700; }
   .tab-bar button .ti::before, .hdr-btn > span::before { forced-color-adjust: none; background: CanvasText; }
   .tab-bar button[aria-current="page"] { outline: 2px solid Highlight; }
   .track-box.crossed { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}
+
+
+/* ======================================================================
+   ENGRAVINGS — the sheet's own art.
+   One-colour line art, painted through a mask with a theme colour, so every
+   picture is ink on paper in the light theme and chalk on slate in the dark
+   one. All of it is decoration: none carries a word, none takes a pointer.
+   ====================================================================== */
+:root {
+  --art-play: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M23.44 22.36 L25.93 22.77 L25.93 25.23 L23.44 25.64 L22.52 28.17 L24.16 30.09 L22.59 31.97 L20.41 30.68 L18.08 32.03 L18.11 34.55 L15.69 34.98 L14.85 32.60 L12.20 32.13 L10.60 34.08 L8.47 32.85 L9.36 30.49 L7.63 28.43 L5.15 28.89 L4.31 26.59 L6.51 25.35 L6.51 22.65 L4.31 21.41 L5.15 19.11 L7.63 19.57 L9.36 17.51 L8.47 15.15 L10.60 13.92 L12.20 15.87 L14.85 15.40 L15.69 13.02 L18.11 13.45 L18.08 15.97 L20.41 17.32 L22.59 16.03 L24.16 17.91 L22.52 19.83Z%27/%3E%3Ccircle cx=%2715%27 cy=%2724%27 r=%275%27 /%3E%3Ccircle cx=%2715%27 cy=%2724%27 r=%271.4%27 fill=%27black%27/%3E%3Cpath d=%27M15.99 24.99L18.54 27.53%27/%3E%3Cpath d=%27M14.01 24.99L11.47 27.54%27/%3E%3Cpath d=%27M14.01 23.01L11.46 20.47%27/%3E%3Cpath d=%27M15.99 23.01L18.53 20.46%27/%3E%3Cpath d=%27M24 18.5h21l-2 5.5 2 5.5H24%27/%3E%3Crect x=%2726%27 y=%2721.5%27 width=%274%27 height=%274%27 rx=%27.4%27 stroke-width=%271.1%27/%3E%3Crect x=%2731%27 y=%2721.5%27 width=%274%27 height=%274%27 rx=%27.4%27 stroke-width=%271.1%27/%3E%3Crect x=%2736%27 y=%2721.5%27 width=%274%27 height=%274%27 rx=%27.4%27 stroke-width=%271.1%27/%3E%3Cpath d=%27M26.6 22.1l2.8 2.8M29.4 22.1l-2.8 2.8M31.6 22.1l2.8 2.8M34.4 22.1l-2.8 2.8%27 stroke-width=%271%27/%3E%3Cpath d=%27M4 40h40%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-scene: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M5 41V9h38v32%27/%3E%3Cpath d=%27M5 9c3 9 4 18 10 24-2 2-2 5-1 8M43 9c-3 9-4 18-10 24 2 2 2 5 1 8%27/%3E%3Cpath d=%27M9 9c1 8 3 15 6 20M13 9c0 7 2 13 4 18M39 9c-1 8-3 15-6 20M35 9c0 7-2 13-4 18%27 stroke-width=%271%27/%3E%3Cpath d=%27M5 9c6 3 13 3 19 0 6 3 13 3 19 0%27 /%3E%3Ccircle cx=%2715%27 cy=%2733%27 r=%271.3%27 fill=%27black%27/%3E%3Ccircle cx=%2733%27 cy=%2733%27 r=%271.3%27 fill=%27black%27/%3E%3Cpath d=%27M3 41h42M8 44h32%27 /%3E%3Cpath d=%27M22 26l2-3 2 3-2 3z%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-oracles: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M6 24c5-8 11-11 18-11s13 3 18 11c-5 8-11 11-18 11S11 32 6 24z%27/%3E%3Ccircle cx=%2724%27 cy=%2724%27 r=%276.5%27 /%3E%3Ccircle cx=%2724%27 cy=%2724%27 r=%273%27 fill=%27black%27/%3E%3Ccircle cx=%2725.6%27 cy=%2722.4%27 r=%270.9%27 fill=%27white%27 stroke=%27none%27/%3E%3Cpath d=%27M10.14 18.26L4.60 15.96%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M13.39 13.39L9.15 9.15%27 stroke-width=%270.9%27/%3E%3Cpath d=%27M18.26 10.14L15.96 4.60%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M24.00 9.00L24.00 3.00%27 stroke-width=%270.9%27/%3E%3Cpath d=%27M29.74 10.14L32.04 4.60%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M34.61 13.39L38.85 9.15%27 stroke-width=%270.9%27/%3E%3Cpath d=%27M37.86 18.26L43.40 15.96%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M37.86 29.74L43.40 32.04%27 stroke-width=%270.9%27/%3E%3Cpath d=%27M34.61 34.61L38.85 38.85%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M29.74 37.86L32.04 43.40%27 stroke-width=%270.9%27/%3E%3Cpath d=%27M24.00 39.00L24.00 45.00%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M18.26 37.86L15.96 43.40%27 stroke-width=%270.9%27/%3E%3Cpath d=%27M13.39 34.61L9.15 38.85%27 stroke-width=%271.4%27/%3E%3Cpath d=%27M10.14 29.74L4.60 32.04%27 stroke-width=%270.9%27/%3E%3C/svg%3E");
+  --art-journal: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M24 15c-5-3-11-3-18-1v24c7-2 13-2 18 1 5-3 11-3 18-1V14c-7-2-13-2-18 1z%27/%3E%3Cpath d=%27M24 15v24%27/%3E%3Cpath d=%27M10 20h9M10 24h9M10 28h7M29 20h8M29 24h6%27 stroke-width=%271%27/%3E%3Cpath d=%27M44 4c-6 2-12 8-15 18l-1.5 5 2-1.2c3-6 8-12 14.5-21.8z%27/%3E%3Cpath d=%27M27.5 27l3-9M33 13l2 3M36.5 9.5l1.5 3M31 17l2 2%27 stroke-width=%27.9%27/%3E%3Cpath d=%27M4 43h40%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-more: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M26.47 17.52 L28.94 17.90 L28.94 20.10 L26.47 20.48 L25.72 22.78 L27.50 24.54 L26.21 26.33 L23.98 25.18 L22.02 26.60 L22.43 29.07 L20.33 29.75 L19.21 27.51 L16.79 27.51 L15.67 29.75 L13.57 29.07 L13.98 26.60 L12.02 25.18 L9.79 26.33 L8.50 24.54 L10.28 22.78 L9.53 20.48 L7.06 20.10 L7.06 17.90 L9.53 17.52 L10.28 15.22 L8.50 13.46 L9.79 11.67 L12.02 12.82 L13.98 11.40 L13.57 8.93 L15.67 8.25 L16.79 10.49 L19.21 10.49 L20.33 8.25 L22.43 8.93 L22.02 11.40 L23.98 12.82 L26.21 11.67 L27.50 13.46 L25.72 15.22Z%27/%3E%3Ccircle cx=%2718%27 cy=%2719%27 r=%273.4%27 /%3E%3Cpath d=%27M39.14 33.83 L40.80 34.78 L40.11 36.66 L38.23 36.32 L36.76 37.93 L37.26 39.77 L35.44 40.62 L34.35 39.05 L32.17 39.14 L31.22 40.80 L29.34 40.11 L29.68 38.23 L28.07 36.76 L26.23 37.26 L25.38 35.44 L26.95 34.35 L26.86 32.17 L25.20 31.22 L25.89 29.34 L27.77 29.68 L29.24 28.07 L28.74 26.23 L30.56 25.38 L31.65 26.95 L33.83 26.86 L34.78 25.20 L36.66 25.89 L36.32 27.77 L37.93 29.24 L39.77 28.74 L40.62 30.56 L39.05 31.65Z%27/%3E%3Ccircle cx=%2733%27 cy=%2733%27 r=%272.4%27 /%3E%3Cpath d=%27M21.25 20.00L26.22 21.54%27/%3E%3Cpath d=%27M18.05 22.40L18.12 27.60%27/%3E%3Cpath d=%27M14.78 20.10L9.86 21.77%27/%3E%3Cpath d=%27M15.96 16.28L12.85 12.11%27/%3E%3Cpath d=%27M19.96 16.22L22.96 11.97%27/%3E%3C/svg%3E");
+  --art-home: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M23.44 22.36 L25.93 22.77 L25.93 25.23 L23.44 25.64 L22.52 28.17 L24.16 30.09 L22.59 31.97 L20.41 30.68 L18.08 32.03 L18.11 34.55 L15.69 34.98 L14.85 32.60 L12.20 32.13 L10.60 34.08 L8.47 32.85 L9.36 30.49 L7.63 28.43 L5.15 28.89 L4.31 26.59 L6.51 25.35 L6.51 22.65 L4.31 21.41 L5.15 19.11 L7.63 19.57 L9.36 17.51 L8.47 15.15 L10.60 13.92 L12.20 15.87 L14.85 15.40 L15.69 13.02 L18.11 13.45 L18.08 15.97 L20.41 17.32 L22.59 16.03 L24.16 17.91 L22.52 19.83Z%27/%3E%3Ccircle cx=%2715%27 cy=%2724%27 r=%275%27 /%3E%3Ccircle cx=%2715%27 cy=%2724%27 r=%271.4%27 fill=%27black%27/%3E%3Cpath d=%27M15.99 24.99L18.54 27.53%27/%3E%3Cpath d=%27M14.01 24.99L11.47 27.54%27/%3E%3Cpath d=%27M14.01 23.01L11.46 20.47%27/%3E%3Cpath d=%27M15.99 23.01L18.53 20.46%27/%3E%3Cpath d=%27M24 18.5h21l-2 5.5 2 5.5H24%27/%3E%3Crect x=%2726%27 y=%2721.5%27 width=%274%27 height=%274%27 rx=%27.4%27 stroke-width=%271.1%27/%3E%3Crect x=%2731%27 y=%2721.5%27 width=%274%27 height=%274%27 rx=%27.4%27 stroke-width=%271.1%27/%3E%3Crect x=%2736%27 y=%2721.5%27 width=%274%27 height=%274%27 rx=%27.4%27 stroke-width=%271.1%27/%3E%3Cpath d=%27M26.6 22.1l2.8 2.8M29.4 22.1l-2.8 2.8M31.6 22.1l2.8 2.8M34.4 22.1l-2.8 2.8%27 stroke-width=%271%27/%3E%3Cpath d=%27M4 40h40%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-forge: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M8 24h26c0 4-4 6-8 6l2 6h6v4H14v-4h6l2-6c-6 0-10-3-14-6z%27/%3E%3Cpath d=%27M34 24c4 0 7-1 9-3-3-1-6-1-9 0z%27/%3E%3Cpath d=%27M14 4l10 10M20 8l-5 5%27 stroke-width=%271.6%27/%3E%3Cpath d=%27M10 16l2-2M30 14l3-3M33 18l4-1M28 9l1-4%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-tables: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M10 8h22c2 0 3 1 3 3v28c0 2 1 3 3 3H14c-2 0-4-1-4-3z%27/%3E%3Cpath d=%27M38 42c2 0 3-1 3-3v-4h-6%27/%3E%3Cpath d=%27M7 8c-2 0-3 1-3 3v3h6%27/%3E%3Cpath d=%27M15 15h3M21 15h9M15 21h3M21 21h9M15 27h3M21 27h7%27 stroke-width=%271%27/%3E%3Cpath d=%27M29 30l6-3 6 3v7l-6 3-6-3z%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M29 30l6 3 6-3M35 33v7%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-library: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 41h40%27/%3E%3Cpath d=%27M7 41V12h6v29M13 41V16h6v25M20 41V9h5v32%27/%3E%3Cpath d=%27M27 15l5-1.5 7.5 26.5-5 1.5z%27/%3E%3Cpath d=%27M7 17h6M7 36h6M13 21h6M20 14h5M20 36h5%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-tutorial: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M24 13c-5-3-11-3-18-1v26c7-2 13-2 18 1 5-3 11-3 18-1V12c-7-2-13-2-18 1z%27/%3E%3Cpath d=%27M24 13v26%27/%3E%3Cpath d=%27M33 11v13l3-2.5 3 2.5V11%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M10 19h9M10 23h9M10 27h9M10 31h6M28 28h9M28 32h7%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-settings: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M34.89 22.42 L37.95 22.83 L37.95 25.17 L34.89 25.58 L34.22 28.08 L36.67 29.96 L35.50 31.99 L32.64 30.81 L30.81 32.64 L31.99 35.50 L29.96 36.67 L28.08 34.22 L25.58 34.89 L25.17 37.95 L22.83 37.95 L22.42 34.89 L19.92 34.22 L18.04 36.67 L16.01 35.50 L17.19 32.64 L15.36 30.81 L12.50 31.99 L11.33 29.96 L13.78 28.08 L13.11 25.58 L10.05 25.17 L10.05 22.83 L13.11 22.42 L13.78 19.92 L11.33 18.04 L12.50 16.01 L15.36 17.19 L17.19 15.36 L16.01 12.50 L18.04 11.33 L19.92 13.78 L22.42 13.11 L22.83 10.05 L25.17 10.05 L25.58 13.11 L28.08 13.78 L29.96 11.33 L31.99 12.50 L30.81 15.36 L32.64 17.19 L35.50 16.01 L36.67 18.04 L34.22 19.92Z%27/%3E%3Ccircle cx=%2724%27 cy=%2724%27 r=%276%27 /%3E%3Cpath d=%27M24 18v6l4 3%27 /%3E%3Cpath d=%27M31.50 24.00L33.50 24.00%27/%3E%3Cpath d=%27M30.50 27.75L32.23 28.75%27/%3E%3Cpath d=%27M27.75 30.50L28.75 32.23%27/%3E%3Cpath d=%27M24.00 31.50L24.00 33.50%27/%3E%3Cpath d=%27M20.25 30.50L19.25 32.23%27/%3E%3Cpath d=%27M17.50 27.75L15.77 28.75%27/%3E%3Cpath d=%27M16.50 24.00L14.50 24.00%27/%3E%3Cpath d=%27M17.50 20.25L15.77 19.25%27/%3E%3Cpath d=%27M20.25 17.50L19.25 15.77%27/%3E%3Cpath d=%27M24.00 16.50L24.00 14.50%27/%3E%3Cpath d=%27M27.75 17.50L28.75 15.77%27/%3E%3Cpath d=%27M30.50 20.25L32.23 19.25%27/%3E%3C/svg%3E");
+  --art-empty: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M14 12h30c3 0 4 2 4 4v32c0 2 1 4 4 4H20c-3 0-6-2-6-4z%27/%3E%3Cpath d=%27M52 52c2 0 4-2 4-4v-4h-8%27/%3E%3Cpath d=%27M11 12c-3 0-4 2-4 4v4h7%27/%3E%3Cpath d=%27M20 22h20M20 28h20M20 34h14%27 stroke-dasharray=%272 3%27 stroke-width=%271%27/%3E%3Cpath d=%27M58 4c-7 3-13 10-16 20l-1 4 2-1c3-7 9-13 15-23z%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M41 28l2-6%27 stroke-width=%271%27/%3E%3Cpath d=%27M22 44l6-3 6 3v6l-6 3-6-3z%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M22 44l6 3 6-3M28 47v6%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-hero: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 240 92%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M64.84 49.41 L69.93 50.13 L69.93 53.87 L64.84 54.59 L63.90 58.71 L68.17 61.57 L66.56 64.93 L61.65 63.37 L59.01 66.68 L61.63 71.11 L58.71 73.44 L54.97 69.91 L51.16 71.74 L51.59 76.87 L47.95 77.70 L46.12 72.89 L41.88 72.89 L40.05 77.70 L36.41 76.87 L36.84 71.74 L33.03 69.91 L29.29 73.44 L26.37 71.11 L28.99 66.68 L26.35 63.37 L21.44 64.93 L19.83 61.57 L24.10 58.71 L23.16 54.59 L18.07 53.87 L18.07 50.13 L23.16 49.41 L24.10 45.29 L19.83 42.43 L21.44 39.07 L26.35 40.63 L28.99 37.32 L26.37 32.89 L29.29 30.56 L33.03 34.09 L36.84 32.26 L36.41 27.13 L40.05 26.30 L41.88 31.11 L46.12 31.11 L47.95 26.30 L51.59 27.13 L51.16 32.26 L54.97 34.09 L58.71 30.56 L61.63 32.89 L59.01 37.32 L61.65 40.63 L66.56 39.07 L68.17 42.43 L63.90 45.29Z%27/%3E%3Ccircle cx=%2744%27 cy=%2752%27 r=%2711%27 /%3E%3Ccircle cx=%2744%27 cy=%2752%27 r=%273%27 fill=%27black%27/%3E%3Cpath d=%27M46.94 52.60L54.78 54.19%27/%3E%3Cpath d=%27M44.34 54.98L45.25 62.93%27/%3E%3Cpath d=%27M41.27 53.25L33.99 56.57%27/%3E%3Cpath d=%27M41.97 49.79L36.56 43.90%27/%3E%3Cpath d=%27M45.48 49.39L49.41 42.42%27/%3E%3Cpath d=%27M93.00 28.09 L95.95 29.23 L95.33 32.29 L92.17 32.20 L90.37 35.14 L91.89 37.91 L89.45 39.85 L87.09 37.75 L83.82 38.85 L83.21 41.95 L80.09 41.87 L79.63 38.74 L76.42 37.48 L73.96 39.46 L71.62 37.39 L73.28 34.70 L71.63 31.68 L68.47 31.61 L68.01 28.52 L71.01 27.53 L71.69 24.16 L69.32 22.07 L70.95 19.41 L73.88 20.57 L76.58 18.43 L76.10 15.31 L79.06 14.31 L80.56 17.10 L84.00 17.18 L85.64 14.48 L88.54 15.62 L87.90 18.72 L90.48 21.00 L93.48 19.98 L94.97 22.72 L92.49 24.68Z%27/%3E%3Ccircle cx=%2782%27 cy=%2728%27 r=%275%27 /%3E%3Cpath d=%27M83.00 28.00L87.00 28.00%27/%3E%3Cpath d=%27M81.50 28.87L79.50 32.33%27/%3E%3Cpath d=%27M81.50 27.13L79.50 23.67%27/%3E%3Cpath d=%27M96 20h22l-4 14h-14z%27/%3E%3Cpath d=%27M104 6l5-3 5 3v6l-5 3-5-3z%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M104 6l5 3 5-3M109 9v6%27 stroke-width=%271%27/%3E%3Cpath d=%27M80 54h52v26H80z%27/%3E%3Cpath d=%27M84 58h44v18H84z%27 stroke-width=%271%27/%3E%3Ccircle cx=%2796%27 cy=%2767%27 r=%274%27 /%3E%3Ccircle cx=%27116%27 cy=%2767%27 r=%274%27 /%3E%3Cpath d=%27M96 67h20%27 stroke-width=%271%27/%3E%3Cpath d=%27M107 34v20%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M132 60h96l-4 6 4 6h-96%27/%3E%3Crect x=%27138%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27148%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27158%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27168%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27178%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27188%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27198%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Crect x=%27208%27 y=%2763%27 width=%275%27 height=%275%27 rx=%27.5%27 stroke-width=%271.1%27/%3E%3Cpath d=%27M138.8 63.8l3.4 3.4M142.2 63.8l-3.4 3.4%27 stroke-width=%271%27/%3E%3Cpath d=%27M148.8 63.8l3.4 3.4M152.2 63.8l-3.4 3.4%27 stroke-width=%271%27/%3E%3Cpath d=%27M158.8 63.8l3.4 3.4M162.2 63.8l-3.4 3.4%27 stroke-width=%271%27/%3E%3Cpath d=%27M10 86h220%27 stroke-width=%271%27/%3E%3Cpath d=%27M14.0 90L16.0 86%27/%3E%3Cpath d=%27M18.0 90L20.0 86%27/%3E%3Cpath d=%27M22.0 90L24.0 86%27/%3E%3Cpath d=%27M26.0 90L28.0 86%27/%3E%3Cpath d=%27M30.0 90L32.0 86%27/%3E%3Cpath d=%27M34.0 90L36.0 86%27/%3E%3Cpath d=%27M38.0 90L40.0 86%27/%3E%3Cpath d=%27M42.0 90L44.0 86%27/%3E%3Cpath d=%27M46.0 90L48.0 86%27/%3E%3Cpath d=%27M50.0 90L52.0 86%27/%3E%3Cpath d=%27M54.0 90L56.0 86%27/%3E%3Cpath d=%27M58.0 90L60.0 86%27/%3E%3Cpath d=%27M62.0 90L64.0 86%27/%3E%3Cpath d=%27M66.0 90L68.0 86%27/%3E%3Cpath d=%27M70.0 90L72.0 86%27/%3E%3Cpath d=%27M74.0 90L76.0 86%27/%3E%3Cpath d=%27M78.0 90L80.0 86%27/%3E%3Cpath d=%27M82.0 90L84.0 86%27/%3E%3Cpath d=%27M86.0 90L88.0 86%27/%3E%3Cpath d=%27M90.0 90L92.0 86%27/%3E%3Cpath d=%27M94.0 90L96.0 86%27/%3E%3Cpath d=%27M98.0 90L100.0 86%27/%3E%3Cpath d=%27M102.0 90L104.0 86%27/%3E%3Cpath d=%27M106.0 90L108.0 86%27/%3E%3Cpath d=%27M110.0 90L112.0 86%27/%3E%3Cpath d=%27M114.0 90L116.0 86%27/%3E%3Cpath d=%27M118.0 90L120.0 86%27/%3E%3Cpath d=%27M122.0 90L124.0 86%27/%3E%3Cpath d=%27M126.0 90L128.0 86%27/%3E%3Cpath d=%27M130.0 90L132.0 86%27/%3E%3Cpath d=%27M134.0 90L136.0 86%27/%3E%3Cpath d=%27M138.0 90L140.0 86%27/%3E%3Cpath d=%27M142.0 90L144.0 86%27/%3E%3Cpath d=%27M146.0 90L148.0 86%27/%3E%3Cpath d=%27M150.0 90L152.0 86%27/%3E%3Cpath d=%27M154.0 90L156.0 86%27/%3E%3Cpath d=%27M158.0 90L160.0 86%27/%3E%3Cpath d=%27M162.0 90L164.0 86%27/%3E%3Cpath d=%27M166.0 90L168.0 86%27/%3E%3Cpath d=%27M170.0 90L172.0 86%27/%3E%3Cpath d=%27M174.0 90L176.0 86%27/%3E%3Cpath d=%27M178.0 90L180.0 86%27/%3E%3Cpath d=%27M182.0 90L184.0 86%27/%3E%3Cpath d=%27M186.0 90L188.0 86%27/%3E%3Cpath d=%27M190.0 90L192.0 86%27/%3E%3Cpath d=%27M194.0 90L196.0 86%27/%3E%3Cpath d=%27M198.0 90L200.0 86%27/%3E%3Cpath d=%27M202.0 90L204.0 86%27/%3E%3Cpath d=%27M206.0 90L208.0 86%27/%3E%3Cpath d=%27M210.0 90L212.0 86%27/%3E%3Cpath d=%27M214.0 90L216.0 86%27/%3E%3Cpath d=%27M218.0 90L220.0 86%27/%3E%3Cpath d=%27M222.0 90L224.0 86%27/%3E%3Cpath d=%27M150 40c4-6 10-6 14 0M170 34c4-6 10-6 14 0M190 40c4-6 10-6 14 0%27 stroke-width=%27.9%27/%3E%3C/svg%3E");
+  --art-fleuron: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 28 10%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.1%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M1 5h6M21 5h6%27/%3E%3Cpath d=%27M14 1l4 4-4 4-4-4z%27 fill=%27black%27/%3E%3Cpath d=%27M8 5c1-2 2-2 2 0s1 2 2 0M16 5c1-2 2-2 2 0s1 2 2 0%27 stroke-width=%27.9%27/%3E%3C/svg%3E");
+  --art-laurel: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 16%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.2%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M12 14c-5 0-9-4-10-10M12 14c5 0 9-4 10-10%27/%3E%3Cpath d=%27M4 7l-2-2M6 10l-2-1M18 10l2-1M20 7l2-2M8 12l-1.5 0M16 12l1.5 0%27 stroke-width=%271.6%27/%3E%3Cpath d=%27M12 2l1.3 2.6 2.9.4-2.1 2 .5 2.9L12 8.6 9.4 9.9l.5-2.9-2.1-2 2.9-.4z%27 fill=%27black%27 stroke-width=%27.6%27/%3E%3C/svg%3E");
+  --art-compass: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.2%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2712%27 cy=%2712%27 r=%2710%27 /%3E%3Cpath d=%27M12 3l2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z%27 stroke-width=%271%27/%3E%3Cpath d=%27M12 3l2.4 6.6L12 12z%27 fill=%27black%27/%3E%3C/svg%3E");
+  --art-d10: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M16 1.5L30 13 16 30.5 2 13z%27/%3E%3Cpath d=%27M2 13l7 3 7-3 7 3 7-3M9 16l7 14.5M23 16l-7 14.5%27 stroke-width=%27.7%27 opacity=%27.55%27/%3E%3C/svg%3E");
+  --art-d20: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M16 1.5l13 7.5v14l-13 7.5-13-7.5V9z%27/%3E%3Cpath d=%27M16 7.5l9 15H7z%27 stroke-width=%27.7%27 opacity=%27.55%27/%3E%3C/svg%3E");
+  --art-d100: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M16 1.5L30 13 16 30.5 2 13z%27/%3E%3Cpath d=%27M16 5L26.5 13.6 16 26.8 5.5 13.6z%27 stroke-width=%27.7%27 opacity=%27.55%27/%3E%3C/svg%3E");
+  --art-globe: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2724%27 cy=%2722%27 r=%2715%27 /%3E%3Cpath d=%27M9 22h30M24 7c-6 5-6 25 0 30M24 7c6 5 6 25 0 30M11 14h26M11 30h26%27 stroke-width=%271%27/%3E%3Cpath d=%27M24 37v5M16 43h16%27/%3E%3Cpath d=%27M8 22a16 16 0 0 0 32 0%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-swords: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M8 8l22 22M40 8L18 30%27/%3E%3Cpath d=%27M8 8l1 6 5-5zM40 8l-1 6-5-5z%27 stroke-width=%271%27/%3E%3Cpath d=%27M26 34l8-8M14 26l8 8%27/%3E%3Cpath d=%27M31 31l7 7M17 31l-7 7%27/%3E%3Ccircle cx=%2739%27 cy=%2739%27 r=%272%27 /%3E%3Ccircle cx=%279%27 cy=%2739%27 r=%272%27 /%3E%3C/svg%3E");
+  --art-key: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2714%27 cy=%2724%27 r=%278%27 /%3E%3Ccircle cx=%2714%27 cy=%2724%27 r=%273%27 /%3E%3Cpath d=%27M22 24h20M36 24v6M41 24v5M30 24v4%27/%3E%3C/svg%3E");
+  --art-question: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M10 8h24c2 0 3 1 3 3v28c0 2 1 3 3 3H14c-2 0-4-1-4-3z%27/%3E%3Cpath d=%27M7 8c-2 0-3 1-3 3v3h6%27/%3E%3Cpath d=%27M19 19c0-3 2-5 5-5s5 2 5 5c0 4-5 4-5 8%27 stroke-width=%271.6%27/%3E%3Ccircle cx=%2724%27 cy=%2732%27 r=%271.2%27 fill=%27black%27/%3E%3C/svg%3E");
+  --art-bust: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2724%27 cy=%2716%27 r=%278%27 /%3E%3Cpath d=%27M10 42c0-9 6-15 14-15s14 6 14 15z%27/%3E%3Cpath d=%27M18 13c3 2 9 2 12-1%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-busts: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2717%27 cy=%2717%27 r=%276.5%27 /%3E%3Ccircle cx=%2732%27 cy=%2715%27 r=%276%27 /%3E%3Cpath d=%27M5 41c0-8 5-13 12-13s12 5 12 13zM28 25c1 0 3-1 4-1 6 0 11 5 11 12h-12%27 /%3E%3C/svg%3E");
+  --art-pin: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M24 42s-12-12-12-21a12 12 0 0 1 24 0c0 9-12 21-12 21z%27/%3E%3Ccircle cx=%2724%27 cy=%2721%27 r=%274.5%27 /%3E%3Cpath d=%27M8 44h32%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-map: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M5 11l12-4 14 4 12-4v30l-12 4-14-4-12 4z%27/%3E%3Cpath d=%27M17 7v30M31 11v30%27 stroke-width=%271%27/%3E%3Cpath d=%27M9 28c4-2 6 3 10 0s6-6 10-3 6 2 10-1%27 stroke-dasharray=%272 2.5%27 stroke-width=%271%27/%3E%3Cpath d=%27M34 17l3 3M37 17l-3 3%27 stroke-width=%271.3%27/%3E%3C/svg%3E");
+  --art-lens: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Ccircle cx=%2720%27 cy=%2720%27 r=%2711%27 /%3E%3Cpath d=%27M28 28l13 13%27 stroke-width=%273%27/%3E%3Cpath d=%27M14 16c1-3 3-4 6-5%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-scales: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M24 6v34M14 42h20M10 12h28%27/%3E%3Ccircle cx=%2724%27 cy=%276%27 r=%271.6%27 fill=%27black%27/%3E%3Cpath d=%27M10 12l-6 14h12zM38 12l-6 14h12z%27 stroke-width=%271.1%27/%3E%3Cpath d=%27M4 26a6 4 0 0 0 12 0M32 26a6 4 0 0 0 12 0%27/%3E%3C/svg%3E");
+  --art-hourglass: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M12 6h24M12 42h24M15 6c0 10 9 13 9 18s-9 8-9 18M33 6c0 10-9 13-9 18s9 8 9 18%27/%3E%3Cpath d=%27M19 38c2-3 8-3 10 0z%27 fill=%27black%27 stroke-width=%271%27/%3E%3Cpath d=%27M20 14h8%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-quill: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M42 4c-10 3-20 12-24 26l-2 7 3-2c5-10 14-20 23-31z%27/%3E%3Cpath d=%27M16 37l-4 7M20 26l5 1M23 20l5 1M27 14l4 1%27 stroke-width=%271%27/%3E%3Cpath d=%27M6 44h20%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-folder: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M5 13h14l4 4h20v24H5z%27/%3E%3Cpath d=%27M5 21h38%27 stroke-width=%271%27/%3E%3Cpath d=%27M12 28h12M12 33h8%27 stroke-width=%271%27/%3E%3C/svg%3E");
+  --art-dice: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M16 6L30 17 16 34 2 17z%27/%3E%3Cpath d=%27M2 17l7 3 7-3 7 3 7-3M9 20l7 14M23 20l-7 14%27 stroke-width=%27.9%27/%3E%3Cpath d=%27M34 22l10 6v12l-10 6-10-6V28z%27/%3E%3Cpath d=%27M34 28l-6 10h12z%27 stroke-width=%27.9%27/%3E%3C/svg%3E");
+  --art-list: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M8 8h32v32H8z%27/%3E%3Cpath d=%27M14 16h3M20 16h14M14 24h3M20 24h14M14 32h3M20 32h10%27 stroke-width=%271.1%27/%3E%3C/svg%3E");
+  --art-curtain: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.4%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M5 41V9h38v32%27/%3E%3Cpath d=%27M5 9c3 9 4 18 10 24-2 2-2 5-1 8M43 9c-3 9-4 18-10 24 2 2 2 5 1 8%27/%3E%3Cpath d=%27M9 9c1 8 3 15 6 20M13 9c0 7 2 13 4 18M39 9c-1 8-3 15-6 20M35 9c0 7-2 13-4 18%27 stroke-width=%271%27/%3E%3Cpath d=%27M5 9c6 3 13 3 19 0 6 3 13 3 19 0%27 /%3E%3Ccircle cx=%2715%27 cy=%2733%27 r=%271.3%27 fill=%27black%27/%3E%3Ccircle cx=%2733%27 cy=%2733%27 r=%271.3%27 fill=%27black%27/%3E%3Cpath d=%27M3 41h42M8 44h32%27 /%3E%3Cpath d=%27M22 26l2-3 2 3-2 3z%27 stroke-width=%271%27/%3E%3C/svg%3E");
+}
+
+.engrave {
+  -webkit-mask: var(--art) center / contain no-repeat; mask: var(--art) center / contain no-repeat;
+  background: var(--ink-2);
+}
+
+/* The vignette beside every screen's title: one picture per tab, and one per
+   More section, since those are six different rooms. */
+body[data-tab="play"]    { --vignette: var(--art-play); }
+body[data-tab="scene"]   { --vignette: var(--art-scene); }
+body[data-tab="oracles"] { --vignette: var(--art-oracles); }
+body[data-tab="journal"] { --vignette: var(--art-journal); }
+body[data-tab="more"]    { --vignette: var(--art-more); }
+body[data-section="nodes"]       { --vignette: var(--art-list); }
+body[data-section="cast"]        { --vignette: var(--art-busts); }
+body[data-section="files"]       { --vignette: var(--art-folder); }
+body[data-section="explore"]     { --vignette: var(--art-map); }
+body[data-section="battle"]      { --vignette: var(--art-swords); }
+body[data-section="discovery"]   { --vignette: var(--art-lens); }
+body[data-section="people"]      { --vignette: var(--art-busts); }
+body[data-section="descriptive"] { --vignette: var(--art-quill); }
+body[data-section="story"]       { --vignette: var(--art-tutorial); }
+body[data-section="granular"]    { --vignette: var(--art-scales); }
+body[data-section="quantifiers"] { --vignette: var(--art-hourglass); }
+body[data-section="dice"]        { --vignette: var(--art-dice); }
+body[data-tab="more"][data-section="home"]     { --vignette: var(--art-home); }
+body[data-tab="more"][data-section="forge"]    { --vignette: var(--art-forge); }
+body[data-tab="more"][data-section="tables"]   { --vignette: var(--art-tables); }
+body[data-tab="more"][data-section="library"]  { --vignette: var(--art-library); }
+body[data-tab="more"][data-section="tutorial"] { --vignette: var(--art-tutorial); }
+body[data-tab="more"][data-section="settings"] { --vignette: var(--art-settings); }
+
+#screen h1 {
+  display: flex; align-items: center; gap: .65rem;
+  border-bottom: none; padding-bottom: .55rem; position: relative;
+}
+#screen h1::before {
+  content: ""; flex: none; width: 44px; height: 44px;
+  -webkit-mask: var(--vignette, var(--art-home)) center / contain no-repeat;
+  mask: var(--vignette, var(--art-home)) center / contain no-repeat;
+  background: var(--accent-text);
+}
+/* The rule under the title, with a fleuron at its head, the way a printed
+   sheet opens a section. */
+#screen h1 {
+  background: linear-gradient(var(--rule-2), var(--rule-2)) left 32px bottom 4.5px / calc(100% - 32px) 1px no-repeat;
+}
+#screen h1::after {
+  content: ""; position: absolute; left: 0; bottom: 0; width: 28px; height: 10px;
+  background: var(--rule-2);
+  -webkit-mask: var(--art-fleuron) center / contain no-repeat;
+  mask: var(--art-fleuron) center / contain no-repeat;
+}
+#screen h1 { margin-bottom: .7rem; padding-bottom: .9rem; }
+
+/* Each plot-node list wears the emblem of what goes in it (PUM p.28's six
+   kinds, and a plain list for the two the player names). */
+.node-card[data-cat="world"]      { --emblem: var(--art-globe); }
+.node-card[data-cat="problems"]   { --emblem: var(--art-swords); }
+.node-card[data-cat="findings"]   { --emblem: var(--art-key); }
+.node-card[data-cat="questions"]  { --emblem: var(--art-question); }
+.node-card[data-cat="characters"] { --emblem: var(--art-bust); }
+.node-card[data-cat="locations"]  { --emblem: var(--art-pin); }
+.node-card[data-cat="custom"]     { --emblem: var(--art-list); }
+.node-card > .card-head::before {
+  content: ""; flex: none; width: 24px; height: 24px; align-self: center;
+  -webkit-mask: var(--emblem) center / contain no-repeat; mask: var(--emblem) center / contain no-repeat;
+  background: var(--accent-text);
+}
+
+/* The cold open: the machine itself, above the three lines that say what it is. */
+.hero {
+  height: 92px; margin: -.2rem 0 .7rem;
+  -webkit-mask: var(--art-hero) center / contain no-repeat; mask: var(--art-hero) center / contain no-repeat;
+  background: var(--ink-2);
+}
+
+/* Empty states get a picture of the blank thing waiting to be filled. */
+.empty::before {
+  content: ""; display: block; width: 64px; height: 64px; margin: 0 auto .6rem;
+  -webkit-mask: var(--art-empty) center / contain no-repeat; mask: var(--art-empty) center / contain no-repeat;
+  background: var(--rule-2); font-size: 0;
+}
+
+/* The coach's card carries a compass: it is the one that says which way. */
+.coach-card .card-head::before {
+  content: ""; flex: none; width: 22px; height: 22px; align-self: center;
+  -webkit-mask: var(--art-compass) center / contain no-repeat; mask: var(--art-compass) center / contain no-repeat;
+  background: var(--accent-text);
+}
+.coach-strip::before {
+  content: ""; flex: none; width: 20px; height: 20px;
+  -webkit-mask: var(--art-compass) center / contain no-repeat; mask: var(--art-compass) center / contain no-repeat;
+  background: var(--accent-text);
+}
+
+/* The Threshold, drawn: a laurel over the last box of the track. Crossing it
+   is what resolving the scope means. */
+.track-sec:last-child .track-box:last-child::before {
+  content: ""; position: absolute; left: 50%; top: -15px; transform: translateX(-50%);
+  width: 22px; height: 14px;
+  -webkit-mask: var(--art-laurel) center / contain no-repeat; mask: var(--art-laurel) center / contain no-repeat;
+  background: var(--warn);
+}
+.track-sec:last-child { margin-top: .35rem; }
+
+/* Dice drawn as the dice they are — the kite of a d10, the face of a d20, the
+   doubled kite of percentile dice — with the face that came up inside. */
+.die[data-d="10"], .die[data-d="20"], .die[data-d="100"] {
+  position: relative; border: none; background: transparent; box-shadow: none;
+  min-width: 36px; height: 36px; font-size: .78rem;
+}
+.die[data-d="100"] { min-width: 40px; height: 40px; font-size: .72rem; }
+.die[data-d="10"]::before, .die[data-d="20"]::before, .die[data-d="100"]::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: currentColor;
+  -webkit-mask: var(--die-art) center / contain no-repeat; mask: var(--die-art) center / contain no-repeat;
+}
+.dice { isolation: isolate; }
+.die[data-d="10"]  { --die-art: var(--art-d10); padding-bottom: 4px; }
+.die[data-d="20"]  { --die-art: var(--art-d20); padding-top: 3px; }
+.die[data-d="100"] { --die-art: var(--art-d100); padding-bottom: 3px; }
+.die.dropped { text-decoration: line-through; }
+
+/* A new roll arrives tumbling and lands on the face the RNG already chose. */
+@keyframes tumble {
+  0%   { transform: rotate(-300deg) scale(.35); opacity: 0; }
+  65%  { transform: rotate(18deg) scale(1.12); opacity: 1; }
+  82%  { transform: rotate(-6deg) scale(.97); }
+  100% { transform: none; }
+}
+.result.fresh .die { animation: tumble .42s cubic-bezier(.2, .7, .3, 1) both; }
+.result.fresh .die:nth-child(2) { animation-delay: .07s; }
+.result.fresh .die:nth-child(3) { animation-delay: .14s; }
+.result:not(.fresh) { animation: none; }
+
+/* Printer's corner marks on every result card. */
+.result { position: relative; }
+.result::after {
+  content: ""; position: absolute; inset: 6px; pointer-events: none;
+  background: var(--rule-2); opacity: .9;
+  -webkit-mask:
+    linear-gradient(#000,#000) left top / 10px 1px no-repeat, linear-gradient(#000,#000) left top / 1px 10px no-repeat,
+    linear-gradient(#000,#000) right top / 10px 1px no-repeat, linear-gradient(#000,#000) right top / 1px 10px no-repeat,
+    linear-gradient(#000,#000) left bottom / 10px 1px no-repeat, linear-gradient(#000,#000) left bottom / 1px 10px no-repeat,
+    linear-gradient(#000,#000) right bottom / 10px 1px no-repeat, linear-gradient(#000,#000) right bottom / 1px 10px no-repeat;
+  mask:
+    linear-gradient(#000,#000) left top / 10px 1px no-repeat, linear-gradient(#000,#000) left top / 1px 10px no-repeat,
+    linear-gradient(#000,#000) right top / 10px 1px no-repeat, linear-gradient(#000,#000) right top / 1px 10px no-repeat,
+    linear-gradient(#000,#000) left bottom / 10px 1px no-repeat, linear-gradient(#000,#000) left bottom / 1px 10px no-repeat,
+    linear-gradient(#000,#000) right bottom / 10px 1px no-repeat, linear-gradient(#000,#000) right bottom / 1px 10px no-repeat;
+}
+
+/* The journal's days, set between rules like a dated page head. */
+h3.jday {
+  display: flex; align-items: center; gap: .6rem;
+  margin: 1.1rem 0 .3rem; color: var(--ink-3);
+  font-family: var(--sans); font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+}
+h3.jday::before, h3.jday::after { content: ""; flex: 1; height: 1px; background: var(--rule-2); }
+h3.jday::before { flex: 0 0 14px; }
+
+/* Desktop: the machine sits at the foot of the rail, faint, like a colophon. */
+@media (min-width: 900px) {
+  .tab-bar::after {
+    content: ""; position: absolute; left: 1rem; right: 1rem; bottom: 1.2rem; height: 70px;
+    -webkit-mask: var(--art-hero) center / contain no-repeat; mask: var(--art-hero) center / contain no-repeat;
+    background: var(--rule-2); pointer-events: none;
+  }
+  #screen h1::before { width: 52px; height: 52px; }
+}
+@media (orientation: landscape) and (max-height: 480px) {
+  #screen h1::before { width: 32px; height: 32px; }
+}
+@media (forced-colors: active) {
+  #screen h1::before, .hero, .empty::before, .node-card > .card-head::before, .coach-card .card-head::before, .coach-strip::before,
+  .die::before, .track-box::before, .tab-bar::after { forced-color-adjust: none; background: CanvasText; }
+}
+
+
+/* Toggles drawn as brass switches: a settings row is an on/off, and a tick
+   box reads as a form to fill rather than a lever to throw. The input is
+   still the native checkbox, so keyboard and assistive tech are unchanged. */
+label.check input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: 42px; height: 24px; flex: none; border-radius: 999px; cursor: pointer;
+  background: var(--paper-sunk); border: 1.5px solid var(--rule-2);
+  position: relative; transition: background-color .15s ease, border-color .15s ease;
+}
+label.check input[type="checkbox"]::after {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 17px; height: 17px; border-radius: 50%;
+  background: var(--paper-2); box-shadow: 0 1px 2px rgba(0,0,0,.3), inset 0 0 0 1px var(--rule-2);
+  transition: transform .15s ease;
+}
+label.check input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+label.check input[type="checkbox"]:checked::after { transform: translateX(18px); }
+label.check input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (forced-colors: active) {
+  label.check input[type="checkbox"] { appearance: auto; -webkit-appearance: auto; width: 22px; height: 22px; }
+  label.check input[type="checkbox"]::after { content: none; }
+}
+
+/* Dialog titles open with the same fleuron as a screen's. */
+.modal h2 { display: flex; align-items: center; gap: .5rem; }
+.modal h2::before {
+  content: ""; flex: none; width: 22px; height: 8px; background: var(--accent-text);
+  -webkit-mask: var(--art-fleuron) center / contain no-repeat; mask: var(--art-fleuron) center / contain no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {
