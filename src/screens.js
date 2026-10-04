@@ -123,7 +123,12 @@ function renderHome(host) {
     add(host, card);
   }
 
-  const cur = el("div", { class: "card" });
+  // The game's card is its cover: a title page, with the track drawn as a dial.
+  const cur = el("div", { class: "card cover" });
+  if (hasTrack(scope)) {
+    const pct = Math.round((crossed(scope) / trackLength(scope)) * 100);
+    add(cur, el("div", { class: "gauge", "aria-hidden": "true", style: `--p:${pct}` }));
+  }
   add(cur, el("div", { class: "card-head" },
     el("h2", { text: game.title }),
     el("span", { class: "cite", text: game.universe || "" })

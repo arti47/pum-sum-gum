@@ -494,7 +494,7 @@ p  { margin: .4rem 0; text-wrap: pretty; }
   border-bottom: 1px dotted var(--rule-2);
 }
 .inlinerow:last-child { border-bottom: none; }
-.inlinerow .k { color: var(--ink-3); font-size: .84rem; }
+.inlinerow .k { color: var(--ink-3); font-size: .84rem; flex: none; white-space: nowrap; }
 .inlinerow .v { margin-left: auto; font-weight: 700; text-align: right; }
 
 /* ---------- buttons --------------------------------------------------- */
@@ -954,7 +954,7 @@ body.has-actionbar .toast-mount { bottom: calc(var(--tabbar-h) + var(--actionbar
 .term-group:first-child { margin-top: .2rem; }
 
 .pill {
-  display: inline-block; padding: .1rem .5rem; border-radius: 999px; background: var(--paper);
+  display: inline-block; white-space: nowrap; flex: none; padding: .1rem .5rem; border-radius: 999px; background: var(--paper);
   font-size: .7rem; border: 1px solid var(--rule-2); color: var(--ink-3);
   font-family: var(--mono);
 }
@@ -1244,6 +1244,147 @@ label.check input[type="checkbox"]:focus-visible { outline: 3px solid var(--acce
   -webkit-mask: var(--art-fleuron) center / contain no-repeat; mask: var(--art-fleuron) center / contain no-repeat;
 }
 
+
+/* ======================================================================
+   CEREMONY — the moments the sheet marks: a box crossed, a storyline
+   resolved, an ending written. All of it after the fact: nothing here
+   decides, fires or rolls anything.
+   ====================================================================== */
+:root { --art-seal: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27 fill=%27none%27 stroke=%27black%27 stroke-width=%272%27 stroke-linecap=%27round%27%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2742%27/%3E%3Ccircle cx=%2750%27 cy=%2750%27 r=%2736%27 stroke-width=%271.2%27/%3E%3Cpath d=%27M94.0 50.0L97.0 50.0%27/%3E%3Cpath d=%27M93.3 57.6L96.3 58.2%27/%3E%3Cpath d=%27M91.3 65.0L94.2 66.1%27/%3E%3Cpath d=%27M88.1 72.0L90.7 73.5%27/%3E%3Cpath d=%27M83.7 78.3L86.0 80.2%27/%3E%3Cpath d=%27M78.3 83.7L80.2 86.0%27/%3E%3Cpath d=%27M72.0 88.1L73.5 90.7%27/%3E%3Cpath d=%27M65.0 91.3L66.1 94.2%27/%3E%3Cpath d=%27M57.6 93.3L58.2 96.3%27/%3E%3Cpath d=%27M50.0 94.0L50.0 97.0%27/%3E%3Cpath d=%27M42.4 93.3L41.8 96.3%27/%3E%3Cpath d=%27M35.0 91.3L33.9 94.2%27/%3E%3Cpath d=%27M28.0 88.1L26.5 90.7%27/%3E%3Cpath d=%27M21.7 83.7L19.8 86.0%27/%3E%3Cpath d=%27M16.3 78.3L14.0 80.2%27/%3E%3Cpath d=%27M11.9 72.0L9.3 73.5%27/%3E%3Cpath d=%27M8.7 65.0L5.8 66.1%27/%3E%3Cpath d=%27M6.7 57.6L3.7 58.2%27/%3E%3Cpath d=%27M6.0 50.0L3.0 50.0%27/%3E%3Cpath d=%27M6.7 42.4L3.7 41.8%27/%3E%3Cpath d=%27M8.7 35.0L5.8 33.9%27/%3E%3Cpath d=%27M11.9 28.0L9.3 26.5%27/%3E%3Cpath d=%27M16.3 21.7L14.0 19.8%27/%3E%3Cpath d=%27M21.7 16.3L19.8 14.0%27/%3E%3Cpath d=%27M28.0 11.9L26.5 9.3%27/%3E%3Cpath d=%27M35.0 8.7L33.9 5.8%27/%3E%3Cpath d=%27M42.4 6.7L41.8 3.7%27/%3E%3Cpath d=%27M50.0 6.0L50.0 3.0%27/%3E%3Cpath d=%27M57.6 6.7L58.2 3.7%27/%3E%3Cpath d=%27M65.0 8.7L66.1 5.8%27/%3E%3Cpath d=%27M72.0 11.9L73.5 9.3%27/%3E%3Cpath d=%27M78.3 16.3L80.2 14.0%27/%3E%3Cpath d=%27M83.7 21.7L86.0 19.8%27/%3E%3Cpath d=%27M88.1 28.0L90.7 26.5%27/%3E%3Cpath d=%27M91.3 35.0L94.2 33.9%27/%3E%3Cpath d=%27M93.3 42.4L96.3 41.8%27/%3E%3Cpath d=%27M28 70c6 8 14 11 22 11s16-3 22-11%27 stroke-width=%271.4%27/%3E%3Cellipse cx=%2740.1%27 cy=%2777.1%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28167 40.1 77.1%29%27/%3E%3Cellipse cx=%2734.1%27 cy=%2773.8%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28181 34.1 73.8%29%27/%3E%3Cellipse cx=%2729.2%27 cy=%2769.2%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28195 29.2 69.2%29%27/%3E%3Cellipse cx=%2725.6%27 cy=%2763.5%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28210 25.6 63.5%29%27/%3E%3Cellipse cx=%2723.5%27 cy=%2757.1%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28224 23.5 57.1%29%27/%3E%3Cellipse cx=%2723.1%27 cy=%2750.3%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28239 23.1 50.3%29%27/%3E%3Cellipse cx=%2759.9%27 cy=%2777.1%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%2813 59.9 77.1%29%27/%3E%3Cellipse cx=%2765.9%27 cy=%2773.8%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28-1 65.9 73.8%29%27/%3E%3Cellipse cx=%2770.8%27 cy=%2769.2%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28-15 70.8 69.2%29%27/%3E%3Cellipse cx=%2774.4%27 cy=%2763.5%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28-30 74.4 63.5%29%27/%3E%3Cellipse cx=%2776.5%27 cy=%2757.1%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28-44 76.5 57.1%29%27/%3E%3Cellipse cx=%2776.9%27 cy=%2750.3%27 rx=%272.4%27 ry=%275.5%27 transform=%27rotate%28-59 76.9 50.3%29%27/%3E%3Cpath d=%27M50 34l4.7 9.6 10.6 1.5-7.7 7.5 1.8 10.5L50 58.1l-9.4 5 1.8-10.5-7.7-7.5 10.6-1.5z%27 fill=%27black%27/%3E%3C/svg%3E"); }
+
+/* Ink: the box crossed since the track was last drawn takes the ink as it
+   lands — a stamp and a spreading ring. */
+@keyframes stamp { 0% { transform: scale(1.5); opacity: 0; } 55% { transform: scale(.92); opacity: 1; } 100% { transform: none; } }
+@keyframes inkring { 0% { box-shadow: 0 0 0 0 var(--accent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+.track-box.just { animation: stamp .35s cubic-bezier(.2,.8,.3,1) both, inkring .7s .2s ease-out both; }
+
+/* The seal on a resolved track: the Threshold met, pressed into the card. */
+.track-card.sealed::after {
+  content: ""; position: absolute; top: .55rem; right: .7rem; width: 74px; height: 74px;
+  background: var(--accent-text); opacity: .85; pointer-events: none;
+  -webkit-mask: var(--art-seal) center / contain no-repeat; mask: var(--art-seal) center / contain no-repeat;
+  transform: rotate(-12deg);
+}
+@keyframes seal { 0% { transform: rotate(-30deg) scale(2.2); opacity: 0; } 60% { transform: rotate(-10deg) scale(.9); opacity: .95; } 100% { transform: rotate(-12deg); } }
+.track-card.seal-fresh::after { animation: seal .6s cubic-bezier(.2,.8,.3,1) both; }
+.track-card.sealed .card-head { padding-right: 80px; }
+
+/* The ending: the last page of the book, framed and ruled twice. */
+.modal.ceremony { border: 3px double var(--rule-2); }
+.modal.ceremony h2 { justify-content: center; font-size: 1.35rem; border-bottom-style: double; border-bottom-width: 3px; }
+.modal.ceremony h2::after {
+  content: ""; flex: none; width: 22px; height: 8px; background: var(--accent-text); transform: scaleX(-1);
+  -webkit-mask: var(--art-fleuron) center / contain no-repeat; mask: var(--art-fleuron) center / contain no-repeat;
+}
+.modal.ceremony > h2 + * { position: relative; }
+.modal.ceremony > h2 + *::before {
+  content: ""; display: block; height: 64px; margin: .1rem 0 .6rem; opacity: .75; background: var(--ink-3);
+  -webkit-mask: var(--art-seal) center / contain no-repeat; mask: var(--art-seal) center / contain no-repeat;
+}
+/* …and the epilogue in the journal, set the same way. */
+.entry.jentry[data-kind="ending"] {
+  margin: .6rem 0; padding: 1rem 1rem 1rem 1.2rem;
+  border: 3px double var(--rule-2); border-radius: var(--radius-sm); background: var(--paper-2);
+}
+.entry.jentry[data-kind="ending"]::before { display: none; }
+.entry.jentry[data-kind="ending"]::after {
+  left: auto; right: .6rem; top: .6rem; width: 34px; height: 34px; border-radius: 0; box-shadow: none;
+  background: var(--accent-text); opacity: .8;
+  -webkit-mask: var(--art-seal) center / contain no-repeat; mask: var(--art-seal) center / contain no-repeat;
+}
+.entry.jentry[data-kind="ending"] .entry-title { font-size: 1.15rem; padding-right: 2.6rem; }
+.entry.jentry[data-kind="ending"] .entry-detail { font-style: italic; color: var(--ink); white-space: pre-wrap; }
+
+/* An entry with a file clipped to it shows a turned-up corner. */
+.entry.jentry.has-attach {
+  background: linear-gradient(225deg, transparent 0 13px, var(--rule-2) 13px 14px, transparent 14px) no-repeat top right / 20px 20px;
+}
+.entry.jentry.has-attach .entry-head { padding-right: 18px; }
+
+/* The guide's parts, numbered the way a book numbers them. */
+#screen { counter-reset: part; }
+.part-card { counter-increment: part; }
+.part-card > details.acc > summary::before {
+  content: counter(part, upper-roman); flex: none;
+  display: grid; place-items: center; min-width: 2rem; height: 2rem; padding: 0 .3rem;
+  border: 1.5px solid var(--accent-text); border-radius: 999px; color: var(--accent-text);
+  font-family: var(--serif); font-size: .82rem; font-weight: 700; letter-spacing: .02em;
+}
+
+/* Turning to a new screen: a short rise, like a fresh sheet laid down. */
+@keyframes turn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.screen.turn > * { animation: turn .18s ease-out both; }
+
+/* The splash that covers the module load: the machine, on paper. */
+.splash {
+  position: fixed; inset: 0; z-index: 200; pointer-events: none;
+  display: grid; place-items: center; background: var(--paper);
+  transition: opacity .3s ease;
+}
+.splash.gone { opacity: 0; }
+.splash-art {
+  width: min(70vw, 320px); height: 130px; background: var(--ink-2);
+  -webkit-mask: var(--art-hero) center / contain no-repeat; mask: var(--art-hero) center / contain no-repeat;
+}
+
+/* Paper, chosen by the theme: a warm parchment vignette in light, a cool slate
+   bloom in dark. Painted as an image, so no measured background colour moves. */
+body {
+  background-image: radial-gradient(120% 90% at 50% 0%, transparent 55%, rgba(120, 90, 40, .07) 100%);
+  background-attachment: fixed;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body { background-image: radial-gradient(120% 80% at 50% 0%, rgba(120, 140, 180, .07), transparent 60%); }
+}
+:root[data-theme="dark"] body { background-image: radial-gradient(120% 80% at 50% 0%, rgba(120, 140, 180, .07), transparent 60%); }
+
+/* Printing the plot sheet: the Play tab comes out as a paper sheet — the
+   track, the nodes, the mission — with the chrome and the controls left off. */
+@media print {
+  :root { --paper: #fff; --paper-2: #fff; --ink: #000; --ink-2: #222; --ink-3: #444; --rule: #bbb; --rule-2: #888; }
+  body { background: #fff; }
+  body::before, .tab-bar, .action-bar-mount, .toast-mount, #modal-mount, .splash, .skip-link,
+  .hdr-btn, .section-nav, .explain, .coach-card, .coach-strip, .coach, .result-foot,
+  #screen .btn, #screen .btn-row { display: none !important; }
+  .app-header { position: static; box-shadow: none; }
+  .screen { max-width: none; padding: 0; display: block; margin: 0; }
+  .card { box-shadow: none; break-inside: avoid; border-color: #888; }
+  .track-box { border-color: #000; }
+  .track-box.crossed { background: #fff; color: #000; }
+  .screen.turn > * { animation: none; }
+}
+
+
+/* The game's cover on Home: a title page in a double frame, the track as a dial. */
+.card.cover {
+  padding: 1.1rem 1.1rem 1rem; border: 3px double var(--rule-2);
+  background-image: radial-gradient(140% 100% at 50% 0%, transparent 60%, color-mix(in srgb, var(--rule) 35%, transparent));
+}
+.card.cover > .card-head { flex-direction: column; align-items: center; text-align: center; padding-bottom: .7rem; }
+.card.cover > .card-head h2 { font-size: 1.45rem; letter-spacing: -.01em; }
+.card.cover:has(.gauge) > .card-head { padding-right: 0; }
+.gauge {
+  width: 64px; height: 64px; margin: 0 auto .6rem; border-radius: 50%;
+  background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--paper-sunk) 0);
+  -webkit-mask: radial-gradient(circle, transparent 55%, #000 56%); mask: radial-gradient(circle, transparent 55%, #000 56%);
+  box-shadow: inset 0 0 0 1px var(--rule-2);
+}
+
+/* People and places in the cast: a portrait, or an engraved stand-in. */
+.entry.person.no-portrait, .entry.person[data-kind="protagonist"] { position: relative; padding-left: 3.2rem; min-height: 3.2rem; }
+.entry.person.no-portrait::before, .entry.person[data-kind="protagonist"]::before {
+  content: ""; position: absolute; left: 0; top: .6rem; width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  border: 1.5px solid var(--rule-2); background: var(--paper);
+}
+.entry.person.no-portrait::after, .entry.person[data-kind="protagonist"]::after {
+  content: ""; position: absolute; left: .45rem; top: 1.05rem; width: 1.6rem; height: 1.6rem;
+  background: var(--ink-3); -webkit-mask: var(--who) center / contain no-repeat; mask: var(--who) center / contain no-repeat;
+}
+.entry.person[data-kind="character"], .entry.person[data-kind="protagonist"] { --who: var(--art-bust); }
+.entry.person[data-kind="location"] { --who: var(--art-pin); }
+.entry.person[data-kind="protagonist"]::before { border-color: var(--accent-text); }
+.entry.person[data-kind="protagonist"]::after { background: var(--accent-text); }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
@@ -1279,6 +1420,7 @@ details.inspire .btn-row {
    The safety net has to be within reach of the thing it undoes, not four moves
    away in Settings. */
 .toast-undo {
+  flex: none; white-space: nowrap;
   pointer-events: auto;   /* the pill stays inert; only this button is live */
   margin-left: .6rem;
   border: 1px solid currentColor;

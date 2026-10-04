@@ -4,13 +4,13 @@ import { el, add, clear, $ } from "./core.js";
 
 let openModal = null;
 
-export function modal({ title, body, actions = [], onClose = null, dismissable = true }) {
+export function modal({ title, body, actions = [], onClose = null, dismissable = true, className = "" }) {
   closeModal();
   const prevFocus = document.activeElement;
 
   const actionRow = el("div", { class: "modal-actions" });
   const box = el("div", {
-    class: "modal", role: "dialog", "aria-modal": "true", "aria-label": title || "Dialog",
+    class: `modal${className ? " " + className : ""}`, role: "dialog", "aria-modal": "true", "aria-label": title || "Dialog",
   });
   add(box, title ? el("h2", { text: title }) : null);
   add(box, body);
@@ -136,7 +136,7 @@ export function inspireBlock(fieldId, input) {
 // `notes` adds a second field below the first. It exists because GUM builds a
 // character as a concept and the concept does not belong in a Name box: the
 // dialog asks for the name, and the rolled words land beside it.
-export function promptModal({ title, label, value = "", multiline = false, placeholder = "", hint = "", inspire = null, notes = null, onSubmit }) {
+export function promptModal({ title, label, value = "", multiline = false, placeholder = "", hint = "", inspire = null, notes = null, className = "", onSubmit }) {
   const input = multiline
     ? el("textarea", { placeholder })
     : el("input", { type: "text", placeholder });
@@ -169,6 +169,7 @@ export function promptModal({ title, label, value = "", multiline = false, place
   return modal({
     title,
     body,
+    className,
     actions: [
       { label: "Save", primary: true, onClick: submit },
       { label: "Cancel" },
@@ -335,9 +336,12 @@ let lastCardSig = "";
 
 export function resultCard({ kind, answer, second, question = "", dice = [], strip = null, actions = [], extra = null }) {
   const sig = [kind, answer, ...dice.map((d) => `${d.label}:${d.value}`)].join("|");
-  const fresh = sig !== lastCardSig;
+  // A hidden document pauses animations, so a card drawn while hidden arrives still.
+  const fresh = sig !== lastCardSig && document.visibilityState === "visible";
   lastCardSig = sig;
   const card = el("div", { class: `result${fresh ? " fresh" : ""}`, role: "group", "aria-label": kind });
+  // Settled on a timer, so a card never stays mid-tumble (see router's page turn).
+  if (fresh) setTimeout(() => card.classList.remove("fresh"), 800);
   const head = el("div", { class: "result-head" },
     el("span", { class: "result-kind", text: kind })
   );

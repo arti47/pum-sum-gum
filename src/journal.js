@@ -121,7 +121,10 @@ function renderEntries(host, game) {
 }
 
 function entryEl(e) {
-  const wrap = el("div", { class: "entry jentry" });
+  const wrap = el("div", {
+    class: `entry jentry${(e.attachments || []).length ? " has-attach" : ""}`,
+    "data-kind": e.kind,
+  });
   add(wrap, el("div", { class: "entry-head" },
     el("span", { class: "entry-kind", text: e.kind }),
     el("span", { class: "entry-ts", text: fmtTime(e.ts) })

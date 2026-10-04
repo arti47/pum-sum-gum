@@ -105,7 +105,7 @@ export function renderTutorial(host) {
 
   // --- the complete guide -------------------------------------------------
   for (const part of PARTS) {
-    const card = el("div", { class: "card" });
+    const card = el("div", { class: "card part-card" });
     const body = el("div");
     // The blurb sits OUTSIDE the fold: four collapsed rows of book vocabulary
     // told a stranger nothing about what was inside them, and the sentence that

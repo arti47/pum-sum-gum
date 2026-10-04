@@ -183,12 +183,31 @@ function renderTrack(host, scope) {
 // PUM p.5's flowchart is a loop, and the loop crosses tabs: a scene opens, you
 // ask, you call a beat, you confirm, you close. Without an onward route at each
 // step the player drives the whole loop from the tab bar (§6.3.6, §6.3.9).
+// How many boxes each scope had crossed when the track was last drawn, so the
+// box crossed since then can be inked as it is drawn — and only that once.
+const crossedSeen = new Map();
+
 function trackCard(scope) {
-  const card = el("div", { class: "card" });
   const sections = sectionsOf(scope);
   const sheet = plotSheet(scope.sheetId);
   const done = crossed(scope);
   const total = trackLength(scope);
+  const before = crossedSeen.has(scope.id) ? crossedSeen.get(scope.id) : done;
+  crossedSeen.set(scope.id, done);
+  // Marked only while the page is on screen: a hidden document pauses animations.
+  const justCrossed = done > before && document.visibilityState === "visible" ? done - 1 : -1;
+  // A resolved track carries a seal; the one that resolved just now presses it.
+  const resolved = isResolved(scope);
+  const card = el("div", {
+    class: `card track-card${resolved ? " sealed" : ""}${resolved && justCrossed === total - 1 ? " seal-fresh" : ""}`,
+  });
+  // Settled on a timer, so nothing stays mid-stamp (see router's page turn).
+  if (justCrossed >= 0) {
+    setTimeout(() => {
+      card.classList.remove("seal-fresh");
+      card.querySelectorAll(".track-box.just").forEach((b) => b.classList.remove("just"));
+    }, 1000);
+  }
 
   add(card, el("div", { class: "card-head" },
     el("h2", { text: "2 · Cross a box" }),
@@ -222,7 +241,8 @@ function trackCard(scope) {
       const isNext = at === done;
       const mark = scope.track.marks[String(at)];
       add(boxes, el("button", {
-        class: ["track-box", isDone ? "crossed" : "", isNext ? "next" : "", mark ? "marked" : ""]
+        class: ["track-box", isDone ? "crossed" : "", isNext ? "next" : "", mark ? "marked" : "",
+          at === justCrossed ? "just" : ""]
           .filter(Boolean).join(" "),
         "aria-label": `Box ${at + 1}${isDone ? ", crossed" : ""}${mark ? ", timed beat: " + mark : ""}`,
         onclick: () => boxDialog(at, isDone, mark),

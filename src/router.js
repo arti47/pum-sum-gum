@@ -176,9 +176,30 @@ function renderPlotHeader() {
   }
 }
 
+// The last route drawn: a new route turns the page, a re-render of the same one
+// (a click that changes something on it) does not.
+let lastRoute = "";
+let turnTimer = 0;
+
 export function render() {
   const screen = $("#screen");
   clear(screen);
+  const route = `${current.tab}/${current.section}`;
+  if (route !== lastRoute) {
+    lastRoute = route;
+    screen.classList.remove("turn");
+    // Only while the page is on screen: a hidden document pauses animations,
+    // and a page turn frozen on its first frame is a screen drawn invisible.
+    if (document.visibilityState === "visible") {
+      void screen.offsetWidth;   // restart the animation
+      screen.classList.add("turn");
+      // …and take it off again on a timer, not on animationend: a page whose
+      // compositor is not ticking never finishes an animation, and controls
+      // left mid-animation are never still enough to press.
+      clearTimeout(turnTimer);
+      turnTimer = setTimeout(() => screen.classList.remove("turn"), 260);
+    }
+  }
   clearActionBar();
   const fn = renderers.get(current.tab);
   renderTabs();

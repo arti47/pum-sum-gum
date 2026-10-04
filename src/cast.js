@@ -33,7 +33,7 @@ export function renderCast(host) {
     add(pcs, el("p", { class: "muted", text: "No protagonists yet. You are in full control of their thoughts, voice and actions." }));
   }
   for (const p of game.protagonists) {
-    add(pcs, el("div", { class: "entry" },
+    add(pcs, el("div", { class: "entry person", "data-kind": "protagonist" },
       el("div", { class: "entry-head" },
         el("span", { class: "entry-title", text: p.name }),
         el("button", {
@@ -101,7 +101,10 @@ export function renderCast(host) {
 }
 
 function castEntry(c) {
-  const wrap = el("div", { class: "entry" });
+  const game0 = store.activeGame();
+  const hasPortrait = !!(c.portraitId && game0 && game0.files.some((f) => f.id === c.portraitId));
+  // Without a portrait, an engraved stand-in: a bust for a person, a pin for a place.
+  const wrap = el("div", { class: `entry person${hasPortrait ? "" : " no-portrait"}`, "data-kind": c.kind });
   add(wrap, el("div", { class: "entry-head" },
     el("span", { class: "entry-title", text: c.name }),
     el("button", {

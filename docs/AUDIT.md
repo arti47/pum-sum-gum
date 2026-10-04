@@ -1871,3 +1871,28 @@ re-rendered does not tumble again. *Rule check:* the animation is applied after
 controls (`go()` call sites), and `probe-flow` walks the p.5 loop without the tab bar. The one
 candidate link — the coach strip on the Journal — was rejected: two coach stages route to the
 Journal, and on the Journal those would navigate to the screen they are on (the F-67 class).
+
+---
+
+## Ceremony
+
+**F-84 · The sheet's moments passed unmarked.** A box crossed, a track resolved and an ending
+written all looked like any other re-render. *Fix:* ink on the box crossed since the last draw,
+a seal on a resolved track, a framed ending dialog and epilogue. *Rule check:* every mark is
+drawn from state the rules already produced (`crossed`, `isResolved`, the `ending` entry); none
+fires, rolls or confirms anything.
+
+**F-85 · The toast's Undo wrapped to two lines** at 390px beside a long message; the guide's
+count pills wrapped; inline-row labels broke mid-word ("Sco/pe") beside a long value. Fixed with
+`flex: none; white-space: nowrap` on each.
+
+**F-86 · A one-shot animation could stall, and controls left mid-animation cannot be pressed.**
+*Found by:* the interaction audit, rounds 1 and 2 — "Open the guide as a page" opens a popup, the
+app's page stops being painted, its animations stop advancing (`document.getAnimations()` held at
+8), and every Settings control re-rendered after that was never "stable": ten controls "cannot be
+clicked". The first fix — start only while `document.visibilityState` is visible — was not enough:
+the page still reported itself visible. *Fix:* the page turn, dice tumble, ink and seal are each
+removed again on a timer rather than on `animationend`, so nothing can be left mid-motion, and they
+still start only while the page is visible.
+
+**Link graph — re-verified, nothing added.** No route changed in this pass.

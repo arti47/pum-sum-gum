@@ -149,6 +149,7 @@ function endingDialog(game, scope) {
     title: "How did it end?",
     label: "The ending",
     multiline: true,
+    className: "ceremony",   // framed like the last page of a book
     // no-inspire: this is your own story's ending. Rolling for it would be the
     // machine writing over the one part that was always yours.
     placeholder: ENDING_PROMPTS[0],

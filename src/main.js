@@ -51,6 +51,9 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", app
 
 renderTabs();
 go(store.activeGame() ? "play" : "more", store.activeGame() ? "track" : "home");
+// The app is drawn: lift the splash that covered the module load.
+const splash = $("#splash");
+if (splash) { splash.classList.add("gone"); setTimeout(() => splash.remove(), 400); }
 
 // PWA: register the worker and offer the update rather than applying it mid-scene.
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
