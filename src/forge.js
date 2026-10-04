@@ -34,12 +34,6 @@ const FORGE_SECTIONS = [
   ["seed", "Plot seed"], ["world", "World"], ["character", "Characters"], ["grand", "Grand oracle"],
 ];
 
-// Prep sends the player here for a starting situation, so it can say which
-// section to land on rather than leaving them wherever they last were.
-export function setForgeSection(id) {
-  if (FORGE_SECTIONS.some(([x]) => x === id)) { forgeSection = id; last = null; }
-}
-
 function resetForge() { last = null; }
 registerClearer(resetForge);
 
@@ -360,15 +354,15 @@ function keepDialog(parts, label, source = "GUM") {
     // what the old call actually did, since startWizard resets the draft.
     const resuming = inWizard();
     add(body, el("p", { class: "muted", text: resuming
-      ? "It will be offered against every field on the step that owns it. Nothing you have already typed is touched."
-      : "No game open yet — which is exactly when a plot seed is most useful. Take this into game prep and it will be offered against every field it could fill." }));
+      ? "Each line goes into the field it belongs to — the mission, the starting point, the tone — added after anything you have already typed."
+      : "No game open yet — which is exactly when a plot seed is most useful. Take it into game prep and each line is written into the field it belongs to, ready to edit." }));
     modal({
       title: "Keep this",
       body,
       actions: [
         {
           label: resuming ? "Take it back to prep" : "Prepare a game with this", primary: true,
-          onClick: () => { closeModal(); carryIntoWizard({ text, label }); return true; },
+          onClick: () => { closeModal(); carryIntoWizard(parts); return true; },
         },
         { label: "Cancel" },
       ],

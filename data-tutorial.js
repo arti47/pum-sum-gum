@@ -215,9 +215,9 @@ const WALKTHROUGH = [
     title: "Preparing a game — the five steps, field by field",
     blocks: [
       { tap: "More → Home → Prepare a game" },
-      { p: "The wizard will not let you past a step whose answer it needs. When the pinned button is greyed out, the line beside it says which answer is missing — 'Name the game to continue', and so on. Steps you have already satisfied stay tappable in the row of step pills, so you can go back and change anything." },
+      { p: "The wizard will not let you past a step whose answer it needs. When the pinned button is greyed out, the line beside it says which answer is missing — 'Name the game to continue', and so on. A row of dots and one line say which step you are on; Back and Next are the only way round, and Back keeps everything you typed." },
 
-      { p: "Step 1 · Universe. Four fields, and only the first is required." },
+      { p: "Step 1 · Universe. One field is required — Name this game. The other three wait behind Add more detail (optional), which opens by itself once anything is in it." },
       { bullets: [
         "Name this game — a label for your library. 'The Neverwinter road'.",
         "Universe or RPG — which game or fiction you are playing in. 'D&D 5e', 'Blade Runner', 'my own'. This is the one field in the app with no inspiration roll: GUM generates worlds, but not the names of published ones.",
@@ -233,7 +233,7 @@ const WALKTHROUGH = [
         "Mission — a pitch for the situation you start in, and the PCs' initial goals.",
         "Starting point — where this opens and what is introduced there. Optional now; the Home screen keeps asking until it is written.",
       ] },
-      { note: "The mission field's inspiration block is GUM's plot seed exactly — a hook, a motivation, a mission, a lead, a caveat and the opposition. Open it and tap 'All 6 tables' and you have rolled the book's own six-table combination without leaving the field." },
+      { note: "No story in mind? Suggest a starting situation, at the top of this step, rolls GUM's plot seed — a hook, a motivation, a mission, a first lead, a caveat and the opposition — and writes each line where it belongs: the mission line into Mission, the rest beneath it as labelled notes, and the hook into Starting point. The fields it filled are marked, the dice are shown, and nothing you already typed is replaced. Roll it again and the new lines are added after the old." },
 
       { p: "Step 3 · Protagonists. Your PCs are your eyes and ears. You are in full control of their thoughts, voice and actions — PUM never rolls for them, ever. At least one is required. The name is yours; the notes field beside it is where a rolled GUM archetype lands, because a concept does not belong in a name box." },
 
@@ -468,7 +468,7 @@ WALKTHROUGH.push(
         then: "Reading them together: a formal request or royal mandate (6) to destroy an objective (9), driven by the wish to trigger a drastic world-changing element (13); there is a source of information nearby (4); too many uncertainties, stay low profile (11); and you have a friend or family on their side (17). That last one is what makes it a story rather than a job." } },
       { note: "GUM's stated method is combination — roll several tables for one subject, or the same table twice, and read the results as one thing. Every group offers 'Roll all of it' for exactly that reason. A single row is rarely the point." },
       { p: "'Keep it →' is what stops a good roll evaporating. Write it into any plot node list, add it as a protagonist or a cast entry, keep it in the journal — or, folded under 'Into this game's setting or plot sheet', add it to the universe, the tone, the game's inspiration, the plot sheet's mission, the starting point, or the game notes. Everything appends; nothing replaces what you already wrote." },
-      { p: "With no game open — which is when a plot seed is most useful, since GUM is a prep tool — 'Prepare a game with this' carries the roll into the wizard, where it is offered against every field on the step that owns it. Rolling six tables and then retyping them by hand was the gap this closes." },
+      { p: "With no game open — which is when a plot seed is most useful, since GUM is a prep tool — 'Prepare a game with this' carries the roll into the wizard and writes each line into the field it belongs to: mission, starting point, tone or inspiration. A line at the top says which fields were filled; edit them like anything else you typed." },
     ],
   },
   {
@@ -507,7 +507,7 @@ WALKTHROUGH.push(
         "Enrich descriptive and story oracles — on, because the books make it the default. With it off, a descriptive or story answer carries Enrich it instead.",
         "Show the \u201cWhat this does\u201d notes expanded — on for a new player. Every screen carries a short note saying what it is for; they start open, and collapse everywhere for good the first time you close one. This brings them back.",
       ] },
-      { p: "Appearance: theme follows the system unless you override it, and a text-size slider runs 85% to 140%. Pinch-zoom is locked so a stray gesture cannot disturb a roll; the slider is what pays that back." },
+      { p: "Appearance: theme follows the system unless you override it, and a text-size slider runs 85% to 140%. Pinch-zoom is locked so a stray gesture cannot disturb a roll; the slider is what pays that back. Sound and vibration is off by default: switched on, a roll rattles, a crossed box takes a pen stroke, a sealed track a press, and the phone buzzes where it can. None of it changes a roll — every sound plays after the result exists." },
       { p: "The library. One game holds many plot sheets — one per scope — and finished ones stay as a record. Home lets you switch scope, edit or delete one, add a new one, switch or archive whole games, and prepare another." },
       { warn: "Danger zone, at the foot of Settings and out of the thumb's resting arc: Delete the current game, and Erase everything. Both confirm and both name exactly what is lost." },
     ],
@@ -787,10 +787,9 @@ const REFERENCE = [
         "Result card: Re-roll · Keep it → · Dismiss · Re-roll this one — on a set, it re-rolls just that table.",
         "Keep this → Write into <list> · Add as a protagonist · Add to the cast as a character · Add to the cast as a location · Just keep it in the journal.",
         "Keep this, folded under 'Into this game's setting or plot sheet' → Add to the universe · Add to the world, tone and theme · Add to the game's inspiration · Add to this plot sheet's mission · Add to the starting point · Add to the game notes. Every one appends; none replaces what you wrote.",
-        "Keep this with no game open → Prepare a game with this, or Take it back to prep if you are already mid-way through it. Either way the roll is carried and offered against each field, rather than discarded, and nothing you have typed is touched.",
+        "Keep this with no game open → Prepare a game with this, or Take it back to prep if you are already mid-way through it. Either way each line is written into the field it belongs to, and the fields it filled are marked.",
+        "Suggest a starting situation (prep step 2) → rolls GUM's plot seed into Mission and Starting point, without leaving prep.",
         "Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.",
-        "Rolled in the Forge (in game prep) → one button per field on that step, plus Dismiss.",
-        "Do not know yet? → Invent one in the Forge → — on prep steps 1 and 2, when nothing has suggested itself. The draft is kept while you go and look.",
         "The coach card at the top of the Play tab — a heading saying where you are, a sentence of what is true, and one Next line. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.",
         "Beside it, at some stages only: Ask an oracle · Call a plot beat · Write it down · Read the whole story.",
         "Where does this open? → Starting point — the dialog the coach opens when the starting point is still blank.",
@@ -819,7 +818,7 @@ const REFERENCE = [
         "Export JSON carries the record and not the files; Export everything carries both, as one much larger paste, and says how large before it builds one. Import takes either.",
         "Export and import dialogs: Copy · Download · Close · Import · Cancel.",
         "Optional rules: Disruption die · Volatile situation · Game Unfolding Machine (GUM v2.2) · Enrich descriptive and story oracles · Show the \u201cWhat this does\u201d notes expanded.",
-        "Appearance: Theme · Text size — N%, which the label carries as you drag it.",
+        "Appearance: Theme · Text size — N%, which the label carries as you drag it · Sound and vibration.",
         "About the books, including what they do not contain.",
         "Danger zone: Delete the current game · Erase everything.",
       ] },

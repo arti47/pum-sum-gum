@@ -330,6 +330,12 @@ function diceRow(dice) {
   return row;
 }
 
+// A sound or a buzz for a new roll, registered at boot so ui.js need not know
+// Settings (the same seam as undo and inspire).
+let cueFn = null;
+
+export function registerCue(fn) { cueFn = fn; }
+
 // The last card drawn, so a re-render of the same answer (a note added, a fold
 // opened) does not tumble its dice again: only a new roll arrives.
 let lastCardSig = "";
@@ -342,6 +348,7 @@ export function resultCard({ kind, answer, second, question = "", dice = [], str
   const card = el("div", { class: `result${fresh ? " fresh" : ""}`, role: "group", "aria-label": kind });
   // Settled on a timer, so a card never stays mid-tumble (see router's page turn).
   if (fresh) setTimeout(() => card.classList.remove("fresh"), 800);
+  if (fresh && dice.length && cueFn) cueFn("roll");
   const head = el("div", { class: "result-head" },
     el("span", { class: "result-kind", text: kind })
   );

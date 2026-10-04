@@ -274,7 +274,7 @@ export function renderFiles(host) {
   for (const [tag, label, blurb] of TAGS) {
     const list = game.files.filter((f) => f.tag === tag);
     if (!list.length) continue;
-    const card = el("div", { class: "card" });
+    const card = el("div", { class: "card drawer", "data-tag": tag });
     add(card, el("div", { class: "card-head" },
       el("h2", { text: label }),
       el("span", { class: "cite", text: String(list.length) })

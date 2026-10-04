@@ -1385,6 +1385,96 @@ body {
 .entry.person[data-kind="protagonist"]::before { border-color: var(--accent-text); }
 .entry.person[data-kind="protagonist"]::after { background: var(--accent-text); }
 
+
+/* The scene arc drawn as one path: three stations on a dotted line, the one
+   reached filled in. On a phone the cards stack, so the path runs down them. */
+@media (max-width: 899px) {
+  .arc-step { margin-left: 1.6rem; }
+  .arc-step::before {
+    content: attr(data-step); position: absolute; left: -1.75rem; top: .8rem;
+    width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
+    font-family: var(--serif); font-size: .78rem; font-weight: 700;
+    background: var(--paper); color: var(--accent-text); border: 1.5px solid var(--accent-text);
+    z-index: 1;
+  }
+  .arc-step.reached::before { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .arc-step[data-step="1"]::after, .arc-step[data-step="2"]::after {
+    content: ""; position: absolute; left: calc(-1.75rem + .7rem - 1px);
+    top: 2.3rem; bottom: calc(-.85rem - .8rem);
+    border-left: 2px dotted var(--rule-2); pointer-events: none;
+  }
+}
+
+/* The active plot sheet on Home is sealed in wax. */
+.scope-list .pill.on {
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+  font-family: var(--serif); font-weight: 700; font-style: italic;
+  border-radius: 46% 54% 50% 50% / 55% 45% 55% 45%;
+  padding: .15rem .55rem;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.18), inset 0 2px 0 rgba(255,255,255,.18), 0 1px 2px rgba(0,0,0,.2);
+  transform: rotate(-4deg);
+}
+
+/* The Maps drawer is laid on a chart: faint contour lines and a compass rose. */
+.drawer[data-tag="map"] {
+  background-image:
+    repeating-radial-gradient(circle at 85% 20%, transparent 0 14px, color-mix(in srgb, var(--rule) 55%, transparent) 14px 15px),
+    repeating-radial-gradient(circle at 10% 90%, transparent 0 18px, color-mix(in srgb, var(--rule) 45%, transparent) 18px 19px);
+}
+.drawer[data-tag="map"] > .card-head::after {
+  content: ""; flex: none; width: 26px; height: 26px; background: var(--accent-text);
+  -webkit-mask: var(--art-compass) center / contain no-repeat; mask: var(--art-compass) center / contain no-repeat;
+}
+.drawer[data-tag="sheet"] > .card-head::before, .drawer[data-tag="portrait"] > .card-head::before, .drawer[data-tag="note"] > .card-head::before {
+  content: ""; flex: none; width: 22px; height: 22px; align-self: center; background: var(--accent-text);
+  -webkit-mask: var(--drawer-art) center / contain no-repeat; mask: var(--drawer-art) center / contain no-repeat;
+}
+.drawer[data-tag="sheet"] { --drawer-art: var(--art-tables); }
+.drawer[data-tag="portrait"] { --drawer-art: var(--art-bust); }
+.drawer[data-tag="note"] { --drawer-art: var(--art-quill); }
+
+/* A tablet held upright: two columns of cards, tabs still at the foot. */
+@media (min-width: 600px) and (max-width: 899px) and (min-height: 500px) {
+  .screen {
+    max-width: 860px; display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 0 .9rem;
+  }
+  .screen > *:not(.card), .screen > .coach-card, .screen > .notice, .screen > .arc-step,
+  .screen > .result, .screen > .cover, .screen > .track-card { grid-column: 1 / -1; }
+  .action-bar { max-width: 860px; }
+}
+
+/* The printed sheet's head: the title between double rules, fleurons each side. */
+@media print {
+  .app-header {
+    border-top: 3px double #000; border-bottom: 3px double #000; justify-content: center;
+    padding: .5rem 0; margin-bottom: .8rem;
+  }
+  .app-header::before, .app-header::after {
+    content: ""; width: 34px; height: 10px; background: #000;
+    -webkit-mask: var(--art-fleuron) center / contain no-repeat; mask: var(--art-fleuron) center / contain no-repeat;
+  }
+  .app-header .plot-header { flex: 0 1 auto; text-align: center; }
+  .arc-step { margin-left: 0; }
+  .arc-step::before, .arc-step::after { display: none; }
+}
+
+
+/* Game prep: where you are as a row of dots and one line — no strip of step
+   buttons — and the fields a roll just filled marked for reading. */
+.wz-progress { margin: -.2rem 0 .8rem; }
+.wz-dots { display: flex; gap: 6px; margin-bottom: .35rem; }
+.wz-dots i { flex: 1 1 0; height: 5px; border-radius: 3px; background: var(--paper-sunk); box-shadow: inset 0 0 0 1px var(--rule-2); }
+.wz-dots i.done { background: var(--accent); box-shadow: none; }
+.wz-dots i.here { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.wz-progress .lede { margin: 0; font-weight: 600; color: var(--ink); }
+.wz-was-filled textarea, .wz-was-filled input { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.wz-was-filled .lbl::after { content: "  \2022 filled for you"; color: var(--accent-text); text-transform: none; letter-spacing: 0; }
+.wz-filled .cite { margin-top: .25rem; }
+.wz-was-filled textarea { min-height: 9rem; }
+details.acc.wz-more { border-bottom: none; border-top: 1px dotted var(--rule-2); margin-top: .3rem; }
+details.acc.wz-more > summary { font-family: var(--sans); font-size: .88rem; color: var(--accent-text); }
+.wz-suggest { border-style: dashed; }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }

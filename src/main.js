@@ -1,7 +1,8 @@
 // Boot.
 
 import { $ } from "./core.js";
-import { toast, registerUndo, registerExplainState } from "./ui.js";
+import { toast, registerUndo, registerExplainState, registerCue } from "./ui.js";
+import { cue } from "./feel.js";
 import * as store from "./store.js";
 import { applyTheme, cycleTheme, Settings } from "./settings.js";
 import { registerScreen, go, renderTabs, render } from "./router.js";
@@ -33,6 +34,7 @@ registerExplainState({
 // uses, from here on, without any screen opting in (§6.6 layer 0).
 installGlossary({ openTerm });
 
+registerCue(cue);
 registerScreen("play", renderPlay);
 registerScreen("oracles", renderOracles);
 registerScreen("scene", renderScene);

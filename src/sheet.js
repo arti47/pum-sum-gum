@@ -22,6 +22,7 @@ import { renderCast } from "./cast.js";
 import { renderFiles } from "./files.js";
 import { coachCard } from "./coach.js";
 import { registerClearer } from "./viewstate.js";
+import { cue } from "./feel.js";
 
 // The beat currently on the table, if any. Held in module state so a re-render
 // never re-rolls it (§5.1: roll once, store it, render from the stored value).
@@ -203,6 +204,7 @@ function trackCard(scope) {
   });
   // Settled on a timer, so nothing stays mid-stamp (see router's page turn).
   if (justCrossed >= 0) {
+    cue(resolved && justCrossed === total - 1 ? "seal" : "cross");
     setTimeout(() => {
       card.classList.remove("seal-fresh");
       card.querySelectorAll(".track-box.just").forEach((b) => b.classList.remove("just"));

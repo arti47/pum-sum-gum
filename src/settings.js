@@ -34,6 +34,11 @@ export const Settings = {
   explainOpen: () => getState().settings.explainOpen !== false,
   setExplainOpen: (v) => setSetting("explainOpen", !!v),
 
+  // Sound and vibration on rolls, crossed boxes, a sealed track and page turns.
+  // Off by default: a play aid that makes noise unasked is one you stop opening.
+  feel: () => !!getState().settings.feel,
+  setFeel: (v) => setSetting("feel", !!v),
+
   seenTutorial: () => !!getState().settings.seenTutorial,
   setSeenTutorial: (v) => setSetting("seenTutorial", !!v),
 

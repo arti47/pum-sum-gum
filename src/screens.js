@@ -151,7 +151,7 @@ function renderHome(host) {
   add(host, cur);
 
   // The scopes of this game
-  const scopes = el("div", { class: "card" });
+  const scopes = el("div", { class: "card scope-list" });
   add(scopes, el("div", { class: "card-head" },
     el("h3", { text: "Plot sheets in this game" }),
     el("span", { class: "cite", text: String(game.scopes.length) })
@@ -673,6 +673,11 @@ function renderSettings(host) {
     el("span", { class: "lbl", text: `Text size — ${Math.round(Settings.textScale() * 100)}%` }),
     scale,
     el("div", { class: "hint", text: "Pinch-zoom is locked so a stray gesture cannot disturb a roll. This is the control that pays that back." })
+  ));
+  add(look, toggle(
+    "Sound and vibration",
+    "A rattle of dice on a roll, a pen stroke when a box is crossed, a press when a track is sealed, a soft page between screens — and a buzz where the phone allows it. Off by default.",
+    Settings.feel(), (v) => { Settings.setFeel(v); render(); }
   ));
   add(host, look);
 

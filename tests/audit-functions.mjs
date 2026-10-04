@@ -538,20 +538,24 @@ const journeys = [];
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
-// 8b. Prep sends you to the Forge for an idea, and the Forge sends the idea
-// back. Both halves are single controls that exist only in that sequence: the
-// offer card renders only on wizard steps 1-2, and "Prepare a game with this"
-// only when no game exists — so a sweep that starts from a seeded fixture takes
-// the other branch every time.
+// 8b. Prep rolls a starting situation in place, and a roll taken in the Forge
+// with no game open is carried into prep. Both exist only in that sequence:
+// "Suggest a starting situation" is on wizard step 2, and "Prepare a game with
+// this" only when no game exists — so a sweep from a seeded fixture never
+// reaches either.
 {
   await seed(null, "more", "home");
   await page.evaluate(async () => (await import("./src/wizard.js")).startWizard());
   await page.waitForTimeout(120);
-  const offered = await tapText(/invent one in the forge/);
-  await page.waitForTimeout(250);
-  const landed = await page.evaluate(() =>
-    document.querySelector("#screen h1")?.textContent || "");
-  // ...roll there, and carry the result back into the draft.
+  await type("#screen input[type=text]", "audit");
+  await page.locator("#action-bar .btn.primary").click().catch(() => {});
+  await page.waitForTimeout(150);
+  const suggested = await tapText(/suggest a starting situation/);
+  await page.waitForTimeout(150);
+  // ...then the Forge half, mid-prep: roll there and take it back.
+  await goTo("more", "forge");
+  await tapText(/^plot seed$/);   // the Forge remembers its last section
+  await page.waitForTimeout(120);
   const rolled = await tapText(/roll a whole plot seed/);
   await page.waitForTimeout(250);
   const kept = await tapText(/keep it/);
@@ -560,8 +564,8 @@ const journeys = [];
   await page.waitForTimeout(250);
   const back = await page.evaluate(() =>
     document.querySelector("#screen h1")?.textContent || "");
-  journeys.push(`prep → Forge → prep: offer ${offered ? "taken" : "NOT OFFERED"}, `
-    + `landed on "${landed}", roll ${rolled ? "taken" : "no"}, keep ${kept ? "taken" : "no"}, `
+  journeys.push(`prep suggestion ${suggested ? "taken" : "NOT OFFERED"}; Forge → prep: `
+    + `roll ${rolled ? "taken" : "no"}, keep ${kept ? "taken" : "no"}, `
     + `carried back to "${back}"${carriedBack ? "" : " (CARRY CONTROL NOT FOUND)"}`);
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
@@ -694,6 +698,34 @@ const journeys = [];
   await tapText(/^delete$/);
   await followDialog(0);
   journeys.push("my tables: written, rolled, kept, edited, deleted");
+}
+
+// 15. Sound and vibration: off by default, so nothing in feel.js runs until the
+// player throws the switch. Throw it, roll, then cross boxes to the end of the
+// track so the pen stroke and the seal both sound.
+{
+  await seed(MID, "more", "settings");
+  const switched = await page.evaluate(() => {
+    const lbl = [...document.querySelectorAll("#screen label.check")]
+      .find((l) => /sound and vibration/i.test(l.textContent));
+    if (!lbl) return false;
+    lbl.querySelector("input").click();
+    return true;
+  });
+  await page.waitForTimeout(60);
+  await goTo("oracles", "yesno");
+  await page.locator("#action-bar .btn.primary").click().catch(() => {});
+  await page.waitForTimeout(80);
+  await goTo("play", "track");
+  let crossed = 0;
+  for (let i = 0; i < 12; i++) {
+    if (!(await tapText(/advance without a beat/))) break;
+    await followDialog(-1, 2);
+    crossed += 1;
+    await page.waitForTimeout(40);
+  }
+  journeys.push(`sound and vibration: switch ${switched ? "thrown" : "NOT FOUND"}, a roll, ${crossed} box(es) crossed`);
+  await page.evaluate(async () => (await import("./src/settings.js")).Settings.setFeel(false));
 }
 
 const coverage = await page.coverage.stopJSCoverage();

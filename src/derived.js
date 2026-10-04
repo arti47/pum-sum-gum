@@ -373,6 +373,7 @@ export function normalize(input = {}) {
       gum: typeof set.gum === "boolean" ? set.gum : true,
       explainOpen: typeof set.explainOpen === "boolean" ? set.explainOpen : true,
       seenTutorial: !!set.seenTutorial,
+      feel: !!set.feel,
     },
     activeGameId: str(raw.activeGameId) || null,
     // Tables the player typed in from a book this app has never read. They sit

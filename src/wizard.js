@@ -2,26 +2,24 @@
 // the thing to decide before play (template §6.3.7).
 
 import { el, add, uid, fmtRange } from "./core.js";
-import { explain, actionBar, toast, modal, inspireBlock } from "./ui.js";
+import { actionBar, toast, modal, inspireBlock } from "./ui.js";
 import * as store from "./store.js";
 import { plotSheet, trackTotal } from "./rules.js";
 import { go, render } from "./router.js";
 import { PLOT_SHEETS, NODE_CATEGORIES } from "../data-pum-plot.js";
+import { GUM_PLOT_SEED, GUM_FOR_FIELDS } from "../data-gum.js";
+import { rollGumSet } from "./roller.js";
 import { registerClearer } from "./viewstate.js";
 import { Settings } from "./settings.js";
-// wizard <-> forge is a mutual import. Both sides reach the other only inside
-// functions called after load, never at module-evaluation time, so the cycle
-// resolves — the same shape forge/screens already has.
-import { setForgeSection } from "./forge.js";
 
 let step = 0;
 let draft = null;
 let onDone = null;
-// A result carried in from the Forge. GUM is a prep tool, so rolling a plot seed
-// before any game exists is the normal way to use it — and until now that roll
-// had nowhere to go but the floor. Held here, offered against each field on the
-// step that owns it, and cleared when prep ends.
-let carried = null;
+// Which fields a roll has just filled, so they can be marked for the player to
+// read and edit, and the dice that filled them (every die face is shown, §1.1).
+// A roll used to arrive as a card of per-field buttons, each pasting all six
+// lines into one box — reported from play as the point the player gave up.
+let filled = null;   // { fields: Set<key>, dice: string, from: string }
 // How many node slots each list is currently showing in prep (§6.5: a long list
 // reveals progressively rather than landing all at once).
 const SLOTS_AT_FIRST = 3;
@@ -38,16 +36,16 @@ const STEPS = [
 // Carry a Forge result into prep WITHOUT restarting it. startWizard resets the
 // draft, so a player who is halfway through, goes to the Forge for an idea and
 // comes back would lose everything they had typed.
-export function carryIntoWizard(seed) {
-  if (!draft) { startWizard(null, seed); return; }
-  carried = seed;
+export function carryIntoWizard(parts) {
+  if (!draft) { startWizard(null, parts); return; }
+  applyRoll(parts, "the Forge");
   go("more", "home");
 }
 
-export function startWizard(after = null, seed = null) {
+export function startWizard(after = null, parts = null) {
   step = 0;
   onDone = after;
-  carried = seed;
+  filled = null;
   draft = {
     title: "", universe: "", tone: "", inspiration: "",
     scopeName: "", mission: "", startingPoint: "",
@@ -58,36 +56,65 @@ export function startWizard(after = null, seed = null) {
   };
   for (const c of NODE_CATEGORIES) draft.nodes[c.id] = [];
   visible = {};
+  if (parts) applyRoll(parts, "the Forge");
   go("more", "home");
+}
+
+// Put each rolled line where it belongs, rather than asking which field it is
+// for. GUM's plot seed (p.3) answers the scope step: its mission line is the
+// mission, its hook is how the story opens, and the rest — motivation, lead,
+// caveat, opposition — is the mission's working notes. A table that serves the
+// game's tone goes to the tone; anything else is inspiration. Appended, never
+// substituted for what the player already wrote.
+const LINE_NAMES = {
+  "plot-hook": "Hook", motivation: "Motivation", mission: "Mission",
+  "initial-lead": "First lead", caveat: "Caveat", opposition: "Opposition",
+};
+
+function applyRoll(parts, from) {
+  const add = (key, text) => {
+    if (!text) return;
+    const was = (draft[key] || "").trim();
+    draft[key] = was ? `${was}\n${text}` : text;
+    keys.add(key);
+  };
+  const keys = new Set();
+  const by = Object.fromEntries(parts.map((p) => [p.tableId, p]));
+  if (by.mission) add("mission", by.mission.answer);
+  const notes = GUM_PLOT_SEED.filter((id) => id !== "mission" && id !== "plot-hook" && by[id])
+    .map((id) => `${LINE_NAMES[id]}: ${by[id].answer}`);
+  if (notes.length) add("mission", notes.join("\n"));
+  if (by["plot-hook"]) add("startingPoint", by["plot-hook"].answer);
+  for (const p of parts) {
+    if (GUM_PLOT_SEED.includes(p.tableId)) continue;
+    add(GUM_FOR_FIELDS["game-tone"].includes(p.tableId) ? "tone" : "inspiration", p.answer);
+  }
+  filled = {
+    fields: keys,
+    from,
+    dice: parts.map((p) => `${(p.table && p.table.name) || LINE_NAMES[p.tableId] || p.tableId} ${p.roll}`).join(" · "),
+  };
 }
 
 export function inWizard() { return draft !== null; }
 
-function cancelWizard() { draft = null; step = 0; carried = null; render(); }
+function cancelWizard() { draft = null; step = 0; filled = null; render(); }
 
 // Switching game mid-prep discards the draft rather than carrying it across.
-registerClearer(() => { draft = null; step = 0; onDone = null; visible = {}; carried = null; });
+registerClearer(() => { draft = null; step = 0; onDone = null; visible = {}; filled = null; });
 
 export function renderWizard(host) {
   const s = STEPS[step];
   add(host, el("h1", { text: "Prepare a game" }));
-  add(host, el("p", { class: "lede", text: `Step ${s.n} of ${STEPS.length} — ${s.legend}` }));
-  add(host, explain([
-    "PUM asks for a little preparation so your mind is in the right creative context before you start.",
-    "Nothing here is locked. Everything can be edited later, and plot nodes are meant to grow as you play.",
-  ]));
-
-  const nav = el("div", { class: "section-nav" });
-  STEPS.forEach((st, i) => {
-    const reachable = i <= step || legalUpTo(i);
-    add(nav, el("button", {
-      "aria-current": i === step ? "true" : "false",
-      disabled: reachable ? null : true,
-      title: reachable ? null : "Finish the earlier steps first",
-      onclick: () => { if (reachable) { step = i; render(); } },
-    }, `${st.n} ${st.name}`));
-  });
-  add(host, nav);
+  // Where you are, said once: no strip of five step buttons (four of them
+  // greyed out), no fold above the form. Back and Next are the only way round.
+  const dots = el("div", { class: "wz-dots", "aria-hidden": "true" });
+  STEPS.forEach((_, i) => add(dots, el("i", { class: i < step ? "done" : i === step ? "here" : "" })));
+  add(host, el("div", { class: "wz-progress" },
+    dots,
+    el("p", { class: "lede", text: `Step ${s.n} of ${STEPS.length} — ${s.legend}` })
+  ));
+  add(host, filledNote());
 
   if (step === 0) stepUniverse(host);
   if (step === 1) stepScope(host);
@@ -118,57 +145,35 @@ function legalNow() {
   return { ok: true, why: "" };
 }
 
-function legalUpTo(i) {
-  if (i >= 1 && !draft.title.trim()) return false;
-  if (i >= 2 && !draft.scopeName.trim()) return false;
-  if (i >= 3 && !draft.protagonists.length) return false;
-  return true;
+// What a roll just filled, said in one line, with the dice beside it. The
+// fields themselves are marked; there is nothing further to choose.
+function filledNote() {
+  if (!filled || !filled.fields.size) return null;
+  const names = { title: "Name this game", universe: "Universe or RPG", tone: "World, tone and theme",
+    inspiration: "Inspiration", mission: "Mission", startingPoint: "Starting point" };
+  const where = [...filled.fields].map((k) => names[k] || k);
+  const onScope = [...filled.fields].some((k) => k === "mission" || k === "startingPoint");
+  return el("div", { class: "coach wz-filled" },
+    el("strong", { text: `Filled from ${filled.from}: ` }),
+    `${where.join(", ")}${onScope && step !== 1 ? " (step 2)" : ""}. Read it, change anything, keep what fits.`,
+    el("div", { class: "cite", text: filled.dice })
+  );
 }
 
-// What was rolled in the Forge, offered against the fields this step owns. One
-// button per field, because "use this" with no destination is the question the
-// player already could not answer.
-// The Forge was invisible from the one screen where it is most useful. A player
-// stuck on "what is this game even about?" was offered five empty fields and no
-// way to find the machine that answers exactly that.
-function forgeOfferCard(what) {
-  if (!Settings.gum() || carried) return null;
-  const card = el("div", { class: "card" });
-  add(card, el("h3", { text: "Do not know yet?" }));
-  add(card, el("p", { text: what }));
-  add(card, el("p", { class: "muted", text: "Your draft is kept — come back to it from the card at the top of any More screen." }));
+// One button that does what the Forge's plot seed does, without leaving prep:
+// roll GUM's six seed tables (GUM p.3) and put each line where it belongs.
+function suggestCard() {
+  if (!Settings.gum()) return null;
+  const card = el("div", { class: "card wz-suggest" });
+  add(card, el("p", { class: "muted", text: "No story in mind yet? GUM can roll one: a hook, a motivation, a mission, a first lead, a caveat and the opposition — written into the mission and starting point below for you to edit." }));
   add(card, el("button", {
-    class: "btn wide", onclick: () => { setForgeSection("seed"); go("more", "forge"); },
-  }, "Invent one in the Forge →"));
-  return card;
-}
-
-function carriedCard(fields) {
-  if (!carried || !fields.length) return null;
-  const card = el("div", { class: "card notice" });
-  add(card, el("div", { class: "card-head" },
-    el("h3", { text: "Rolled in the Forge" }),
-    el("span", { class: "cite", text: carried.label || "GUM" })
-  ));
-  add(card, el("p", { text: carried.text }));
-  add(card, el("p", { class: "muted", text: "Add it to any field on this step. It is appended, never substituted for what you have already written." }));
-  const row = el("div", { class: "btn-row" });
-  for (const [key, name] of fields) {
-    add(row, el("button", {
-      class: "btn small", "aria-label": `Add the rolled text to ${name}`,
-      onclick: () => {
-        const was = (draft[key] || "").trim();
-        draft[key] = was ? `${was}\n\n${carried.text}` : carried.text;
-        toast(`Added to ${name}.`);
-        render();
-      },
-    }, name));
-  }
-  add(card, row);
-  add(card, el("button", {
-    class: "btn small ghost", style: "margin-top:.4rem",
-    onclick: () => { carried = null; render(); },
-  }, "Dismiss"));
+    class: "btn wide",
+    onclick: () => {
+      const set = rollGumSet(GUM_PLOT_SEED);
+      applyRoll(set.parts, "GUM's plot seed");
+      render();
+    },
+  }, "Suggest a starting situation"));
   return card;
 }
 
@@ -186,7 +191,7 @@ function field(label, key, { multiline = false, placeholder = "", hint = "", ins
   });
   // The wizard's fields are inline on the screen rather than in a dialog, so the
   // block mounts beside the input instead of inside promptModal.
-  return el("div", null,
+  return el("div", { class: filled && filled.fields.has(key) ? "wz-was-filled" : null },
     el("label", { class: "field" },
       el("span", { class: "lbl", text: label }),
       input,
@@ -197,43 +202,44 @@ function field(label, key, { multiline = false, placeholder = "", hint = "", ins
 }
 
 function stepUniverse(host) {
-  add(host, forgeOfferCard("The Forge rolls six tables at once and hands you a whole starting situation — who pulled your protagonists in, what they are being asked to do, and who stands in the way. Roll it, then bring the parts you like back here."));
-  add(host, carriedCard([
-    ["title", "Name this game"], ["universe", "Universe or RPG"],
-    ["tone", "World, tone and theme"], ["inspiration", "Inspiration"],
-  ]));
   const card = el("div", { class: "card" });
-  add(card, el("p", { class: "muted", text: "Narrow things down. Which RPG or universe do you want to roleplay in? If it brings no setting, define the world, tone and theme yourself. Mystery or horror? Social or action?" }));
   // no-inspire: a title is a name you coin. GUM's nearest tables emit synonym
   // clusters, not words, so the offer was to paste a thesaurus entry into it.
-  add(card, field("Name this game", "title", { placeholder: "The Neverwinter road" }));
+  add(card, field("Name this game", "title", {
+    placeholder: "The Neverwinter road",
+    hint: "The only thing this step needs. You can change it later.",
+  }));
+  // The rest is optional, so it waits behind one line instead of standing
+  // between the player and Next. It opens by itself once anything is in it.
+  const more = el("details", { class: "acc wz-more" },
+    el("summary", null, "Add more detail (optional)"));
+  if (draft.universe || draft.tone || draft.inspiration) more.open = true;
+  const body = el("div", { class: "acc-body" });
+  add(body, el("p", { class: "muted", text: "Which RPG or universe do you want to roleplay in? If it brings no setting, define the world, tone and theme yourself. Mystery or horror? Social or action?" }));
   // no-inspire: which RPG you are playing is a real-world answer, not one GUM has.
-  add(card, field("Universe or RPG", "universe", { placeholder: "D&D 5e · Blade Runner · my own" }));
-  add(card, field("World, tone and theme", "tone", { placeholder: "Grim frontier fantasy, low magic", inspire: "game-tone" }));
-  add(card, field("Inspiration", "inspiration", {
+  add(body, field("Universe or RPG", "universe", { placeholder: "D&D 5e · Blade Runner · my own" }));
+  add(body, field("World, tone and theme", "tone", { placeholder: "Grim frontier fantasy, low magic", inspire: "game-tone" }));
+  add(body, field("Inspiration", "inspiration", {
     multiline: true,
     inspire: "game-inspiration",
     placeholder: "Artbooks, video games, lore, films, tarot…",
     hint: "The book suggests drawing on anything to hand. Premade adventures work too — read only the minimum to get started.",
   }));
+  add(more, body);
+  add(card, more);
   add(host, card);
 }
 
 function stepScope(host) {
-  add(host, forgeOfferCard("A plot scope is one goal with an end in sight. The Forge rolls a list of exactly those — try it if nothing has suggested itself."));
-  add(host, carriedCard([
-    ["scopeName", "Plot scope name"], ["mission", "Mission"],
-    ["startingPoint", "Starting point"],
-  ]));
+  add(host, suggestCard());
   const card = el("div", { class: "card" });
   // The old intro read "a plot scope is one defined MISSION, task or goal" and
-  // was followed by two fields, one of them called Mission — the screen defined
-  // the scope as a mission and then asked for both. Reported from play as
-  // impossible to tell apart, and fairly.
-  add(card, el("p", { class: "muted", text: "A plot scope is one storyline with an end in sight — defeating a powerful enemy, uncovering a mystery, solving an inner problem. Two things are asked about it, and they are not the same thing." }));
+  // was followed by two fields, one of them called Mission — reported from play
+  // as impossible to tell apart. The contrast is said once, plainly.
   add(card, el("p", { class: "muted" },
+    "A plot scope is one storyline with an end in sight. ",
     el("strong", { text: "The name " }),
-    "is a short label. You will see it at the top of every screen while you play. ",
+    "is a short label you will see at the top of every screen. ",
     el("strong", { text: "The mission " }),
     "is the paragraph underneath: what is going on, and what your protagonists want out of it."
   ));
@@ -242,33 +248,20 @@ function stepScope(host) {
   // generic goal they would rewrite from scratch. Reported from play twice.
   add(card, field("Plot scope name", "scopeName", {
     placeholder: "Find out who burned the caravan",
-    hint: "A handle, not a description — two to six words. It goes in the header on every screen. Nothing coming? Write the mission below first, then lift the name out of it.",
+    hint: "Two to six words. Nothing coming? Write the mission first, then lift the name out of it.",
   }));
-  // One label for one stored field: the scope's mission is called "Mission"
-  // here, in the Add-a-scope dialog and on Home. What it is *for* — the initial
-  // goals — is guidance, and guidance goes in the hint (§6.6).
-  //
-  // Its placeholder used to be an INSTRUCTION ("A pitch for the situation you
-  // start in…") while the name field's was an EXAMPLE. One field showed and the
-  // other told, which is half of why they read alike — and on a dark screen the
-  // instruction looked like content already in the box.
+  // no-inspire: the suggestion card above rolls the plot seed into this field.
   add(card, field("Mission", "mission", {
     multiline: true,
-    inspire: "scope-mission",
     placeholder: "Caravans on the Triboar Trail keep burning. A merchant house has hired the party to find out who is behind it and stop them.",
     hint: "A paragraph, not a title: the situation you are starting in, and the protagonists' initial goals.",
   }));
+  // no-inspire: the suggestion card above rolls the plot seed's hook into this field.
   add(card, field("Starting point", "startingPoint", {
     multiline: true,
-    inspire: "scope-start",
     placeholder: "Where does this open, and what is introduced there?",
-    hint: "Optional now, and the home screen will keep asking until it's written. Consider starting in medias res.",
+    hint: "Optional now — the home screen will keep asking until it's written. Consider starting in medias res.",
   }));
-  if (Settings.gum()) {
-    // The mission field's own inspiration block is the plot seed: scope-mission
-    // maps to exactly GUM's six seed tables, so "All 6 tables" rolls the seed.
-    add(card, el("p", { class: "cite", text: "Stuck on the mission? Its inspiration block rolls GUM's plot seed — a hook, a motivation, a mission, a lead, a caveat and the opposition." }));
-  }
   add(host, card);
 }
 
@@ -470,7 +463,7 @@ function finish() {
   const d = draft;
   draft = null;
   step = 0;
-  carried = null;
+  filled = null;
 
   const game = store.createGame(d);
   const scope = game.scopes[0];

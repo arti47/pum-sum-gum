@@ -6,6 +6,7 @@ import * as store from "./store.js";
 import { crossed, trackLength, hasTrack, isResolved, isEnded, currentSection, sectionsOf } from "./derived.js";
 import { plotSheet } from "./rules.js";
 import { Settings } from "./settings.js";
+import { cue } from "./feel.js";
 
 export const TABS = [
   { id: "play",    icon: "▤", label: "Play",    sections: ["track", "nodes", "cast", "files"] },
@@ -180,6 +181,7 @@ function renderPlotHeader() {
 // (a click that changes something on it) does not.
 let lastRoute = "";
 let turnTimer = 0;
+let lastRouteSeen = false;   // the first screen drawn is not a page turned
 
 export function render() {
   const screen = $("#screen");
@@ -198,6 +200,8 @@ export function render() {
       // left mid-animation are never still enough to press.
       clearTimeout(turnTimer);
       turnTimer = setTimeout(() => screen.classList.remove("turn"), 260);
+      if (lastRouteSeen) cue("page");
+      lastRouteSeen = true;
     }
   }
   clearActionBar();

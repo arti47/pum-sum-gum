@@ -62,7 +62,9 @@ function renderArc(host, scope) {
   const open = scope && scope.openScene;
 
   // 1 — Open
-  const c1 = el("div", { class: "card" });
+  // The three cards are drawn as one path: open → intervene → close, the arc
+  // SUM walks a scene through, with the stage reached marked along it.
+  const c1 = el("div", { class: `card arc-step${open ? " reached" : ""}`, "data-step": "1" });
   add(c1, el("div", { class: "card-head" },
     el("h2", { text: "1 · Open the scene" }),
     open ? el("span", { class: "pill on", text: "open" }) : null
@@ -101,7 +103,7 @@ function renderArc(host, scope) {
   add(host, c1);
 
   // 2 — Intervene
-  const c2 = el("div", { class: "card" });
+  const c2 = el("div", { class: `card arc-step${open && open.interventions && open.interventions.length ? " reached" : ""}`, "data-step": "2" });
   add(c2, el("h2", { text: "2 · Intervention check" }));
   add(c2, el("p", { class: "muted", text: "Roll when the PCs are taking too long, tension is high, danger is near, or silence lingers." }));
   add(c2, el("button", {
@@ -123,7 +125,7 @@ function renderArc(host, scope) {
   add(host, c2);
 
   // 3 — Close
-  const c3 = el("div", { class: "card" });
+  const c3 = el("div", { class: "card arc-step", "data-step": "3" });
   add(c3, el("h2", { text: "3 · Close the scene" }));
   add(c3, el("p", { class: "muted", text: "See how the world responds — a consequence, a shift, or a lead into what comes next." }));
   add(c3, el("button", {

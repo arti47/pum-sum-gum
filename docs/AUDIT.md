@@ -1896,3 +1896,28 @@ removed again on a timer rather than on `animationend`, so nothing can be left m
 still start only while the page is visible.
 
 **Link graph — re-verified, nothing added.** No route changed in this pass.
+
+---
+
+## Senses and shapes
+
+**F-87 · Three sound functions reachable by no click.** *Found by:* the function audit — sound is
+off by default and no journey turned it on, so `feel.js`'s `audio`, `burst` and `knock` never ran.
+*Fix:* journey 15 throws the Sound and vibration switch, rolls an oracle, and crosses the track to
+its last box, which plays the roll, the pen stroke and the seal. *Rule check:* `feel.js` draws its
+noise from a fixed sequence, never `crypto.getRandomValues`, so a seeded playtest's dice are
+unchanged — the spine played identically on seeds 7, 23 and 101.
+
+---
+
+## Reported from play — game prep is a mess
+
+**F-88 · A stranger gave up on the first screen of game prep.** *Rule:* PUM p.3's four steps plus
+the starting point — unchanged. *Target:* `src/wizard.js` — about twelve things to read or tap
+before the one required field; a step strip of five buttons, four disabled; a "Do not know yet?"
+card above the form sending the player out to the Forge; a carried roll arriving as per-field
+buttons that each pasted all six lines into one box. *Fix:* progress dots and one line; step 1 is
+Name this game with the rest folded; Suggest a starting situation rolls the plot seed in place,
+and `applyRoll` writes each line into its own field (also used for rolls carried in from the
+Forge), marking what it filled and showing the dice. *Why it mattered:* the first screen is the
+only one every player sees; a player who leaves there never reaches a single rule.
