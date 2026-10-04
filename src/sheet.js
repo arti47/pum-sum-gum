@@ -20,7 +20,7 @@ import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-
 import { BEAT_TRIGGERS, FIRST_BEAT_COACH } from "../data-guidance.js";
 import { renderCast } from "./cast.js";
 import { renderFiles } from "./files.js";
-import { coachCard } from "./coach.js";
+import { coachCard, whichMachine, bookTag } from "./coach.js";
 import { registerClearer } from "./viewstate.js";
 import { cue } from "./feel.js";
 
@@ -90,6 +90,7 @@ export function renderPlay(host, section) {
 function renderTrack(host, scope) {
   const sheet = plotSheet(scope.sheetId);
   add(host, el("h1", { text: scope.name }));
+  add(host, bookTag("play"));
   add(host, el("p", { class: "lede", text: sheet ? `${sheet.name} · ${sheet.tagline}` : "" }));
   // The coach leads, short: where you are, and the one next thing. Its literal
   // steps fold beneath it — open until the first beat of this game is
@@ -101,6 +102,7 @@ function renderTrack(host, scope) {
     "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
     "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
   ], "confirm", openRule));
+  add(host, whichMachine("play"));
 
   // The sheet itself: the track, and the beat called on it, in one card.
   add(host, trackCard(scope));
@@ -851,6 +853,7 @@ function triggersFold() {
 function renderNodes(host, scope) {
   const sheet = plotSheet(scope.sheetId);
   add(host, el("h1", { text: "Plot nodes" }));
+  add(host, bookTag("play"));
   add(host, explain([
     "Plot nodes are your game's own content — the things a random prompt can reach into. Write them at the start and keep them alive as you play.",
     "The die above each list is the one the app will roll: 1d10 while a list is less than half full, 1d20 from the halfway entry on.",

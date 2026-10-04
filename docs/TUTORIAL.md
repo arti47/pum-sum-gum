@@ -182,6 +182,8 @@ Three books, three jobs. Confusing them is the commonest way to get stuck, so it
 - SUM — Scene Unfolding Machine. A supplement. Once PUM says a beat happens, SUM tells you what the scene offers, how the fight goes, and how the people in it behave.
 - GUM — Game Unfolding Machine. Prep. Worlds, factions, objects, a nemesis, characters as concepts. Use it before you play, and when a blank field stops you mid-play.
 
+In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its three rows are Call a plot beat (what happens next, stuck, drifting, nearly over?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. It folds with the What this does notes. Home's machines card opens on the same three rows.
+
 > **Why.** The division that matters: GUM creates a character as a concept — an archetype, an edge, a flaw. SUM decides how that character behaves when you actually meet them. If you find yourself asking 'what is this person like', you want SUM. If you are asking 'who even is this person', you want GUM.
 
 None of the three resolves a task. No book here tells you whether you picked the lock, hit the guard, or convinced the magistrate. Bring your own RPG's rules for that, or simply decide. The app will never report success or failure — it reports what the world offers.
@@ -731,6 +733,7 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 
 Plot track
 
+- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · Ask an oracle · Go to the scene, or you are here.
 - Random prompt (pinned) / Proposal — the two beat controls. The card above repeats them as Modified proposal and Random prompt.
 - On a beat card: Confirm — cross a box · Not this time (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged.
 - On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Bring one in · Recall (N), on a list this sheet does not print — the count is how many are in the cast.
@@ -768,6 +771,7 @@ Files
 
 ### Scene
 
+- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · Ask an oracle · Go to the scene, or you are here.
 - This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), Roll an intervention check · Roll a scene closure. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action becomes Intervention check with Close beside it.
 - Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
 - While it runs: Call a plot beat · Ask an oracle · Who is here? · Roll a SUM table.
@@ -777,6 +781,7 @@ Files
 
 ### Oracles
 
+- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · Ask an oracle · Go to the scene, or you are here.
 - Your question — optional, stamped on the result card and into the journal.
 - Yes or No — three registers, an “I have a bias” checkbox, Ask.
 - Granular — three registers, seven likelihood bands, Ask.
@@ -799,7 +804,7 @@ Home
 - The current game card: Go to the plot sheet · Open a scene / Continue the scene · Edit → Name this game, Universe or RPG, World, tone and theme, Inspiration.
 - Plot sheets in this game: Switch to this · Edit (scope name, mission, starting point) · Delete · New plot sheet.
 - Your games: Open · Archive / Restore · Prepare another game.
-- The machines — what PUM, SUM and GUM each do.
+- The machines — which do I need? (the three rows: Call a plot beat · Ask an oracle · Go to the scene), then what PUM, SUM and GUM each do.
 - With no game: Never played solo before? — three lines saying you narrate, the app answers, and your own RPG resolves · Prepare a game (pinned) · Read the first-session walkthrough.
 
 Forge (hidden when GUM is off)

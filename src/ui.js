@@ -222,15 +222,20 @@ export function explain(text, ruleId = null, onRuleLink = null) {
   }
   if (explainDecorator) add(foot, explainDecorator(paras.join(" ")));
   if (foot.childNodes.length) add(body, foot);
+  return noteFold("What this does", body);
+}
+
+// A teaching fold that shares the notes' open state. Closing one closes them
+// everywhere, and for good: a reader who has taken the point should not have
+// to take it again on every screen. Re-opening one brings them all back, so
+// the gesture is symmetrical.
+export function noteFold(summary, body, extraClass = "") {
   const open = explainState ? explainState.isOpen() : false;
-  const d = el("details", { class: "explain" },
-    el("summary", null, "What this does"),
+  const d = el("details", { class: `explain${extraClass ? " " + extraClass : ""}` },
+    el("summary", null, summary),
     body
   );
   if (open) d.open = true;
-  // Closing one closes them everywhere, and for good: a reader who has taken
-  // the point should not have to take it again on every screen. Re-opening one
-  // brings them all back, so the gesture is symmetrical.
   d.addEventListener("toggle", () => {
     if (!explainState) return;
     if (d.open !== explainState.isOpen()) explainState.set(d.open);

@@ -12,7 +12,7 @@ import { DESCRIPTIVE, STORY, QUANTIFIERS } from "../data-pum-oracles.js";
 import { NO_TASK_RESOLUTION } from "../data-guidance.js";
 import { setOpenBeat } from "./sheet.js";
 import { registerClearer } from "./viewstate.js";
-import { coachStrip } from "./coach.js";
+import { coachStrip, whichMachine, bookTag } from "./coach.js";
 
 // The last result, held so a re-render never re-rolls it.
 let last = null;
@@ -24,12 +24,14 @@ let question = "";
 export function renderOracles(host, section) {
   add(host, sectionNav("oracles", section));
   add(host, el("h1", { text: "Oracles" }));
+  add(host, bookTag("oracles"));
   add(host, explain([
     "Ask a question, pick the oracle that fits, and read the answer as inspiration rather than instruction.",
     NO_TASK_RESOLUTION,
     "Dislike an answer? Re-roll it, ignore it, or read it against the grain. The journal keeps both rolls either way.",
   ], "no-resolution", openRule));
 
+  add(host, whichMachine("oracles"));
   if (store.activeGame()) add(host, coachStrip());
 
   if (!store.activeGame()) {

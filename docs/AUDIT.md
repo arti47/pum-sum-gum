@@ -1975,3 +1975,19 @@ empty slot loses the empty-state engraving it was inheriting by class name. Trac
 for a newcomer (steps open), nodes 2,318 → 1,945px. *Found by the cycle:* the function audit reported `scrollToBeat` unreachable — its last click route
 was the coach's "Call a plot beat" extra, now left off above the beat controls; journey 6a presses
 the coach's "Go to the beat" with a beat on the table, the button that still uses it.
+
+---
+
+## Reported from play — when PUM, when SUM?
+
+**F-92 · Nothing in play said which book to reach for.** *Rule:* none changed — PUM's beats and
+oracles, SUM's scene tables. *Target:* the distinction lived in two places a player in the middle
+of a scene never reads — the guide's machines section and three closed folds on Home — and the tabs
+did not say which book each belongs to; the Oracles tab is PUM, which nothing on screen said.
+*Fix:* `WHICH_MACHINE` and `BOOK_TAGS` (data-guidance.js, the app's own words): each in-play tab
+names its book under its title (PUM · the story · PUM · one question · SUM · this scene) and
+carries a **Which do I need?** fold — one line ("PUM moves the story; SUM fills in the scene you
+are in"), then three rows, each a question, its answer and a button to that place, the current tab
+reading "you are here" rather than offering a button to itself (F-67). It shares the notes' open
+state through a new `ui.noteFold()`, so closing it closes them all. Home's machines card opens on
+the same rows above the three books' descriptions.

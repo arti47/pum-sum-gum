@@ -15,6 +15,7 @@ import { startWizard, inWizard, renderWizard, addScopeDialog } from "./wizard.js
 import { renderTutorial } from "./tutorial.js";
 import { renderForge, renderTables } from "./forge.js";
 import * as media from "./media.js";
+import { whichBody } from "./coach.js";
 import { RULES_LIBRARY, GLOSSARY } from "../data-rules-library.js";
 import { PLAY_STATES, FLOWCHART, ADVICE, ADVANCED, MACHINES, NEW_TO_SOLO } from "../data-guidance.js";
 import { PUM_ERRATA, NODE_CATEGORIES } from "../data-pum-plot.js";
@@ -327,8 +328,10 @@ function newToSoloCard() {
 }
 
 function machinesCard() {
-  const card = el("div", { class: "card" });
-  add(card, el("h3", { text: "The machines" }));
+  const card = el("div", { class: "card machines" });
+  add(card, el("h3", { text: "The machines — which do I need?" }));
+  add(card, whichBody());
+  add(card, el("p", { class: "cite", text: "What each book is for:" }));
   for (const m of MACHINES) {
     const d = el("details", { class: "acc" }, el("summary", null, m.name));
     add(d, el("div", { class: "acc-body" },

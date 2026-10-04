@@ -152,6 +152,37 @@ export const MACHINES = [
   },
 ];
 
+// --- Which machine do I need? ----------------------------------------------
+// The app's own words, not either book's. PUM and SUM each say what they are
+// for; neither says, at the moment you are stuck, which one to reach for. The
+// one line is the whole distinction; the rows are it applied. `go` is where in
+// the app each answer lives.
+export const WHICH_MACHINE = {
+  title: "Which do I need?",
+  line: "PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes.",
+  rows: [
+    {
+      ask: "What happens next in the story? I am stuck, or drifting. Is this storyline nearly over?",
+      use: "PUM · a plot beat", go: ["play", "track"], button: "Call a plot beat",
+    },
+    {
+      ask: "One question I cannot answer myself — is it true? what is it like?",
+      use: "PUM · an oracle", go: ["oracles", "yesno"], button: "Ask an oracle",
+    },
+    {
+      ask: "How does this scene start, what is here, how does the fight, the clue or the person play out, how does it end?",
+      use: "SUM · the scene", go: ["scene", "arc"], button: "Go to the scene",
+    },
+  ],
+};
+
+// The book each in-play tab belongs to, on its title line.
+export const BOOK_TAGS = {
+  play: "PUM · the story",
+  oracles: "PUM · one question",
+  scene: "SUM · this scene",
+};
+
 // The app must not pretend to resolve tasks.
 export const NO_TASK_RESOLUTION =
   "PUM resolves nothing. It never says whether an action succeeded — it says what the world offers. Bring your own RPG's rules for task resolution, or narrate the outcome yourself.";

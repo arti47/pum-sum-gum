@@ -12,7 +12,7 @@
 // correct, because it is derived, never remembered.
 
 import { el, add } from "./core.js";
-import { promptModal, toast } from "./ui.js";
+import { promptModal, toast, noteFold } from "./ui.js";
 import * as store from "./store.js";
 import { isResolved, isEnded, hasTrack, crossed, trackLength } from "./derived.js";
 import { go, render } from "./router.js";
@@ -35,7 +35,7 @@ function goToScene() {
   if (anchor) { anchor.scrollIntoView({ block: "start", behavior: "smooth" }); return; }
   go("scene", "arc");
 }
-import { SESSION_STAGES, ENDING_PROMPTS } from "../data-guidance.js";
+import { SESSION_STAGES, ENDING_PROMPTS, WHICH_MACHINE, BOOK_TAGS } from "../data-guidance.js";
 
 // Journal kinds that mean play actually happened, as opposed to preparing to
 // play. A plot node written in the wizard is prep; a beat, a scene or an oracle
@@ -256,4 +256,36 @@ export function coachCard({ compact = false, newcomer = false, newcomerLine = nu
     add(card, row);
   }
   return card;
+}
+
+// "Which do I need?" — PUM or SUM, beat or oracle — on each tab where the
+// question comes up, folded with the notes. The row for the tab you are on
+// says so instead of offering a button that would navigate to this screen
+// (the F-67 defect).
+export function whichMachine(here) {
+  return noteFold(WHICH_MACHINE.title, whichBody(here), "which");
+}
+
+// The rows themselves; Home shows them open, above the three books.
+export function whichBody(here = null) {
+  const body = el("div", { class: "body which-body" });
+  add(body, el("p", { class: "which-line", text: WHICH_MACHINE.line }));
+  for (const row of WHICH_MACHINE.rows) {
+    const isHere = row.go[0] === here;
+    add(body, el("div", { class: `which-row${isHere ? " here" : ""}` },
+      el("div", { class: "which-text" },
+        el("strong", { text: row.use }),
+        el("span", { text: row.ask })
+      ),
+      isHere
+        ? el("span", { class: "cite", text: "you are here" })
+        : el("button", { class: "btn small", onclick: () => go(...row.go) }, row.button)
+    ));
+  }
+  return body;
+}
+
+// The book a tab belongs to, as a kicker on its title line.
+export function bookTag(tab) {
+  return BOOK_TAGS[tab] ? el("p", { class: "book-tag", text: BOOK_TAGS[tab] }) : null;
 }
