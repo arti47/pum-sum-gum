@@ -420,6 +420,17 @@ const journeys = [];
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
+// 6a. With a beat on the table, the coach's own button scrolls to it. Its
+// "Call a plot beat" extra used to reach the same scroll; on the plot sheet it
+// now sits directly above the controls, so that extra is left off.
+{
+  await seed(MID, "play", "track");
+  await tapText(/^random prompt$/);
+  const went = await tapText(/^go to the beat$/);
+  journeys.push(`beat open → coach "Go to the beat": ${went ? "pressed" : "NOT OFFERED"}`);
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+}
+
 // 6. Roll a plot beat until it points at a plot node, then act on it.
 // A beat's face is a die roll: on a Standard sheet only some faces reach a node
 // list, and only faces 5 and 6 reach a list the sheet does not print. Rolling

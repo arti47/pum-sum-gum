@@ -87,7 +87,7 @@ for (const seed of seeds) {
       const txt = (n) => (n.textContent || "").replace(/\s+/g, " ").trim();
       const sel = document.querySelector(".modal")
         ? ".modal button"
-        : "#screen button, #screen .btn, #action-bar button, .modal button";
+        : "#screen button, #screen .btn, #screen summary, #action-bar button, .modal button";
       const nodes = [...document.querySelectorAll(sel)]
         .filter((n) => vis(n) && !n.disabled && !n.classList.contains("term"));
       const rx = new RegExp(want, "i");
@@ -273,6 +273,7 @@ for (const seed of seeds) {
 
   await page.evaluate(async () => (await import("./src/router.js")).go("play", "track"));
   await page.waitForTimeout(70);
+  await step("open the track's options", "^Track options$", { optional: true });
   await step("end the scope", "End this scope");
   // The confirm dialog's button is "End the scope" — not the card's own label,
   // which is the trap the playtester brief warns about: matching the opener's

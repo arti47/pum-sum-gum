@@ -197,14 +197,18 @@ export function coachStrip({ onScene = false } = {}) {
 }
 
 // The card. One stage, where you are, the literal steps, one next action.
-export function coachCard() {
+// `compact` is the plot sheet's form: the heading, what is true, and the
+// button stay in view; the literal steps fold beneath them, open for a
+// newcomer — the steps are the point for someone who has never played, and
+// furniture above the track for someone who has.
+export function coachCard({ compact = false, newcomer = false, newcomerLine = null } = {}) {
   const game = store.activeGame();
   const scope = store.currentScope();
   const stage = stageOf(game, scope);
   const copy = SESSION_STAGES[stage];
   if (!copy) return null;
 
-  const card = el("div", { class: "card coach-card" });
+  const card = el("div", { class: `card coach-card${compact ? " compact" : ""}` });
   add(card, el("div", { class: "card-head" },
     el("h2", { text: copy.title }),
     el("span", { class: "cite", text: "what now" })
@@ -215,16 +219,24 @@ export function coachCard() {
   // of advice — "keep playing, ask an oracle when you do not know" — which
   // describes solo roleplaying rather than telling anyone how to do it. These
   // are literal: say this, then ask yourself this, then tap that.
+  const steps = [];
+  if (newcomerLine) steps.push(el("p", { class: "coach", text: newcomerLine }));
   if (copy.steps && copy.steps.length) {
     const ol = el("ol", { class: "coach-steps" });
     for (const step of copy.steps) add(ol, el("li", { text: step }));
-    add(card, ol);
+    steps.push(ol);
   }
   // One worked line, in the player's own voice, for the stages where "say
   // something" is the instruction and a stranger has no idea what that sounds like.
   if (copy.example) {
-    add(card, el("p", { class: "coach-eg" },
+    steps.push(el("p", { class: "coach-eg" },
       el("span", { class: "coach-eg-lead", text: "Like this: " }), copy.example));
+  }
+  if (compact && steps.length) {
+    add(card, el("details", { class: "rows-fold coach-fold", open: newcomer || undefined },
+      el("summary", null, "Show me the steps"), el("div", { class: "body" }, ...steps)));
+  } else {
+    add(card, ...steps);
   }
 
   const act = actionFor(stage, game, scope);
@@ -233,7 +245,9 @@ export function coachCard() {
       class: "btn primary wide", onclick: act.run,
     }, act.label));
   }
-  const extras = extrasFor(stage);
+  // In its compact form the card sits right above the beat controls, so an
+  // extra that would only scroll down to them is left off.
+  const extras = extrasFor(stage).filter((e) => !(compact && e.run === scrollToBeat));
   if (extras.length) {
     const row = el("div", { class: "btn-row", style: "margin-top:.4rem" });
     for (const e of extras) {

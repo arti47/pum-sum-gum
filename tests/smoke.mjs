@@ -395,6 +395,7 @@ for (const theme of ["light", "dark"]) {
   const { ctx, page } = await newPage(FIXTURES.mid);
   await goto(page, "play", "track");
   const before = await page.locator("#plot-header .ph-count").textContent();
+  await page.locator("#screen summary", { hasText: "Track options" }).click();
   await page.getByRole("button", { name: "Advance without a beat" }).click();
   await page.waitForTimeout(120);
   await page.getByRole("button", { name: "Cross the next box" }).click();

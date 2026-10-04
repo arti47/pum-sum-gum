@@ -1953,3 +1953,25 @@ Discovering · Meeting someone; one row per table, its result under the row that
 character depths folded, the first open). The Rule of Bias is one row of three above the roll it
 modifies, its paragraph moved into the note; the coach strip omits an action that would only
 scroll to the card beneath it. arc 1,782 → 1,454px; four table screens (1,612-1,820px each) → one.
+
+---
+
+## Reported from play — the plot sheet is messy
+
+**F-91 · The plot sheet began below the fold, under three teaching surfaces.** *Rule:* PUM's beats,
+the confirm gate, the node die, invocation, voluntary advance, step back and ending a scope —
+unchanged. *Target:* measured at 390×844 mid-session: the coach card (~450px, four steps and an
+example), the screen's note and a separate "New here?" line all before the first button; a
+starting-point card repeating the coach's own next step; "Proposal / Random prompt" in the bar and
+again as two full-width buttons in card 1; three rarely-used permissions level with the track; a
+whole card for two folds. Plot nodes: a full-width roll button, a fold and an emblem-sized empty
+slot per list. *Fix:* the coach keeps its heading, sentence and button, its steps folding beneath
+(open, with the newcomer line, until the first beat is confirmed; a "Call a plot beat" extra that
+only scrolled down is left off); the beat is called inside the track card under the track it
+would cross, with When to call which folded there; Advance without a beat · Step back · End this
+scope fold under Track options (End this scope stays visible on a trackless sheet, where it is the
+only ending); node lists put the die, What goes in here and Roll this list on one line, and the
+empty slot loses the empty-state engraving it was inheriting by class name. Track 2,213 → ~2,030px
+for a newcomer (steps open), nodes 2,318 → 1,945px. *Found by the cycle:* the function audit reported `scrollToBeat` unreachable — its last click route
+was the coach's "Call a plot beat" extra, now left off above the beat controls; journey 6a presses
+the coach's "Go to the beat" with a beat on the table, the button that still uses it.

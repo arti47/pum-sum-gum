@@ -1732,3 +1732,33 @@ details.acc.group > summary .pill {
 .rows-fold[open] > summary::after { transform: rotate(-135deg) translateY(-1px); }
 .rows-fold > .body { margin-top: .3rem; }
 @media print { .arc-path { display: none; } }
+
+/* The plot sheet. The beat is called inside the track card, under the track
+   it would cross; the track's occasional permissions fold beneath. */
+.track-card .beat-call, .track-card > .result { margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--rule); }
+.track-card > .result { border-top: none; }
+.beat-call-head { display: flex; flex-direction: column; gap: .15rem; margin-bottom: .5rem; }
+.beat-call-head .label { font-family: var(--sans); font-size: .82rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-text); }
+.beat-call-head .muted { font-size: .88rem; }
+.beat-call .rows-fold ul { margin: .1rem 0 .5rem; padding-left: 1.2rem; font-size: .88rem; color: var(--ink-2); }
+.beat-call .rows-fold p { margin: .3rem 0 .1rem; font-size: .9rem; }
+.beat-call > .cite { margin: .3rem 0 0; }
+.track-opts { margin-top: .6rem; border-top: 1px dashed var(--rule); padding-top: .2rem; }
+.track-opts > .btn-row { margin-top: .4rem; }
+.track-opts .btn-row + .btn-row { margin-top: .5rem; }
+
+/* The coach on the plot sheet: what is true and the next move in view, the
+   steps folded beneath. */
+.coach-card.compact > p { margin: .2rem 0 .3rem; }
+.coach-card .coach-fold { margin: 0 0 .5rem; }
+.coach-card .coach-fold > .body .coach { margin: .2rem 0 .5rem; }
+
+/* Plot nodes: the die, what the list is for, and the roll share one line. */
+.node-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem .6rem; margin: -.1rem 0 .3rem; }
+.node-tools > .rows-fold { flex: 1 1 auto; margin: 0; }
+.node-tools > .rows-fold[open] { order: 3; flex-basis: 100%; }
+.node-tools > .rows-fold > .body p { margin: .2rem 0; font-size: .9rem; }
+.node-tools > .btn { margin-left: auto; }
+.node-txt.empty::before { content: none; display: none; }
+.node-txt.empty::after { content: none; }
+.node-txt.empty { font-size: .92rem; }

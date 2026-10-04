@@ -151,7 +151,7 @@ A story ends when the plot track fills — and the last third of the track is wh
 
 And a scope can end before the track fills. If the real question has been answered and the remaining boxes are just more incident, say so and end it — the app records that you ended it rather than pretending the track resolved. Sandbox and Improvised sheets have no track at all, so this is the only way they ever finish.
 
-`Play → Plot track → End this scope`
+`Play → Plot track → Track options → End this scope`
 
 *PUM p.7*
 
@@ -234,11 +234,9 @@ On a sheet that pairs with the plot-node extension sheet (Journey, Story-focus, 
 This is the screen you will spend most of your time on. Top to bottom:
 
 - The persistent plot header, above everything, on every in-play screen: the scope's name, the section you are in, and the crossed/total count. This is the honest answer to 'how close is this to over?' and it is why it never scrolls away.
+- What now — the coach: where you are and the one next thing, with Show me the steps folding the book's own loop (PUM p.5) beneath it. The steps start open until your first beat is confirmed, then fold.
+- The plot track card — the track itself and what the current section is for, then Call a plot beat right under it: the two beat controls, When to call which (the p.28 cheat sheet, folded) and the last beat you rolled. A beat you roll opens in the same place. Track options folds the track's occasional permissions beneath.
 - This scope — a fold holding your mission, starting point and game notes. Context you re-read occasionally, not every beat.
-- 1 · Call a plot beat — the two beat controls, and the last beat you rolled.
-- 2 · Cross a box — the track itself, plus what the current section is for.
-- What now — the book's own loop (PUM p.5), with the next step offered in place so you are not driving the game from the tab bar.
-- 3 · When to call which — the p.28 cheat sheet, folded.
 
 The pinned bar at the foot carries the primary action — Random prompt — with Proposal beside it, and the track position as its context line. Those two are the same actions the card above spells out; the card explains them, the bar performs them.
 
@@ -354,7 +352,7 @@ Calling a beat authorises you to cross a box. It does not oblige you to. Play th
 
 > **Why.** This is the single rule most likely to be skipped by someone used to progress clocks that tick automatically. The track is a compass against endless wandering, not a clock. If every beat crossed a box, the length of your story would be decided by how often you happened to roll, not by what happened.
 
-The track card also carries three permissions the book grants and the app therefore makes controls, not sentences:
+The track card also carries three permissions the book grants and the app therefore makes controls, not sentences. You use them now and then rather than every beat, so they sit under Track options, folded beneath the track — except on a sheet with no track, where End this scope stands in plain view because it is the only way the scope can finish:
 
 - Advance without a beat — when an event was exceptionally impactful. The journal records that it was voluntary.
 - Step back — undo a crossing.
@@ -737,17 +735,17 @@ Plot track
 - On a beat card: Confirm — cross a box · Not this time (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged.
 - On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Bring one in · Recall (N), on a list this sheet does not print — the count is how many are in the cast.
 - Track: any box opens Box N — Mark a timed beat / Edit the timed beat / Clear the mark / Close.
-- Advance without a beat · Step back · End this scope · Reopen this scope.
+- Track options → Advance without a beat · Step back · End this scope; Reopen this scope once it has ended.
 - Customize (Customized sheet only) → Add a section · + box · Remove · Edit the prompt column → Save the column / Reset to the standard column · Done.
 - Add track section dialog: Section name, Boxes, Add.
 - This scope fold → Add game notes / Edit game notes.
-- Next step: decide the starting point → Write the starting point.
+- A blank starting point is the coach's next step: Write the starting point.
 - What now → Open a scene / Back to the scene · Ask an oracle · Write it down · Start another plot sheet when the scope has finished.
 - Dialogs that can fire on confirming: A timed plot beat fires (Play it) · The scope has resolved (Start another plot sheet / Stay here) · The scope is finished.
 
 Plot nodes
 
-- Per list: the 1d10 or 1d20 pill, the fill count, Roll this list — 1d10 or 1d20, a “What goes in here” fold, the first four written slots plus one empty as buttons, Invoke on written entries, Show all N slots.
+- Per list: the fill count in its heading; then one line with the 1d10 or 1d20 pill, a “What goes in here” fold and Roll this list; the first four written slots plus one empty as buttons, Invoke on written entries, Show all N slots.
 - Player-named lists add Rename and Remove.
 - Add a plot node list — names one of the two blank lists from the extension sheet.
 - Invoke this node → Invoke as a beat / Cancel.
@@ -814,7 +812,7 @@ Forge (hidden when GUM is off)
 - Keep this with no game open → Prepare a game with this, or Take it back to prep if you are already mid-way through it. Either way each line is written into the field it belongs to, and the fields it filled are marked.
 - Suggest a starting situation (prep step 2) → rolls GUM's plot seed into Mission, Starting point and Game notes, without leaving prep.
 - Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.
-- The coach card at the top of the Play tab — a heading saying where you are, a sentence of what is true, and one Next line. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.
+- The coach card at the top of the Play tab — a heading saying where you are, a sentence of what is true, Show me the steps, and one Next line. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.
 - Beside it, at some stages only: Ask an oracle · Call a plot beat · Write it down · Read the whole story.
 - Where does this open? → Starting point — the dialog the coach opens when the starting point is still blank.
 - How did it end? → The ending — the dialog that closes a storyline. It writes an Endings entry into the journal and marks the scope finished.
