@@ -138,11 +138,17 @@ for (const width of WIDTHS) {
     const m = await page.evaluate(() => ({
       cols: getComputedStyle(document.querySelector("#screen")).gridTemplateColumns.split(" ").length,
       over: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      pad: parseFloat(getComputedStyle(document.querySelector(".tab-bar")).paddingLeft),
+      rail: (() => {
+        const r = document.querySelector(".tab-bar").getBoundingClientRect();
+        const s = document.querySelector("#screen").getBoundingClientRect();
+        return { w: r.width, h: r.height, clear: s.left >= r.right };
+      })(),
     }));
     ok(`wide ${tab}/${section} flows in two columns`, m.cols === 2, `${m.cols} column(s)`);
     ok(`wide ${tab}/${section} no horizontal overflow`, m.over <= 1, `${m.over}px`);
-    ok(`wide ${tab}/${section} holds the tab bar to the column`, m.pad > 0, `${m.pad}px`);
+    // The tabs stand up into a rail on the left, and nothing is drawn under it.
+    ok(`wide ${tab}/${section} the tabs are a rail beside the column`,
+      m.rail.w < 300 && m.rail.h >= 600 && m.rail.clear, JSON.stringify(m.rail));
   }
   ok("a wide viewport produced no console errors", errors.length === 0, errors.slice(0, 2).join(" | "));
   await ctx.close();

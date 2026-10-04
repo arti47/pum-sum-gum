@@ -3,7 +3,7 @@
 import { el, add, clear, $ } from "./core.js";
 import { clearActionBar } from "./ui.js";
 import * as store from "./store.js";
-import { crossed, trackLength, hasTrack, isResolved, isEnded, currentSection } from "./derived.js";
+import { crossed, trackLength, hasTrack, isResolved, isEnded, currentSection, sectionsOf } from "./derived.js";
 import { plotSheet } from "./rules.js";
 import { Settings } from "./settings.js";
 
@@ -78,7 +78,7 @@ export function renderTabs() {
       "aria-current": current.tab === t.id ? "page" : null,
       "aria-label": t.label,
     },
-      el("span", { class: "ti", "aria-hidden": "true", text: t.icon }),
+      el("span", { class: "ti", "aria-hidden": "true", "data-tab": t.id, text: t.icon }),
       el("span", { text: t.label })
     );
     const badge = (t.id === "scene" && live.sceneOpen)
@@ -100,7 +100,28 @@ export function sectionNav(tabId, activeSection, badges = {}) {
     if (badges[s]) add(btn, el("span", { class: "dot", "aria-hidden": "true" }));
     add(nav, btn);
   }
+  keepCurrentInView(nav);
   return nav;
+}
+
+// A strip that scrolls sideways hides its far end, and the far end is often
+// the section you are on. Once the strip is in the document, bring the current
+// one into view without moving the page.
+export function keepCurrentInView(nav) {
+  requestAnimationFrame(() => {
+    const on = nav.querySelector('[aria-current="true"]');
+    if (!on || !nav.isConnected) return;
+    const left = on.offsetLeft - (nav.clientWidth - on.offsetWidth) / 2;
+    nav.scrollLeft = Math.max(0, left);
+    fadeEdges(nav);
+  });
+  nav.addEventListener("scroll", () => fadeEdges(nav), { passive: true });
+}
+
+function fadeEdges(nav) {
+  const max = nav.scrollWidth - nav.clientWidth;
+  nav.classList.toggle("more-left", nav.scrollLeft > 2);
+  nav.classList.toggle("more-right", nav.scrollLeft < max - 2);
 }
 
 // The persistent plot header: the game's Threshold, on every in-play screen (§6.2).
@@ -109,7 +130,9 @@ function renderPlotHeader() {
   clear(host);
   const scope = store.currentScope();
   const game = store.activeGame();
-  if (!game || !scope || current.tab === "more") { host.hidden = true; return; }
+  const inPlay = !!(game && scope && current.tab !== "more");
+  document.body.classList.toggle("in-play", inPlay);
+  if (!inPlay) { host.hidden = true; return; }
   host.hidden = false;
 
   const sheet = plotSheet(scope.sheetId);
@@ -134,8 +157,14 @@ function renderPlotHeader() {
     const mini = el("div", { class: "ph-mini", "aria-hidden": "true" });
     const total = trackLength(scope);
     const done = crossed(scope);
+    // Where one act ends and the next begins, so the drawn track reads as the
+    // printed one does: sections, not one undifferentiated run of boxes.
+    const starts = new Set();
+    let at = 0;
+    for (const sec of sectionsOf(scope)) { if (at) starts.add(at); at += sec.boxes; }
     for (let i = 0; i < total; i++) {
-      const cls = ["", i < done ? "on" : "", scope.track.marks[String(i)] ? "mark" : ""]
+      const cls = ["", i < done ? "on" : "", scope.track.marks[String(i)] ? "mark" : "",
+        starts.has(i) ? "act" : ""]
         .filter(Boolean).join(" ");
       add(mini, el("i", { class: cls }));
     }

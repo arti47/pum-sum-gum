@@ -2,6 +2,7 @@
    Warm paper, ink type, one machine-orange accent. Light + dark, follows system. */
 
 :root {
+  color-scheme: light dark;   /* native controls and scrollbars follow the sheet */
   --paper:        #f7f1e3;
   --paper-2:      #fffaf0;
   --paper-sunk:   #efe7d4;
@@ -19,10 +20,17 @@
   --good:         #3f7d58;
   --warn:         #a8631a;
   --shadow:       0 1px 0 rgba(27, 33, 48, .06), 0 2px 10px rgba(27, 33, 48, .05);
-  --radius:       10px;
+  --radius:       12px;
+  --radius-sm:    8px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --sans:  ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono:  ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --lift:         0 1px 0 rgba(27, 33, 48, .05), 0 6px 20px -10px rgba(27, 33, 48, .22);
+  --press:        inset 0 -2px 0 rgba(27, 33, 48, .10);
+  --grain-a:      .035;
   --tap:          44px;
   --scale:        1;
-  --hdr-h:        52px;   /* app header */
+  --hdr-h:        56px;   /* app header: the one sticky bar */
   --tabbar-h:     56px;   /* bottom tab bar */
   --actionbar-h:  60px;   /* pinned primary action */
 }
@@ -44,10 +52,15 @@
     --good:       #6fb98c;
     --warn:       #d9a05b;
     --shadow:     0 1px 0 rgba(0,0,0,.3), 0 2px 10px rgba(0,0,0,.35);
+    --lift:       0 1px 0 rgba(0,0,0,.35), 0 8px 24px -10px rgba(0,0,0,.6);
+    --press:      inset 0 -2px 0 rgba(0,0,0,.35);
+    --grain-a:    .05;
   }
 }
 
+:root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --paper:      #14161d;
   --paper-2:    #1c1f28;
   --paper-sunk: #0f1116;
@@ -63,6 +76,9 @@
   --good:       #6fb98c;
   --warn:       #d9a05b;
   --shadow:     0 1px 0 rgba(0,0,0,.3), 0 2px 10px rgba(0,0,0,.35);
+  --lift:       0 1px 0 rgba(0,0,0,.35), 0 8px 24px -10px rgba(0,0,0,.6);
+  --press:      inset 0 -2px 0 rgba(0,0,0,.35);
+  --grain-a:    .05;
 }
 
 * { box-sizing: border-box; }
@@ -83,19 +99,37 @@
    would make the books' own tables unreadable. */
 #screen .table-scroll, #screen pre { overflow-wrap: normal; overflow-x: auto; }
 
-html { font-size: calc(100% * var(--scale)); }
+html {
+  font-size: calc(100% * var(--scale));
+  /* Anything scrolled to — a beat card, the scene controls, a rule — lands
+     clear of the sticky bars instead of under them. */
+  scroll-padding-top: calc(var(--hdr-h) + 52px);
+  scroll-padding-bottom: calc(var(--tabbar-h) + var(--actionbar-h) + 12px);
+  -webkit-tap-highlight-color: transparent;
+}
 
 body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  font-family: var(--serif);
+  font-feature-settings: "kern", "liga", "onum";
   font-size: 1rem;
   line-height: 1.45;
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
   overflow-x: hidden;
 }
+
+/* Paper, not a flat fill: a faint fibre grain painted ABOVE the page and below
+   everything interactive, so it never changes a measured background colour and
+   never takes a pointer event. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  opacity: var(--grain-a);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.screen { position: relative; z-index: 1; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -115,72 +149,95 @@ body {
 
 /* ---------- frame ---------------------------------------------------- */
 
+/* ONE sticky bar. The plot header used to be a second sticky bar under the
+   brand; together with the section strip that was ~150px of chrome before a
+   word of content on a 844px phone. In play the plot header takes the brand's
+   place — the brand says nothing you need mid-scene, the track says the stakes. */
 .app-header {
   position: sticky; top: 0; z-index: 30;
-  display: flex; align-items: center; gap: .5rem;
-  padding: .35rem .5rem;
-  padding-top: calc(.35rem + env(safe-area-inset-top));
+  display: flex; align-items: center; gap: .35rem;
+  padding: .3rem .4rem;
+  padding-top: calc(.3rem + env(safe-area-inset-top));
   background: var(--paper-2);
   border-bottom: 1px solid var(--rule);
+  box-shadow: 0 1px 0 var(--paper-2), 0 2px 0 var(--rule);   /* the printed double rule */
   min-height: var(--hdr-h);
 }
 
 .brand { flex: 1; min-width: 0; text-align: center; line-height: 1.15; }
 .brand-name {
-  display: block; font-weight: 700; letter-spacing: .01em;
-  font-size: 1.02rem;
+  display: block; font-weight: 700; letter-spacing: .02em;
+  font-size: 1.02rem; font-variant: small-caps;
 }
 .brand-sub {
   display: block; font-size: .72rem; color: var(--ink-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+body.in-play .brand { display: none; }
 
 .hdr-btn {
   flex: none;
   min-width: var(--tap); min-height: var(--tap);
   display: grid; place-items: center;
-  background: transparent; border: 1px solid transparent; border-radius: var(--radius);
-  color: var(--ink-2); font-size: 1.2rem; cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 999px;
+  color: var(--ink-2); font-size: 1.15rem; cursor: pointer;
+  transition: background-color .15s ease;
 }
 .hdr-btn:hover { background: var(--paper-sunk); }
-
-/* Persistent plot header — the plot track position, always visible in play */
-.plot-header {
-  position: sticky; z-index: 29;
-  top: calc(var(--hdr-h) + env(safe-area-inset-top));
-  background: var(--paper-2);
-  border-bottom: 1px solid var(--rule);
-  padding: .4rem .7rem .5rem;
+.hdr-btn > span { font-size: 0; display: grid; }
+.hdr-btn > span::before {
+  content: ""; width: 22px; height: 22px; background: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat;
 }
-.ph-row { display: flex; align-items: baseline; gap: .5rem; }
+#btn-home > span { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M12%203l8%209-8%209-8-9z%27/%3E%3Cpath%20d%3D%27M12%208l3.5%204-3.5%204-3.5-4z%27/%3E%3C/svg%3E"); }
+#btn-theme > span { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%278%27/%3E%3Cpath%20d%3D%27M12%204a8%208%200%200%200%200%2016z%27%20fill%3D%27black%27/%3E%3C/svg%3E"); }
+
+/* Persistent plot header — the plot track position, always visible in play.
+   It now lives inside the app header and flexes into the brand's slot. */
+.plot-header {
+  flex: 1; min-width: 0;
+  padding: .1rem .2rem;
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .15rem .6rem;
+  grid-template-areas: "name name" "mini sec";
+}
+.plot-header[hidden] { display: none; }
+.plot-header:not(:has(.ph-mini)) { grid-template-areas: "name sec"; }
+.ph-row { display: contents; }
+.ph-name { grid-area: name; }
+.ph-sec { grid-area: sec; }
+.ph-mini { grid-area: mini; }
 .ph-name {
-  font-weight: 700; font-size: .92rem;
+  font-weight: 700; font-size: .95rem; letter-spacing: -.005em;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.ph-sec { font-size: .75rem; color: var(--ink-3); margin-left: auto; white-space: nowrap; }
+.ph-sec {
+  font-size: .72rem; color: var(--ink-3); white-space: nowrap; line-height: 1;
+  font-family: var(--sans);
+}
 .ph-count {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .75rem; color: var(--accent-text); font-weight: 700;
+  font-family: var(--mono);
+  font-size: .74rem; color: var(--accent-text); font-weight: 700;
 }
-.ph-mini { display: flex; gap: 2px; margin-top: .35rem; }
+.ph-mini { display: flex; gap: 2px; }
 .ph-mini i {
-  flex: 1 1 0; height: 6px; border-radius: 2px;
-  background: var(--paper-sunk); border: 1px solid var(--rule-2);
+  flex: 1 1 0; height: 5px; border-radius: 1px;
+  background: var(--paper-sunk); box-shadow: inset 0 0 0 1px var(--rule-2);
 }
-.ph-mini i.on { background: var(--accent); border-color: var(--accent); }
-.ph-mini i.mark { border-color: var(--warn); border-width: 2px; }
+.ph-mini i.on { background: var(--accent); box-shadow: none; }
+.ph-mini i.mark { box-shadow: inset 0 0 0 2px var(--warn); }
+.ph-mini i.act { margin-left: 4px; }
 .ph-resolved { color: var(--good); font-weight: 700; }
 
 .screen {
   display: block;
-  padding: .7rem .7rem 0;
-  padding-bottom: calc(var(--tabbar-h) + 8px + env(safe-area-inset-bottom) + 1.4rem);
+  padding: .85rem 1rem 0;
+  padding-bottom: calc(var(--tabbar-h) + 8px + env(safe-area-inset-bottom) + 1.6rem);
   max-width: 720px; margin: 0 auto;
   outline: none;
 }
 body.has-actionbar .screen {
-  padding-bottom: calc(var(--tabbar-h) + var(--actionbar-h) + 8px + env(safe-area-inset-bottom) + 1.4rem);
+  padding-bottom: calc(var(--tabbar-h) + var(--actionbar-h) + 8px + env(safe-area-inset-bottom) + 1.6rem);
 }
 
 .action-bar-mount { position: fixed; left: 0; right: 0; z-index: 28;
@@ -188,17 +245,26 @@ body.has-actionbar .screen {
 .action-bar {
   max-width: 720px; margin: 0 auto;
   display: flex; gap: .5rem; align-items: center;
-  padding: .5rem .7rem;
-  background: var(--paper-2);
+  padding: .5rem 1rem;
+  background: color-mix(in srgb, var(--paper-2) 94%, transparent);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   border-top: 1px solid var(--rule);
-  box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+  box-shadow: 0 -6px 18px -8px rgba(27, 33, 48, .18);
 }
 .action-bar .ab-ctx {
-  font-size: .75rem; color: var(--ink-3); flex: 1 1 0; min-width: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .72rem; color: var(--ink-3); flex: 1 1 0; min-width: 0;
+  font-family: var(--mono);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .action-bar .btn { flex: none; }
+/* Below 360px the context line is a few truncated characters ("2…") — space
+   the buttons need more. It is visual only; the primary's accessible name
+   already carries it. */
+@media (max-width: 359px) {
+  .action-bar .ab-ctx { display: none; }
+  .action-bar .btn:first-of-type { margin-left: auto; }
+}
+.action-bar .btn.primary { min-width: 8.5rem; }
 
 .tab-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
@@ -210,267 +276,456 @@ body.has-actionbar .screen {
 .tab-bar button {
   flex: 1 1 0; min-height: var(--tabbar-h);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 1px; background: none; border: none; cursor: pointer;
-  color: var(--ink-3); font: inherit; font-size: .68rem;
+  gap: 2px; background: none; border: none; cursor: pointer;
+  color: var(--ink-3); font-family: var(--sans); font-size: .68rem; font-weight: 600;
+  letter-spacing: .02em;
   padding: .2rem .1rem; position: relative;
+  transition: color .15s ease;
 }
-.tab-bar button .ti { font-size: 1.15rem; line-height: 1; }
-.tab-bar button[aria-current="page"] { color: var(--accent-text); font-weight: 700; }
+.tab-bar button .ti {
+  font-size: 1.1rem; line-height: 1;
+  display: grid; place-items: center; width: 2.6rem; height: 1.6rem; border-radius: 999px;
+  transition: background-color .15s ease;
+}
+.tab-bar button[aria-current="page"] { color: var(--accent-text); }
+.tab-bar button[aria-current="page"] .ti { background: var(--accent-soft); }
+.tab-bar button[aria-current="page"]::before {
+  content: ""; position: absolute; top: -1px; left: 30%; right: 30%;
+  height: 3px; border-radius: 0 0 3px 3px; background: var(--accent);
+}
 .tab-bar button .badge {
-  position: absolute; top: 6px; right: 50%; transform: translateX(20px);
-  min-width: 8px; height: 8px; border-radius: 5px; background: var(--accent);
+  position: absolute; top: 5px; right: 50%; transform: translateX(19px);
+  min-width: 9px; height: 9px; border-radius: 5px; background: var(--accent);
+  box-shadow: 0 0 0 2px var(--paper-2);
 }
+
+
+/* Tab icons drawn as one stroked set rather than five unrelated glyphs from
+   whatever font the device has. The glyph stays in the DOM for anything that
+   reads it; it is just not painted. */
+.tab-bar button .ti { font-size: 0; }
+.tab-bar button .ti::before {
+  content: ""; width: 22px; height: 22px; background: currentColor;
+  -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat;
+}
+.ti[data-tab="play"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%274%27%20y%3D%273%27%20width%3D%2716%27%20height%3D%2718%27%20rx%3D%272%27/%3E%3Cpath%20d%3D%27M8%208h8M8%2012h8%27/%3E%3Cpath%20d%3D%27M8%2016h2M11.5%2016h2M15%2016h1%27/%3E%3C/svg%3E"); }
+.ti[data-tab="scene"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M3%205h18v14H3z%27/%3E%3Cpath%20d%3D%27M3%209h18%27/%3E%3Cpath%20d%3D%27M7%205l-2%204M12%205l-2%204M17%205l-2%204%27/%3E%3C/svg%3E"); }
+.ti[data-tab="oracles"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Crect%20x%3D%274%27%20y%3D%274%27%20width%3D%2716%27%20height%3D%2716%27%20rx%3D%273.5%27/%3E%3Ccircle%20cx%3D%279%27%20cy%3D%279%27%20r%3D%271.6%27%20fill%3D%27black%27/%3E%3Ccircle%20cx%3D%2715%27%20cy%3D%2715%27%20r%3D%271.6%27%20fill%3D%27black%27/%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%271.6%27%20fill%3D%27black%27/%3E%3C/svg%3E"); }
+.ti[data-tab="journal"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M6%203h10a2%202%200%200%201%202%202v14a2%202%200%200%201-2%202H6z%27/%3E%3Cpath%20d%3D%27M6%203v18%27/%3E%3Cpath%20d%3D%27M10%208h5M10%2012h5%27/%3E%3C/svg%3E"); }
+.ti[data-tab="more"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M4%207h16M4%2012h16M4%2017h16%27/%3E%3C/svg%3E"); }
 
 /* ---------- section nav (two-level navigation) ------------------------ */
 
+/* Index tabs, not pills: the orange fill is the primary action's colour, and
+   a strip of filled pills on every screen spent it on navigation. The current
+   section is ink with an accent rule beneath it, the way a printed index
+   marks the page you are on. The ends fade when there is more to scroll. */
 .section-nav {
-  display: flex; gap: .35rem; overflow-x: auto; scrollbar-width: none;
-  padding: 0 0 .55rem; margin: 0 -.15rem .3rem;
+  display: flex; gap: .15rem; overflow-x: auto; scrollbar-width: none;
+  padding: 0; margin: -.3rem -1rem .75rem;
+  padding-inline: .6rem;
+  border-bottom: 1px solid var(--rule);
+}
+.section-nav.more-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+.section-nav.more-left { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); }
+.section-nav.more-left.more-right {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
 }
 .section-nav::-webkit-scrollbar { display: none; }
-.section-nav button {
-  flex: none; min-height: 40px; padding: .4rem .75rem;
-  border: 1px solid var(--rule-2); border-radius: 999px;
-  background: var(--paper-2); color: var(--ink-2);
-  font: inherit; font-size: .82rem; cursor: pointer; white-space: nowrap;
+/* The tab's own sections stay within reach once the screen is scrolled. */
+.screen > .section-nav:first-child {
+  position: sticky; z-index: 20;
+  top: calc(var(--hdr-h) + env(safe-area-inset-top));
+  background: var(--paper);
 }
+.section-nav button {
+  flex: none; min-height: 42px; padding: .4rem .65rem;
+  border: none; border-bottom: 3px solid transparent; border-radius: 0;
+  background: transparent; color: var(--ink-3);
+  font-family: var(--sans); font-size: .84rem; font-weight: 600;
+  cursor: pointer; white-space: nowrap; margin-bottom: -1px;
+  transition: color .15s ease, border-color .15s ease;
+}
+.section-nav button:hover:not(:disabled) { color: var(--ink); }
+.section-nav button:disabled { opacity: .45; cursor: not-allowed; }
 .section-nav button[aria-current="true"] {
-  background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700;
+  color: var(--ink); border-bottom-color: var(--accent);
 }
 .section-nav button .dot {
   display: inline-block; width: 7px; height: 7px; border-radius: 4px;
   background: var(--accent); margin-left: .35rem; vertical-align: middle;
 }
-.section-nav button[aria-current="true"] .dot { background: var(--accent-ink); }
+/* A second strip on the same screen (the Forge's own sections, the journal's
+   filters) is a quieter, inset row, so the two levels read as two levels. */
+.section-nav ~ .section-nav, .explain ~ .section-nav {
+  margin: 0 0 .75rem; padding-inline: 0; border-bottom: none; gap: .35rem;
+}
+.section-nav ~ .section-nav button, .explain ~ .section-nav button {
+  min-height: 40px; border: 1px solid var(--rule-2); border-radius: 999px;
+  padding: .3rem .8rem; margin: 0; font-size: .8rem; background: var(--paper-2);
+}
+.section-nav ~ .section-nav button[aria-current="true"],
+.explain ~ .section-nav button[aria-current="true"] {
+  background: var(--ink); border-color: var(--ink); color: var(--paper-2);
+}
 
 /* ---------- type ------------------------------------------------------ */
 
-h1 { font-size: 1.32rem; margin: .1rem 0 .2rem; letter-spacing: -.01em; }
-h2 { font-size: 1.05rem; margin: 1.1rem 0 .4rem; }
-h3 { font-size: .92rem; margin: .8rem 0 .3rem; }
-p  { margin: .4rem 0; }
-.lede { color: var(--ink-2); font-size: .9rem; margin-top: 0; }
-.muted { color: var(--ink-3); font-size: .82rem; }
-.cite {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .7rem; color: var(--ink-3);
+/* A printed sheet's hierarchy: a set title with a rule under it, section
+   heads in the text face, and every label — field names, kinds, counts — in a
+   small sans, so what you READ and what you OPERATE are told apart at a glance. */
+h1 {
+  font-size: 1.5rem; line-height: 1.15; margin: .15rem 0 .55rem; letter-spacing: -.015em;
+  padding-bottom: .4rem; border-bottom: 1px solid var(--rule);
+  text-wrap: balance;
 }
-.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+h2 { font-size: 1.08rem; line-height: 1.25; margin: 1.2rem 0 .45rem; letter-spacing: -.005em; text-wrap: balance; }
+h3 { font-size: .95rem; margin: .85rem 0 .3rem; }
+p  { margin: .4rem 0; text-wrap: pretty; }
+.lede { color: var(--ink-2); font-size: .92rem; margin-top: -.25rem; }
+.muted { color: var(--ink-3); font-size: .84rem; }
+.cite {
+  font-family: var(--mono);
+  font-size: .68rem; color: var(--ink-3); letter-spacing: .01em;
+}
+.mono { font-family: var(--mono); }
 
 /* ---------- explain() note -------------------------------------------- */
 
+/* A margin note, not a box: a hairline on the left, a small sans label, and —
+   open — its first lines with the rest one tap away. */
 .explain {
-  border: 1px dashed var(--rule-2); border-radius: var(--radius);
-  background: var(--paper-2); margin: 0 0 .8rem; padding: 0;
+  border: none; border-left: 2px solid var(--rule-2);
+  background: transparent; margin: 0 0 .9rem; padding: 0 0 0 .75rem;
 }
 .explain > summary {
-  cursor: pointer; list-style: none; padding: .6rem .7rem;
-  font-size: .84rem; color: var(--ink-2); min-height: 44px;
-  display: flex; align-items: center; gap: .4rem;
+  cursor: pointer; list-style: none; padding: .25rem 0;
+  font-family: var(--sans); font-size: .74rem; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); min-height: 40px;
+  display: flex; align-items: center; gap: .45rem;
 }
 .explain > summary::-webkit-details-marker { display: none; }
-.explain > summary::before { content: "?"; font-weight: 700; color: var(--accent-text); }
+.explain > summary::before {
+  content: "?"; display: grid; place-items: center;
+  width: 1.15rem; height: 1.15rem; border-radius: 50%;
+  border: 1.5px solid var(--accent-text); color: var(--accent-text);
+  font-size: .7rem; font-weight: 700; letter-spacing: 0;
+}
 /* Open/closed state, as .acc folds have — a static marker gives no clue that
    the row does anything. */
 .explain > summary::after {
-  content: "+"; margin-left: auto; color: var(--accent-text); font-weight: 700;
+  content: "Show"; margin-left: auto; color: var(--accent-text);
+  font-size: .72rem; letter-spacing: .04em;
 }
-.explain[open] > summary::after { content: "\2013"; }
+.explain[open] > summary::after { content: "Hide"; }
 /* The inspiration block is not an explanation; it should not wear the "?". */
-.explain.inspire > summary::before { content: none; }
-.explain[open] > summary { border-bottom: 1px dashed var(--rule-2); }
-.explain .body { padding: .6rem .7rem; font-size: .86rem; color: var(--ink-2); }
-.explain .body p { margin: .35rem 0; }
+.explain.inspire > summary::before { content: "\2684"; border: none; font-size: 1rem; width: auto; }
+.explain .body { padding: 0 0 .2rem; font-size: .9rem; color: var(--ink-2); }
+.explain .body p { margin: .1rem 0 .4rem; }
+.explain:hover { border-left-color: var(--accent); }
+
+/* The teaser: about three lines painted, the rest held behind "More". */
+/* The first paragraph, clamped to three lines; the rest stays in the document
+   (and in what assistive tech reads) but is not painted until "More". */
+.ex-text { position: relative; }
+.ex-text:not(.full) > p:first-child {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3;
+  overflow: hidden;
+}
+.ex-text:not(.full) > p:not(:first-child) {
+  position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.ex-more {
+  border: none; cursor: pointer; min-height: 40px; padding: 0 .1rem; margin: 0 .9rem 0 0;
+  font-family: var(--sans); font-size: .8rem; font-weight: 700;
+  color: var(--accent-text); background: transparent;
+}
+.ex-more::after { content: " \2193"; }
+.ex-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0 .35rem; margin-top: -.1rem; }
+.ex-foot > .btn.ghost { padding-inline: 0; margin-right: .4rem; color: var(--accent-text); font-weight: 600; }
+.ex-foot .term-row { margin: 0; padding: 0; border: none; flex: 1 1 100%; }
 
 /* ---------- cards & rows ---------------------------------------------- */
 
 .card {
+  position: relative;
   background: var(--paper-2); border: 1px solid var(--rule);
-  border-radius: var(--radius); box-shadow: var(--shadow);
-  padding: .7rem; margin: 0 0 .7rem;
+  border-radius: var(--radius); box-shadow: var(--lift);
+  padding: .85rem .9rem; margin: 0 0 .85rem;
 }
 .card.flush { padding: 0; overflow: hidden; }
 .card h2, .card h3 { margin-top: 0; }
-.card-head {
-  display: flex; align-items: baseline; gap: .5rem; margin-bottom: .4rem;
+.card > h2:first-child, .card > h3:first-child, .card-head {
+  padding-bottom: .45rem; border-bottom: 1px solid var(--rule); margin-bottom: .55rem;
 }
-.card-head h2, .card-head h3 { flex: 1; margin: 0; }
+.card-head {
+  display: flex; align-items: baseline; gap: .5rem;
+}
+.card-head h2, .card-head h3 { flex: 1; margin: 0; padding: 0; border: none; }
 
 .defrow {
-  display: block; padding: .5rem 0; border-bottom: 1px solid var(--rule);
+  display: block; padding: .55rem 0; border-bottom: 1px solid var(--rule);
 }
 .defrow:last-child { border-bottom: none; }
-.defrow .k { display: block; font-size: .74rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; }
+.defrow .k {
+  display: block; font-family: var(--sans); font-size: .68rem; font-weight: 600;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .1rem;
+}
 .defrow .v { display: block; }
 /* The glossary is twelve definitions read one after another, so the term runs
    into its own definition rather than sitting on a line of its own: same words,
    twelve fewer lines, on the one screen whose whole job is defining things. */
-.glossary .defrow { padding: .4rem 0; }
+.glossary { font-size: .93rem; line-height: 1.4; }
+.glossary .defrow { padding: .38rem 0; }
 .glossary .defrow .k {
-  display: inline; text-transform: none; letter-spacing: 0;
+  display: inline; text-transform: none; letter-spacing: 0; font-family: var(--serif);
   font-size: 1em; font-weight: 700; color: var(--ink);
 }
 .glossary .defrow .k::after { content: " \2014 "; color: var(--ink-3); font-weight: 400; }
 .glossary .defrow .v { display: inline; }
 
 .inlinerow {
-  display: flex; align-items: baseline; gap: .6rem; padding: .4rem 0;
-  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: baseline; gap: .6rem; padding: .45rem 0;
+  border-bottom: 1px dotted var(--rule-2);
 }
 .inlinerow:last-child { border-bottom: none; }
-.inlinerow .k { color: var(--ink-3); font-size: .82rem; }
-.inlinerow .v { margin-left: auto; font-weight: 700; }
+.inlinerow .k { color: var(--ink-3); font-size: .84rem; }
+.inlinerow .v { margin-left: auto; font-weight: 700; text-align: right; }
 
 /* ---------- buttons --------------------------------------------------- */
 
 button, .btn {
   font: inherit;
 }
+/* Controls are set in the sans; the sheet's words stay in the serif. A button
+   is pressed like a key: a darker lower edge, and it sinks a pixel. */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .35rem;
-  min-height: var(--tap); padding: .5rem .9rem;
-  border: 1px solid var(--rule-2); border-radius: var(--radius);
+  min-height: var(--tap); padding: .5rem .95rem;
+  border: 1px solid var(--rule-2); border-radius: var(--radius-sm);
   background: var(--paper-2); color: var(--ink);
+  font-family: var(--sans); font-size: .9rem; font-weight: 600; letter-spacing: .005em;
+  box-shadow: var(--press);
   cursor: pointer; text-align: center;
+  transition: background-color .12s ease, border-color .12s ease, transform .06s ease, filter .12s ease;
 }
-.btn:hover { background: var(--paper-sunk); }
-.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:hover { background: var(--paper-sunk); border-color: var(--ink-3); }
+.btn:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+.btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 .btn.primary {
   background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
   font-weight: 700;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.16), 0 4px 12px -6px var(--accent);
 }
-.btn.primary:hover { filter: brightness(1.05); }
+.btn.primary:hover { filter: brightness(1.05); background: var(--accent); border-color: var(--accent); }
+/* Where the screen already pins its call in the action bar, a primary inside
+   the page is tinted rather than filled: one orange fill per screen, so the
+   eye finds the move the screen is for. Still unmistakably the card's own
+   main control — accent edge, accent wash, bold. */
+body.has-actionbar #screen .btn.primary:not([aria-pressed="true"]) {
+  background: var(--accent-soft); border-color: var(--accent); color: var(--ink);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 45%, transparent);
+}
+body.has-actionbar #screen .btn.primary:not([aria-pressed="true"]):hover { filter: none; background: color-mix(in srgb, var(--accent-soft) 70%, var(--accent)); }
 .btn.wide { width: 100%; }
-.btn.small { min-height: 40px; padding: .35rem .65rem; font-size: .82rem; }
+.btn.small { min-height: 40px; padding: .35rem .7rem; font-size: .82rem; }
 .btn.danger { color: var(--accent-text); border-color: var(--accent-text); }
-.btn.ghost { border-color: transparent; background: transparent; }
+.btn.ghost { border-color: transparent; background: transparent; box-shadow: none; }
+.btn.ghost:hover { background: var(--paper-sunk); border-color: transparent; }
 .btn-row { display: flex; gap: .5rem; flex-wrap: wrap; }
 .btn-row > .btn { flex: 1 1 auto; }
+/* A choice, not an action: the chosen option of a radio-like group is inked,
+   not orange, so the screen's one orange button stays the one that rolls. */
+.seg .btn[aria-pressed="true"], .seg-grid .btn[aria-pressed="true"],
+.btn[aria-pressed="true"].primary {
+  background: var(--ink); border-color: var(--ink); color: var(--paper-2);
+  box-shadow: none; filter: none;
+}
+.seg .btn[aria-pressed="true"]::before, .seg-grid .btn[aria-pressed="true"]::before { content: "\2713"; font-weight: 700; }
+.seg { gap: 0; flex-direction: column; }
+.seg > .btn { border-radius: 0; margin-top: -1px; justify-content: flex-start; }
+.seg > .btn:first-child { border-radius: var(--radius-sm) var(--radius-sm) 0 0; margin-top: 0; }
+.seg > .btn:last-child { border-radius: 0 0 var(--radius-sm) var(--radius-sm); }
+@media (min-width: 560px) {
+  .seg { flex-direction: row; }
+  .seg > .btn { margin-top: 0; margin-left: -1px; justify-content: center; flex: 1 1 0; }
+  .seg > .btn:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); margin-left: 0; }
+  .seg > .btn:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+}
 .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .5rem; }
 
 /* ---------- forms ----------------------------------------------------- */
 
-label.field { display: block; margin: 0 0 .7rem; }
+label.field { display: block; margin: 0 0 .85rem; }
 label.field > span.lbl {
-  display: block; font-size: .78rem; color: var(--ink-3);
-  text-transform: uppercase; letter-spacing: .04em; margin-bottom: .2rem;
+  display: block; font-family: var(--sans); font-size: .7rem; font-weight: 600;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .3rem;
 }
-input[type="text"], input[type="number"], textarea, select {
+input[type="text"], input[type="number"], input[type="search"], textarea, select {
   width: 100%; font: inherit; font-size: 1rem;
-  min-height: var(--tap); padding: .5rem .6rem;
+  min-height: var(--tap); padding: .55rem .7rem;
   background: var(--paper); color: var(--ink);
-  border: 1px solid var(--rule-2); border-radius: var(--radius);
+  border: 1px solid var(--rule-2); border-radius: var(--radius-sm);
+  box-shadow: inset 0 1px 2px rgba(27, 33, 48, .06);
+  transition: border-color .12s ease, box-shadow .12s ease;
 }
+input[type="text"]:focus, input[type="number"]:focus, input[type="search"]:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+select {
+  appearance: none; -webkit-appearance: none; padding-right: 2.2rem; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2012%208%27%3E%3Cpath%20d%3D%27M1%201.5l5%205%205-5%27%20fill%3D%27none%27%20stroke%3D%27%23888%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E"); background-repeat: no-repeat;
+  background-position: right .8rem center; background-size: 12px 8px;
+}
+input[type="range"] { accent-color: var(--accent); width: 100%; min-height: var(--tap); }
+::placeholder { color: var(--ink-3); opacity: 1; font-style: italic; }
 textarea { min-height: 5rem; resize: vertical; line-height: 1.45; }
-.hint { font-size: .78rem; color: var(--ink-3); margin-top: .2rem; }
+.hint { font-size: .8rem; color: var(--ink-3); margin-top: .25rem; }
 
 /* The one-line coach on the plot sheet, shown until the first beat is
    confirmed, and the plain list on the "never played solo" card. */
 .coach {
-  margin: 0 0 .8rem; padding: .55rem .7rem;
-  border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0;
-  background: var(--paper-2); color: var(--ink-2); font-size: .88rem;
+  margin: 0 0 .85rem; padding: .6rem .75rem;
+  border-left: 3px solid var(--accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--paper-2); color: var(--ink-2); font-size: .9rem;
 }
 ul.plain { margin: .2rem 0 .6rem; padding-left: 1.1rem; }
-ul.plain li { margin: .35rem 0; color: var(--ink-2); font-size: .92rem; }
+ul.plain li { margin: .35rem 0; color: var(--ink-2); font-size: .93rem; }
+ul.plain li::marker { color: var(--accent-text); }
 .loop {
-  margin: 0; font-size: .86rem; color: var(--ink-2);
+  margin: 0; font-size: .88rem; color: var(--ink-2);
   border-top: 1px solid var(--rule); padding-top: .55rem;
 }
 
 label.check {
-  display: flex; align-items: center; gap: .6rem;
-  min-height: var(--tap); padding: .35rem .1rem; cursor: pointer;
+  display: flex; align-items: center; gap: .7rem;
+  min-height: var(--tap); padding: .45rem .1rem; cursor: pointer;
 }
+label.check + label.check { border-top: 1px dotted var(--rule-2); }
 label.check input { width: 22px; height: 22px; flex: none; accent-color: var(--accent); }
 label.check .ct { flex: 1; }
-label.check .ct small { display: block; color: var(--ink-3); font-size: .78rem; }
+label.check .ct small { display: block; color: var(--ink-3); font-size: .8rem; }
 
 /* ---------- the plot track -------------------------------------------- */
 
-.track { margin: .3rem 0 .2rem; }
-.track-sec { margin-bottom: .45rem; }
+/* Boxes as they are printed and as they are played: an empty square, then a
+   square crossed through by hand. */
+.track { margin: .35rem 0 .3rem; }
+.track-sec { margin-bottom: .55rem; }
 .track-sec-name {
-  font-size: .74rem; text-transform: uppercase; letter-spacing: .05em;
-  color: var(--ink-3); margin-bottom: .18rem;
+  font-family: var(--sans); font-size: .68rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .08em;
+  color: var(--ink-3); margin-bottom: .25rem;
 }
 .track-sec.current .track-sec-name { color: var(--accent-text); font-weight: 700; }
-.track-boxes { display: flex; gap: 4px; flex-wrap: wrap; }
+.track-sec.current .track-sec-name::before { content: "\25B8\00a0"; }
+.track-boxes { display: flex; gap: 5px; flex-wrap: wrap; }
 .track-box {
   position: relative;
   flex: 1 1 40px; min-width: 40px; max-width: 56px; height: 40px;
-  border: 1.5px solid var(--rule-2); border-radius: 4px;
+  border: 1.5px solid var(--rule-2); border-radius: 3px;
   background: var(--paper);
   display: grid; place-items: center;
   font-size: .7rem; color: var(--ink-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
   cursor: pointer; padding: 0;
+  transition: transform .1s ease, border-color .12s ease;
 }
-.track-box.crossed { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.track-box.next { border-color: var(--accent); border-style: dashed; }
+.track-box:hover { border-color: var(--ink-3); }
+.track-box.crossed {
+  border-color: var(--accent); color: var(--accent-ink);
+  background: var(--accent);
+  font-family: var(--sans); font-size: 1.05rem; font-weight: 700;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.14);
+}
+.track-box.next {
+  border-color: var(--accent); border-style: dashed;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
 .track-box.marked::after {
-  content: "★"; position: absolute; top: -7px; right: -3px;
-  font-size: .68rem; color: var(--warn);
+  content: "★"; position: absolute; top: -8px; right: -5px;
+  font-size: .72rem; color: var(--warn);
+  background: var(--paper-2); border-radius: 50%; line-height: 1; padding: 1px;
 }
 
 /* ---------- result cards ---------------------------------------------- */
 
+/* The machine's answer is the loudest thing on any screen it appears on:
+   it arrives (a short rise, none under reduced motion), and it is set large. */
+@keyframes arrive { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .result {
-  border: 1px solid var(--accent); border-radius: var(--radius);
-  background: var(--paper-2); box-shadow: var(--shadow);
-  overflow: hidden; margin-bottom: .7rem;
+  border: 1px solid var(--rule); border-top: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--paper-2); box-shadow: var(--lift);
+  overflow: hidden; margin-bottom: .85rem;
+  animation: arrive .22s ease-out both;
 }
 .result-head {
-  background: var(--accent-soft); padding: .4rem .7rem;
+  padding: .5rem .8rem .4rem;
   display: flex; align-items: center; gap: .5rem;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px dotted var(--rule-2);
 }
 .result-kind {
-  font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+  font-family: var(--sans);
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .08em;
   color: var(--ink-2); font-weight: 700;
 }
-.result-body { padding: .7rem; }
-.result-answer { font-size: 1.12rem; font-weight: 700; line-height: 1.3; }
-.result-second { color: var(--ink-2); margin-top: .3rem; }
+.result-body { padding: .75rem .85rem .8rem; }
+.result-answer { font-size: 1.32rem; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; text-wrap: balance; }
+.result-second { color: var(--ink-2); margin-top: .35rem; }
 .result-foot {
-  padding: .5rem .7rem; border-top: 1px solid var(--rule);
+  padding: .55rem .8rem; border-top: 1px solid var(--rule);
+  background: var(--paper);
   display: flex; gap: .45rem; flex-wrap: wrap;
 }
 
-.dice { display: flex; gap: .3rem; flex-wrap: wrap; align-items: center; margin-left: auto; }
+/* Dice as dice: a rounded face with a lip, the kept one inked in the accent. */
+.dice { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; margin-left: auto; }
 .die {
-  min-width: 30px; height: 30px; padding: 0 .3rem;
+  min-width: 32px; height: 32px; padding: 0 .35rem;
   display: grid; place-items: center;
-  border: 1.5px solid var(--ink-3); border-radius: 6px;
+  border: 1.5px solid var(--ink-3); border-radius: 7px;
   background: var(--paper);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .8rem; font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--rule), 0 1px 0 var(--rule-2);
+  font-family: var(--mono);
+  font-size: .82rem; font-weight: 700;
 }
 .die.kept { border-color: var(--accent-text); color: var(--accent-text); }
 .die.dropped { opacity: .4; text-decoration: line-through; }
 .die-label {
-  font-size: .64rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em;
+  font-family: var(--sans);
+  font-size: .62rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em;
 }
 
 .chip-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
 .chip {
-  flex: 1 1 45%; min-height: var(--tap); padding: .5rem .6rem;
-  border: 1.5px solid var(--rule-2); border-radius: var(--radius);
+  flex: 1 1 45%; min-height: var(--tap); padding: .55rem .7rem;
+  border: 1.5px solid var(--rule-2); border-radius: var(--radius-sm);
   background: var(--paper); cursor: pointer; text-align: left; font: inherit;
+  box-shadow: var(--press);
+  transition: border-color .12s ease, transform .06s ease;
 }
 .chip:hover { border-color: var(--accent); }
+.chip:active { transform: translateY(1px); }
 .chip .cd {
-  display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  display: block; font-family: var(--mono);
   font-size: .68rem; color: var(--ink-3);
 }
-.chip .cv { display: block; font-weight: 700; font-size: .9rem; }
+.chip .cv { display: block; font-weight: 700; font-size: .92rem; }
 
 .strip {
   border-left: 3px solid var(--warn); background: var(--paper-sunk);
-  padding: .5rem .6rem; margin-top: .6rem; border-radius: 0 6px 6px 0;
+  padding: .55rem .7rem; margin-top: .65rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 .strip .strip-k {
-  font-size: .7rem; text-transform: uppercase; letter-spacing: .06em;
+  font-family: var(--sans);
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .07em;
   color: var(--warn); font-weight: 700;
 }
 
@@ -479,34 +734,44 @@ label.check .ct small { display: block; color: var(--ink-3); font-size: .78rem; 
 .node-list { margin: 0 0 .7rem; }
 .node-row {
   display: flex; align-items: center; gap: .5rem;
-  padding: .35rem 0; border-bottom: 1px solid var(--rule); min-height: 42px;
+  padding: .35rem 0; border-bottom: 1px dotted var(--rule-2); min-height: 44px;
 }
 .node-row:last-child { border-bottom: none; }
 .node-idx {
-  flex: none; width: 42px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .74rem; color: var(--accent-text); font-weight: 700;
+  flex: none; width: 40px;
+  font-family: var(--mono);
+  font-size: .72rem; color: var(--accent-text); font-weight: 700;
 }
 .node-txt { flex: 1; min-width: 0; word-break: break-word; }
 .node-txt.empty { color: var(--ink-3); font-style: italic; }
 
-.entry {
-  border-bottom: 1px solid var(--rule); padding: .55rem 0;
+.entry { border-bottom: 1px solid var(--rule); padding: .6rem 0; }
+/* The journal reads as a timeline: a rule down the left, a mark per entry.
+   Only the journal — a cast list or a scope list is not a sequence in time. */
+.entry.jentry { position: relative; padding: .65rem 0 .65rem .95rem; }
+.entry.jentry::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--rule-2);
+}
+.entry.jentry::after {
+  content: ""; position: absolute; left: -3px; top: 1.05rem;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--paper-2); box-shadow: 0 0 0 1.5px var(--accent-text);
 }
 .entry:last-child { border-bottom: none; }
 .entry-head { display: flex; gap: .5rem; align-items: baseline; }
 .entry-kind {
-  font-size: .68rem; text-transform: uppercase; letter-spacing: .05em;
+  font-family: var(--sans);
+  font-size: .66rem; text-transform: uppercase; letter-spacing: .08em;
   color: var(--accent-text); font-weight: 700; flex: none;
 }
-.entry-ts { margin-left: auto; font-size: .7rem; color: var(--ink-3); flex: none; }
-.entry-title { font-weight: 700; margin-top: .1rem; }
-.entry-detail { color: var(--ink-2); font-size: .9rem; }
+.entry-ts { margin-left: auto; font-size: .7rem; color: var(--ink-3); flex: none; font-family: var(--sans); }
+.entry-title { font-weight: 700; margin-top: .12rem; }
+.entry-detail { color: var(--ink-2); font-size: .92rem; }
 .entry-note {
-  margin-top: .3rem; padding-left: .55rem; border-left: 2px solid var(--rule-2);
+  margin-top: .35rem; padding-left: .6rem; border-left: 2px solid var(--accent-soft);
   color: var(--ink-2); font-style: italic; white-space: pre-wrap;
 }
-.entry-dice { font-size: .72rem; color: var(--ink-3); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.entry-dice { font-size: .72rem; color: var(--ink-3); font-family: var(--mono); }
 
 /* ---------- accordion (rules library) --------------------------------- */
 
@@ -514,54 +779,94 @@ details.acc { border-bottom: 1px solid var(--rule); }
 details.acc > summary {
   cursor: pointer; list-style: none; padding: .6rem .1rem;
   min-height: var(--tap); display: flex; align-items: center; gap: .5rem;
-  font-weight: 700; font-size: .93rem;
+  font-weight: 700; font-size: .95rem;
 }
 details.acc > summary::-webkit-details-marker { display: none; }
-details.acc > summary::after { content: "+"; margin-left: auto; color: var(--accent-text); font-weight: 700; }
-details.acc[open] > summary::after { content: "–"; }
-details.acc .acc-body { padding: 0 .1rem .7rem; color: var(--ink-2); font-size: .9rem; }
+details.acc > summary::after {
+  content: ""; margin-left: auto; flex: none;
+  width: .5rem; height: .5rem; margin-right: .25rem;
+  border-right: 2px solid var(--accent-text); border-bottom: 2px solid var(--accent-text);
+  transform: rotate(45deg) translate(-2px, -2px); transition: transform .15s ease;
+}
+details.acc[open] > summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+details.acc .acc-body { padding: 0 .1rem .75rem; color: var(--ink-2); font-size: .92rem; }
 details.acc:target > summary, details.acc.flash > summary { background: var(--accent-soft); }
 
 /* ---------- modal / toast --------------------------------------------- */
 
+/* A sheet that rises from the bottom on a phone, with a grip to say so; a
+   centred dialog on anything wider. */
+@keyframes rise { from { transform: translateY(24px); opacity: .4; } to { transform: none; opacity: 1; } }
+@keyframes dim  { from { opacity: 0; } to { opacity: 1; } }
 .modal-back {
   position: fixed; inset: 0; z-index: 60;
-  background: rgba(10, 12, 18, .55);
+  background: rgba(10, 12, 18, .5);
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
   display: flex; align-items: flex-end; justify-content: center;
   padding: 0;
+  animation: dim .16s ease-out both;
 }
 .modal {
+  position: relative;
   background: var(--paper-2); color: var(--ink);
-  border-radius: var(--radius) var(--radius) 0 0;
+  border-radius: 18px 18px 0 0;
   border: 1px solid var(--rule); border-bottom: none;
+  box-shadow: 0 -10px 40px -12px rgba(0,0,0,.35);
   width: 100%; max-width: 560px;
   max-height: 88vh; max-height: 88dvh; overflow-y: auto;
-  padding: .9rem .8rem;
-  padding-bottom: calc(.9rem + env(safe-area-inset-bottom));
+  padding: 1.35rem 1rem 0;
+  animation: rise .2s cubic-bezier(.2, .8, .2, 1) both;
 }
-.modal h2 { margin-top: 0; }
-.modal-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .9rem; }
+.modal::before {
+  content: ""; position: absolute; top: .5rem; left: 50%; transform: translateX(-50%);
+  width: 38px; height: 4px; border-radius: 2px; background: var(--rule-2);
+}
+.modal h2 { margin-top: 0; font-size: 1.2rem; padding-bottom: .45rem; border-bottom: 1px solid var(--rule); }
+.modal-actions {
+  display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem;
+  position: sticky; bottom: 0; z-index: 2;
+  margin-inline: -1rem; padding: .6rem 1rem calc(.7rem + env(safe-area-inset-bottom));
+  background: var(--paper-2); border-top: 1px solid var(--rule);
+}
 .modal-actions .btn { flex: 1 1 auto; }
+.modal > :last-child:not(.modal-actions) { margin-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+@media (min-width: 700px) {
+  .modal-back { align-items: center; padding: 1.5rem; }
+  .modal { border-radius: 16px; border-bottom: 1px solid var(--rule); max-height: 82vh; }
+  .modal::before { display: none; }
+  .modal { padding-top: 1.1rem; }
+}
 
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
 .toast-mount {
   position: fixed; left: 0; right: 0; z-index: 50;
   bottom: calc(var(--tabbar-h) + 8px + env(safe-area-inset-bottom));
   display: flex; flex-direction: column; align-items: center; gap: .4rem;
   pointer-events: none;
 }
+body.has-actionbar .toast-mount { bottom: calc(var(--tabbar-h) + var(--actionbar-h) + 8px + env(safe-area-inset-bottom)); }
 .toast {
+  display: flex; align-items: center;
   background: var(--ink); color: var(--paper);
-  padding: .5rem .85rem; border-radius: 999px;
-  font-size: .86rem; max-width: 90%; box-shadow: var(--shadow);
+  font-family: var(--sans); font-weight: 500;
+  padding: .55rem .9rem; border-radius: 999px;
+  font-size: .86rem; max-width: 90%; box-shadow: 0 8px 24px -8px rgba(0,0,0,.45);
+  animation: pop .2s ease-out both;
 }
 
 /* ---------- misc ------------------------------------------------------ */
 
 .empty {
-  text-align: center; padding: 1.6rem .8rem; color: var(--ink-2);
-  border: 1px dashed var(--rule-2); border-radius: var(--radius);
+  text-align: center; padding: 1.8rem 1rem 1.5rem; color: var(--ink-2);
+  border: 1.5px dashed var(--rule-2); border-radius: var(--radius);
+  margin-bottom: .85rem;
 }
-.empty h3 { margin-top: 0; }
+.empty::before {
+  content: "\25C8"; display: block; font-size: 1.6rem; line-height: 1;
+  color: var(--rule-2); margin-bottom: .5rem;
+}
+.empty h3 { margin-top: 0; font-size: 1.05rem; }
+.empty p { max-width: 34ch; margin-inline: auto; }
 .empty .btn + .btn { margin-top: .45rem; }
 
 /* The first-run notice on a rolling surface: marked, not shouted — an accent
@@ -578,13 +883,25 @@ details.acc:target > summary, details.acc.flash > summary { background: var(--ac
   margin: .5rem 0 .6rem; color: var(--ink-2); font-style: italic;
 }
 .coach-eg-lead { font-style: normal; font-weight: 700; color: var(--ink-3); font-size: .8rem; }
-.coach-strip { border-left-width: 2px; }
-.coach-strip p { margin: 0 0 .4rem; font-size: .9rem; }
+/* The strip that follows the player onto the Scene and Oracles tabs: one line
+   and its button side by side, not a second card the size of the first. */
+.coach-strip {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .55rem .7rem; box-shadow: none; background: var(--paper-2);
+}
+.coach-strip p { margin: 0; font-size: .86rem; color: var(--ink-2); flex: 1; min-width: 0; }
+.coach-strip p strong { color: var(--ink); }
+.coach-strip .btn { flex: none; }
+@media (max-width: 420px) {
+  .coach-strip { flex-wrap: wrap; }
+  .coach-strip .btn { flex: 1 1 100%; }
+}
 
 /* The session coach: the one card that is always correct about what to do next.
    Marked like the beginner notice, because it is the same promise kept. */
-.coach-card { border-left: 3px solid var(--accent); }
+.coach-card { border-left: 4px solid var(--accent); }
 .coach-card h2 { margin-top: 0; }
+.coach-card > h2:first-child { border-bottom: none; padding-bottom: 0; }
 .coach-next { border-top: 1px dashed var(--rule-2); padding-top: .5rem; margin-bottom: .6rem; }
 
 /* An inspiration offer: what it is, then what it says. A bare sentence gave no
@@ -597,36 +914,46 @@ details.acc:target > summary, details.acc.flash > summary { background: var(--ac
 }
 .ip-table {
   display: block; font-size: .68rem; color: var(--ink-3); font-weight: 400;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
 }
 .ip-text { display: block; }
 
 /* Glossary chips under every "what this does" note (§6.6 layer 0). */
+/* Set as a printed index line — terms underlined in dots, the way a reference
+   marks a defined word — rather than a row of bordered pills. */
 .term-row {
-  display: flex; flex-wrap: wrap; gap: .35rem; align-items: center;
-  margin-top: .6rem; padding-top: .5rem; border-top: 1px dashed var(--rule-2);
+  display: flex; flex-wrap: wrap; gap: 0 .15rem; align-items: center;
+  margin-top: .4rem;
 }
-.term-lead { font-size: .72rem; color: var(--ink-3); margin-right: .15rem; }
+.term-lead {
+  flex: 1 1 100%;
+  font-family: var(--sans); font-size: .68rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3); margin-right: .25rem;
+}
 .chip.term {
-  flex: 0 0 auto; min-height: var(--tap); padding: .35rem .6rem;
-  font-size: .78rem; font-weight: 600; border-radius: 999px;
-  border-style: dashed; color: var(--ink-2);
+  flex: 0 0 auto; min-height: 40px; padding: .2rem .4rem;
+  font-family: var(--sans); font-size: .82rem; font-weight: 600;
+  border: none; border-radius: var(--radius-sm); background: transparent; box-shadow: none;
+  color: var(--ink-2);
   display: inline-flex; align-items: center;
+  text-decoration: underline dotted var(--accent-text); text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
 }
-.chip.term::after { content: "?"; margin-left: .35rem; color: var(--accent); font-weight: 700; }
+.chip.term:hover { background: var(--paper-sunk); color: var(--ink); }
+.chip.term::after { content: none; }
 
 /* The glossary's two layers get headings, so the group that assumes nothing is
    visibly the one to start from. */
 .term-group {
-  margin: .9rem 0 .3rem; font-size: .74rem; letter-spacing: .06em;
+  margin: .9rem 0 .3rem; font-family: var(--sans); font-size: .7rem; font-weight: 600; letter-spacing: .07em;
   text-transform: uppercase; color: var(--ink-3);
 }
 .term-group:first-child { margin-top: .2rem; }
 
 .pill {
-  display: inline-block; padding: .1rem .45rem; border-radius: 999px;
+  display: inline-block; padding: .1rem .5rem; border-radius: 999px; background: var(--paper);
   font-size: .7rem; border: 1px solid var(--rule-2); color: var(--ink-3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
 }
 .pill.on { border-color: var(--accent-text); color: var(--accent-text); }
 
@@ -635,7 +962,7 @@ table.rows { width: 100%; border-collapse: collapse; font-size: .86rem; }
 table.rows td { padding: .3rem .4rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
 table.rows td.r {
   width: 3.6rem; white-space: nowrap; color: var(--accent-text);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .76rem;
+  font-family: var(--mono); font-size: .76rem;
 }
 table.rows tr.hit td { background: var(--accent-soft); font-weight: 700; }
 
@@ -649,6 +976,14 @@ table.rows tr.hit td { background: var(--accent-soft); font-weight: 700; }
   font-size: .6rem; color: var(--ink-3); font-family: ui-monospace, monospace;
 }
 .dist-labels span { flex: 1; text-align: center; }
+
+/* Windows high-contrast: masked icons paint with a background colour, which
+   forced colours would otherwise erase, leaving five blank tabs. */
+@media (forced-colors: active) {
+  .tab-bar button .ti::before, .hdr-btn > span::before { forced-color-adjust: none; background: CanvasText; }
+  .tab-bar button[aria-current="page"] { outline: 2px solid Highlight; }
+  .track-box.crossed { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
@@ -667,8 +1002,9 @@ details.inspire {
 }
 details.inspire > summary {
   color: var(--accent-text);
-  font-size: .82rem;
+  font-size: .86rem; text-transform: none; letter-spacing: 0; font-weight: 600;
 }
+details.inspire { border-left-color: var(--accent-soft); }
 details.inspire > summary::marker,
 details.inspire > summary::-webkit-details-marker {
   color: var(--accent-text);
@@ -723,56 +1059,104 @@ details.acc.group > summary .pill {
 }
 
 /* ---------- a phone on its side ---------------------------------------
-   Measured at 740x360: header + action bar + tab bar took 48% of the
-   viewport, leaving a 187px window to scroll five screens through. The
-   app header is the one piece of chrome that carries nothing you need
-   mid-scroll — brand, home and theme — so it stops being sticky and the
-   two bars that DO carry live state get shorter. The plot header stays
-   pinned: it is the Threshold, and it is the reason it exists. */
+   Measured at 740x360: header + action bar + tab bar once took 48% of the
+   viewport. The header is now ONE bar that carries the plot track — the
+   Threshold, which is the reason it exists — so it stays pinned, and all
+   three bars get shorter instead. */
 @media (orientation: landscape) and (max-height: 480px) {
   :root {
-    --hdr-h: 44px;
+    --hdr-h: 50px;
     --tabbar-h: 44px;
     --actionbar-h: 48px;
   }
-  .app-header { position: static; }
-  /* The count stays; the drawn track goes. In a 360px-tall window those 22px
-     are worth more than a second rendering of a number already on screen. */
-  .plot-header { top: 0; padding: .25rem .7rem; }
+  .app-header { padding-block: .15rem; }
+  /* The count stays; the drawn track goes. In a 360px-tall window those
+     pixels are worth more than a second rendering of a number on screen. */
   .plot-header .ph-mini { display: none; }
-  .tab-bar button { font-size: 0; gap: 0; }          /* icons only… */
-  .tab-bar button .ti { font-size: 1.15rem; }
-  .tab-bar button span:last-child {                   /* …the label stays for AT */
+  .plot-header { grid-template-areas: "name sec"; }
+  .tab-bar button { font-size: 0; gap: 0; flex-direction: row; }   /* icons only… */
+  .tab-bar button span:not(.ti):not(.badge) {                       /* …the label stays for AT */
     position: absolute; width: 1px; height: 1px; overflow: hidden;
     clip: rect(0 0 0 0); white-space: nowrap;
   }
-  .action-bar { padding: .3rem .7rem; }
+  .action-bar { padding: .3rem .9rem; }
   .explain > summary { min-height: 40px; }
+  .screen > .section-nav:first-child { position: static; }
 }
 
-/* ---------- desktop ----------------------------------------------------
-   A 720px column in a 1440px window, with a tab bar stretched the full
-   width beneath it. Cards flow two-up instead, and the tab bar's buttons
-   are held to the column while its background still spans the window. */
+/* ---------- desktop: a rail, a reading column -------------------------
+   At 1440px a bottom tab bar is a phone idiom stretched across a monitor.
+   The tabs stand up into a rail on the left, the header and action bar
+   start where the rail ends, and cards flow two-up in the column. */
 @media (min-width: 900px) {
+  :root { --rail-w: 208px; }
+  .app-header { margin-left: var(--rail-w); padding-inline: 1.2rem; }
+  .tab-bar {
+    top: 0; bottom: 0; right: auto; width: var(--rail-w);
+    flex-direction: column; gap: .2rem;
+    padding: calc(var(--hdr-h) + 1rem) .75rem 1rem;
+    border-top: none; border-right: 1px solid var(--rule);
+    box-shadow: 1px 0 0 var(--paper-2), 2px 0 0 var(--rule);
+  }
+  .tab-bar::before {
+    content: "Unfolding Machines"; position: absolute; top: 0; left: 0; right: 0;
+    height: var(--hdr-h); display: flex; align-items: center; padding-left: 1.15rem;
+    font-family: var(--serif); font-variant: small-caps; font-weight: 700; font-size: 1.05rem;
+    letter-spacing: .02em; color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+  }
+  .tab-bar button {
+    flex: none; flex-direction: row; justify-content: flex-start; gap: .65rem;
+    min-height: 46px; padding: .35rem .6rem; border-radius: var(--radius-sm);
+    font-size: .9rem; letter-spacing: .01em;
+  }
+  .tab-bar button:hover { background: var(--paper-sunk); color: var(--ink); }
+  .tab-bar button[aria-current="page"] { background: var(--accent-soft); color: var(--ink); }
+  .tab-bar button[aria-current="page"] .ti { background: var(--accent); color: var(--accent-ink); }
+  .tab-bar button[aria-current="page"]::before {
+    top: 10px; bottom: 10px; left: -.75rem; right: auto; width: 3px; height: auto;
+    border-radius: 0 3px 3px 0;
+  }
+  .tab-bar button .badge { top: 50%; right: .8rem; left: auto; transform: translateY(-50%); }
+  body.in-play .brand { display: none; }
+  .brand { text-align: left; }
+  .brand-name { display: none; }          /* the rail already carries it */
+  .brand-sub { font-family: var(--serif); font-size: .95rem; font-weight: 700; color: var(--ink); }
   .screen {
+    margin-left: calc(var(--rail-w) + max(0px, (100vw - var(--rail-w) - 1000px) / 2));
+    margin-right: auto;
     max-width: 1000px;
+    padding-inline: 1.5rem;
+    padding-top: 1.1rem;
+    padding-bottom: 2rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: start;
-    gap: 0 .8rem;
+    gap: 0 1rem;
   }
+  body.has-actionbar .screen { padding-bottom: calc(var(--actionbar-h) + 2rem); }
   /* Only cards pair up; headings, navs and empty states span the column. */
-  .screen > *:not(.card) { grid-column: 1 / -1; }
-  .action-bar { max-width: 1000px; }
-  .tab-bar { padding-inline: max(0px, calc((100% - 1000px) / 2)); }
+  .screen > *:not(.card), .screen > .coach-card, .screen > .notice { grid-column: 1 / -1; }
+  .screen > .coach-card { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.5rem; align-items: start; }
+  .screen > .coach-card > * { grid-column: 1; }
+  .screen > .coach-card > .card-head { grid-column: 1 / -1; }
+  .screen > .coach-card > .coach-steps, .screen > .coach-card > .coach-eg { grid-column: 2; }
+  .screen > .coach-card > .coach-steps { grid-row: 2 / span 3; margin-top: .3rem; }
+  .screen > .coach-card > .coach-eg { grid-row: 5; }
+  .section-nav { margin-inline: -1.5rem; padding-inline: 1.1rem; }
+  .action-bar-mount { left: var(--rail-w); bottom: 0; }
+  .action-bar { max-width: 1000px; padding-inline: 1.5rem; border: 1px solid var(--rule); border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0; }
+  .toast-mount { left: var(--rail-w); bottom: 1rem; }
+  body.has-actionbar .toast-mount { bottom: calc(var(--actionbar-h) + 1rem); }
+  h1 { font-size: 1.75rem; }
 }
 
 /* ---------- tutorial ---------------------------------------------------
    The guide renders from data-tutorial.js: paragraphs, UI paths, worked
    die examples, rationale notes and traps. */
 .tut-tap {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--mono);
   font-size: .8rem; color: var(--accent-text);
   /* paper-2, not paper-sunk: the accent reads 4.17 on the sunk tone and 4.93
      on the card tone, and the contrast gate says so. */
@@ -803,6 +1187,8 @@ details.acc.group > summary .pill {
 .file-preview img {
   display: block;
   max-width: 100%;
+  max-height: 55vh; object-fit: contain;
+  border-radius: var(--radius-sm);
   height: auto;
   border: 1px solid var(--rule);
   background: var(--paper-2);

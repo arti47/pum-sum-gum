@@ -54,7 +54,7 @@ export function applyTheme() {
   if (meta) {
     const dark = t === "dark"
       || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    meta.setAttribute("content", dark ? "#14161d" : "#f7f1e3");
+    meta.setAttribute("content", dark ? "#1c1f28" : "#fffaf0");   // the header bar, which the status bar sits on
   }
 }
 

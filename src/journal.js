@@ -4,7 +4,7 @@
 import { el, add, fmtTime, fmtDay } from "./core.js";
 import { explain, promptModal, confirmModal, toast, emptyState, actionBar } from "./ui.js";
 import * as store from "./store.js";
-import { sectionNav, render, go } from "./router.js";
+import { sectionNav, render, go, keepCurrentInView } from "./router.js";
 import { openRule } from "./screens.js";
 import { registerClearer } from "./viewstate.js";
 import { filePreview, chooseFile } from "./files.js";
@@ -55,6 +55,7 @@ function renderEntries(host, game) {
     }, label));
   }
   add(host, row);
+  keepCurrentInView(row);
 
   const all = game.journal.filter((e) => filter === "all"
     || e.kind === filter
@@ -120,7 +121,7 @@ function renderEntries(host, game) {
 }
 
 function entryEl(e) {
-  const wrap = el("div", { class: "entry" });
+  const wrap = el("div", { class: "entry jentry" });
   add(wrap, el("div", { class: "entry-head" },
     el("span", { class: "entry-kind", text: e.kind }),
     el("span", { class: "entry-ts", text: fmtTime(e.ts) })

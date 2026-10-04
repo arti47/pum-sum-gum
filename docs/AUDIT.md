@@ -1812,3 +1812,42 @@ the blob has to come back out of IndexedDB, and asserts that removing it empties
 defaults to the row count, the roll journals with its die, and My tables is still there with GUM
 switched off. Broken on purpose in two places — the blob write, and the numbering strip — and
 three assertions failed before they were trusted.
+
+---
+
+## The printed sheet, refined — six rounds aimed at UX, UI and finish
+
+No content and no rule changed: every string, table and data file is untouched, and every
+Permission that was a control is still a control. Measured before anything moved — ~290px of
+chrome on a 390×844 phone, and an open "What this does" note pushing each screen's controls a
+further 250-400px down.
+
+**F-76 · Two sticky bars where one would do.** *Target:* `index.html`, `router.renderPlotHeader`.
+*Fix:* the plot header moves into the app header and takes the brand's slot in play
+(`body.in-play`). *Why:* the brand carries nothing you need mid-scene; the track carries the stakes.
+
+**F-77 · Section strips spent the primary colour on navigation, and hid their far end.**
+*Fix:* index tabs with an accent rule; sticky; the current section scrolled into view; the ends
+faded when more is off-screen (`router.keepCurrentInView`).
+
+**F-78 · Notes open in full on every screen.** *Fix:* first paragraph clamped to three lines,
+the rest one tap away (**More**); the Phase 11 open-until-closed rule is untouched, and the full
+text stays in the document. *Guard:* novice, guide and reach audits read the same words as before.
+
+**F-79 · Several orange fills per screen.** *Fix:* where the action bar pins the call, in-page
+primaries are tinted; radio-like groups become a segmented control with an inked, ticked choice.
+The granular likelihood bands gain the `aria-pressed` they lacked.
+
+**F-80 · `scroll-behavior: smooth` on a strip made off-screen sections unclickable.**
+*Found by:* the interaction audit, round 2 — five Settings-strip controls timed out while the
+strip animated to reveal them. *Fix:* removed; the current-section scroll is instant.
+
+**F-81 · Desktop was a phone layout stretched.** *Fix:* the tabs stand up into a left rail; the
+coach card spans both columns. *Guard:* the smoke desktop pass now asserts the rail, replacing the
+check that held a bottom tab bar to the column.
+
+**Verified clean in this pass:** contrast in both themes (the gate measures painted backgrounds,
+and the paper grain sits above the page without changing one); every tap target ≥40px including
+the new **More**; landscape chrome under 45%; the playtest spine on seeds 7, 23 and 101 reaches an
+ending with 0 stalls (its one note — the empty *Choose from…* dialog offering only Cancel — is
+the already-recorded content finding, left as it was).

@@ -13,7 +13,7 @@ import * as store from "./store.js";
 import { rollGum, rollGumSet, journalRoll, diceText } from "./roller.js";
 import { gumTable, gumSection } from "./rules.js";
 import { nodeSlots, categoryName } from "./derived.js";
-import { render, go } from "./router.js";
+import { render, go, keepCurrentInView } from "./router.js";
 import { Settings } from "./settings.js";
 import { openRule } from "./screens.js";
 // Prep is where a plot seed belongs, so the Forge has to be able to start it.
@@ -62,6 +62,7 @@ export function renderForge(host) {
     }, label));
   }
   add(host, nav);
+  keepCurrentInView(nav);
 
   if (forgeSection === "seed") return renderSeed(host);
   if (forgeSection === "grand") return renderGrand(host);

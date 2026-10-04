@@ -196,14 +196,31 @@ export function registerExplainDecorator(fn) { explainDecorator = fn; }
 export function explain(text, ruleId = null, onRuleLink = null) {
   const body = el("div", { class: "body" });
   const paras = Array.isArray(text) ? text : [text];
-  for (const p of paras) add(body, el("p", { text: p }));
+  // Open, the note leads with its first lines and holds the rest one tap away:
+  // a note that is fully open on every screen pushed every screen's controls
+  // 250-400px down. The words are all still here, in the document and for
+  // assistive tech; only the painted height is clamped.
+  const words = el("div", { class: "ex-text" });
+  for (const p of paras) add(words, el("p", { text: p }));
+  add(body, words);
+  const foot = el("div", { class: "ex-foot" });
+  if (paras.join(" ").length > 170) {
+    add(foot, el("button", {
+      class: "ex-more", type: "button",
+      "aria-label": "Show the whole note",
+      onclick: (e) => { words.classList.add("full"); e.currentTarget.remove(); },
+    }, "More"));
+  } else {
+    words.classList.add("full");
+  }
   if (ruleId && onRuleLink) {
-    add(body, el("button", {
+    add(foot, el("button", {
       class: "btn small ghost",
       onclick: () => onRuleLink(ruleId),
     }, "Read the rule →"));
   }
-  if (explainDecorator) add(body, explainDecorator(paras.join(" ")));
+  if (explainDecorator) add(foot, explainDecorator(paras.join(" ")));
+  if (foot.childNodes.length) add(body, foot);
   const open = explainState ? explainState.isOpen() : false;
   const d = el("details", { class: "explain" },
     el("summary", null, "What this does"),

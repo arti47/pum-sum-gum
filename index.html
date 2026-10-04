@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#f7f1e3">
+<meta name="theme-color" content="#fffaf0">
 <meta name="description" content="A solo play aid for the Plot Unfolding Machine and Scene Unfolding Machine.">
 <title>Unfolding Machines</title>
 <link rel="manifest" href="manifest.json">
@@ -22,13 +22,14 @@
       <span class="brand-name">Unfolding Machines</span>
       <span class="brand-sub" id="brand-sub">PUM v9 · SUM v8</span>
     </div>
+    <!-- Persistent plot header: the game's Threshold, visible on every in-play
+         screen. It takes the brand's place in the one sticky bar rather than
+         stacking a second bar under it. -->
+    <div class="plot-header" id="plot-header" hidden></div>
     <button class="hdr-btn" id="btn-theme" aria-label="Switch theme" title="Switch theme">
       <span aria-hidden="true">◐</span>
     </button>
   </header>
-
-  <!-- Persistent plot header: the game's Threshold, visible on every in-play screen -->
-  <div class="plot-header" id="plot-header" hidden></div>
 
   <main id="screen" class="screen" tabindex="-1"></main>
 

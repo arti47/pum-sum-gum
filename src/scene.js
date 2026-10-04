@@ -235,7 +235,7 @@ function biasCard() {
     el("span", { class: "cite", text: "SUM p.3" })
   ));
   add(card, el("p", { class: "muted", text: BIAS_NOTE }));
-  const row = el("div", { class: "btn-row" });
+  const row = el("div", { class: "btn-row seg", role: "group", "aria-label": "Rule of Bias" });
   const opts = [
     ["none", "Neutral — roll once"],
     ["low", "Favourable — keep lowest"],

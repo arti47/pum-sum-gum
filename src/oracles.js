@@ -116,10 +116,11 @@ function renderGranular(host) {
     ));
   }
 
-  const bandRow = el("div", { class: "btn-grid" });
+  const bandRow = el("div", { class: "btn-grid seg-grid" });
   for (const b of granularBands()) {
     add(bandRow, el("button", {
       class: `btn small ${grBand === b ? "primary" : ""}`.trim(),
+      "aria-pressed": grBand === b ? "true" : "false",
       onclick: () => { grBand = b; render(); },
     }, b));
   }
