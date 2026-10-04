@@ -124,6 +124,7 @@ export function createGame(data) {
       mission: data.mission || "",
       sheetId: data.sheetId || "standard",
       startingPoint: data.startingPoint || "",
+      notes: data.gameNotes || "",   // prep calls it Game notes, as the plot sheet does
       customNames: data.customNames || {},
       nodes: data.nodes || {},
     })],

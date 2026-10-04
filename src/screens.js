@@ -860,7 +860,7 @@ function mdScope(game, scope, index, out) {
     if (filled.length) nodes.push(`- **${categoryName(scope, cat.id)}** ${DASH} ${filled.join(" · ")}`);
   }
   if (nodes.length) out.push("**Plot nodes**", "", ...nodes, "");
-  field("Notes", scope.notes, out);
+  field("Game notes", scope.notes, out);
 
   const entries = game.journal.filter((e) => e.scopeId === scope.id).slice().reverse();
   // The epilogue is written when the player is ready, which is not always last

@@ -48,7 +48,7 @@ export function startWizard(after = null, parts = null) {
   filled = null;
   draft = {
     title: "", universe: "", tone: "", inspiration: "",
-    scopeName: "", mission: "", startingPoint: "",
+    scopeName: "", mission: "", startingPoint: "", gameNotes: "",
     protagonists: [],
     sheetId: "standard",
     customNames: { custom1: "", custom2: "" },
@@ -61,11 +61,13 @@ export function startWizard(after = null, parts = null) {
 }
 
 // Put each rolled line where it belongs, rather than asking which field it is
-// for. GUM's plot seed (p.3) answers the scope step: its mission line is the
-// mission, its hook is how the story opens, and the rest — motivation, lead,
-// caveat, opposition — is the mission's working notes. A table that serves the
-// game's tone goes to the tone; anything else is inspiration. Appended, never
-// substituted for what the player already wrote.
+// for. GUM's plot seed (p.3) answers the scope step, one line per place: the
+// mission line is the Mission and nothing else (reported from play: "why does
+// mission have the whole lump of data dumped inside"); the hook and the first
+// lead are how the story opens, so they are the Starting point; motivation,
+// caveat and opposition are background the player keeps in the plot sheet's
+// Game notes. A table that serves the game's tone goes to the tone; anything
+// else is inspiration. Appended, never substituted for what was written.
 const LINE_NAMES = {
   "plot-hook": "Hook", motivation: "Motivation", mission: "Mission",
   "initial-lead": "First lead", caveat: "Caveat", opposition: "Opposition",
@@ -80,11 +82,10 @@ function applyRoll(parts, from) {
   };
   const keys = new Set();
   const by = Object.fromEntries(parts.map((p) => [p.tableId, p]));
+  const lines = (ids) => ids.filter((id) => by[id]).map((id) => `${LINE_NAMES[id]}: ${by[id].answer}`).join("\n");
   if (by.mission) add("mission", by.mission.answer);
-  const notes = GUM_PLOT_SEED.filter((id) => id !== "mission" && id !== "plot-hook" && by[id])
-    .map((id) => `${LINE_NAMES[id]}: ${by[id].answer}`);
-  if (notes.length) add("mission", notes.join("\n"));
-  if (by["plot-hook"]) add("startingPoint", by["plot-hook"].answer);
+  add("startingPoint", lines(["plot-hook", "initial-lead"]));
+  add("gameNotes", lines(["motivation", "caveat", "opposition"]));
   for (const p of parts) {
     if (GUM_PLOT_SEED.includes(p.tableId)) continue;
     add(GUM_FOR_FIELDS["game-tone"].includes(p.tableId) ? "tone" : "inspiration", p.answer);
@@ -150,9 +151,9 @@ function legalNow() {
 function filledNote() {
   if (!filled || !filled.fields.size) return null;
   const names = { title: "Name this game", universe: "Universe or RPG", tone: "World, tone and theme",
-    inspiration: "Inspiration", mission: "Mission", startingPoint: "Starting point" };
+    inspiration: "Inspiration", mission: "Mission", startingPoint: "Starting point", gameNotes: "Game notes" };
   const where = [...filled.fields].map((k) => names[k] || k);
-  const onScope = [...filled.fields].some((k) => k === "mission" || k === "startingPoint");
+  const onScope = [...filled.fields].some((k) => k === "mission" || k === "startingPoint" || k === "gameNotes");
   return el("div", { class: "coach wz-filled" },
     el("strong", { text: `Filled from ${filled.from}: ` }),
     `${where.join(", ")}${onScope && step !== 1 ? " (step 2)" : ""}. Read it, change anything, keep what fits.`,
@@ -165,7 +166,7 @@ function filledNote() {
 function suggestCard() {
   if (!Settings.gum()) return null;
   const card = el("div", { class: "card wz-suggest" });
-  add(card, el("p", { class: "muted", text: "No story in mind yet? GUM can roll one: a hook, a motivation, a mission, a first lead, a caveat and the opposition — written into the mission and starting point below for you to edit." }));
+  add(card, el("p", { class: "muted", text: "No story in mind yet? GUM can roll one: a hook, a motivation, a mission, a first lead, a caveat and the opposition — each written into the field it belongs to below, for you to edit." }));
   add(card, el("button", {
     class: "btn wide",
     onclick: () => {
@@ -262,6 +263,20 @@ function stepScope(host) {
     placeholder: "Where does this open, and what is introduced there?",
     hint: "Optional now — the home screen will keep asking until it's written. Consider starting in medias res.",
   }));
+  // The plot sheet's Game notes area (the printed node sheets carry one), here
+  // so background the player wants kept has a home that is not the Mission.
+  // Folded: it is optional, and opens by itself once anything is in it.
+  const more = el("details", { class: "acc wz-more" }, el("summary", null, "Game notes (optional)"));
+  if (draft.gameNotes) more.open = true;
+  const body = el("div", { class: "acc-body" });
+  // no-inspire: the suggestion card above writes the plot seed's background lines here.
+  add(body, field("Game notes", "gameNotes", {
+    multiline: true,
+    placeholder: "Who wants what, what could go wrong, who stands in the way…",
+    hint: "Background to keep beside the plot sheet. You will find it under This scope on the Play tab.",
+  }));
+  add(more, body);
+  add(card, more);
   add(host, card);
 }
 

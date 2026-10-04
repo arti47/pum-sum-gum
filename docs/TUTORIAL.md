@@ -211,7 +211,7 @@ This step asks two things about it, and they are not the same thing. The NAME is
 - Mission — a pitch for the situation you start in, and the PCs' initial goals.
 - Starting point — where this opens and what is introduced there. Optional now; the Home screen keeps asking until it is written.
 
-> **Why.** No story in mind? Suggest a starting situation, at the top of this step, rolls GUM's plot seed — a hook, a motivation, a mission, a first lead, a caveat and the opposition — and writes each line where it belongs: the mission line into Mission, the rest beneath it as labelled notes, and the hook into Starting point. The fields it filled are marked, the dice are shown, and nothing you already typed is replaced. Roll it again and the new lines are added after the old.
+> **Why.** No story in mind? Suggest a starting situation, at the top of this step, rolls GUM's plot seed — a hook, a motivation, a mission, a first lead, a caveat and the opposition — and writes each line where it belongs: the mission line alone into Mission; the hook and the first lead into Starting point; motivation, caveat and opposition into Game notes, folded at the foot of the step, which become the plot sheet's Game notes under This scope. The fields it filled are marked, the dice are shown, and nothing you already typed is replaced. Roll it again and the new lines are added after the old.
 
 Step 3 · Protagonists. Your PCs are your eyes and ears. You are in full control of their thoughts, voice and actions — PUM never rolls for them, ever. At least one is required. The name is yours; the notes field beside it is where a rolled GUM archetype lands, because a concept does not belong in a name box.
 
@@ -459,7 +459,7 @@ Forty-three tables in four sections, for prep and for the moment a blank stops y
 
 'Keep it →' is what stops a good roll evaporating. Write it into any plot node list, add it as a protagonist or a cast entry, keep it in the journal — or, folded under 'Into this game's setting or plot sheet', add it to the universe, the tone, the game's inspiration, the plot sheet's mission, the starting point, or the game notes. Everything appends; nothing replaces what you already wrote.
 
-With no game open — which is when a plot seed is most useful, since GUM is a prep tool — 'Prepare a game with this' carries the roll into the wizard and writes each line into the field it belongs to: mission, starting point, tone or inspiration. A line at the top says which fields were filled; edit them like anything else you typed.
+With no game open — which is when a plot seed is most useful, since GUM is a prep tool — 'Prepare a game with this' carries the roll into the wizard and writes each line into the field it belongs to: mission, starting point, game notes, tone or inspiration. A line at the top says which fields were filled; edit them like anything else you typed.
 
 ### Three words beside a blank
 
@@ -810,7 +810,7 @@ Forge (hidden when GUM is off)
 - Keep this → Write into <list> · Add as a protagonist · Add to the cast as a character · Add to the cast as a location · Just keep it in the journal.
 - Keep this, folded under 'Into this game's setting or plot sheet' → Add to the universe · Add to the world, tone and theme · Add to the game's inspiration · Add to this plot sheet's mission · Add to the starting point · Add to the game notes. Every one appends; none replaces what you wrote.
 - Keep this with no game open → Prepare a game with this, or Take it back to prep if you are already mid-way through it. Either way each line is written into the field it belongs to, and the fields it filled are marked.
-- Suggest a starting situation (prep step 2) → rolls GUM's plot seed into Mission and Starting point, without leaving prep.
+- Suggest a starting situation (prep step 2) → rolls GUM's plot seed into Mission, Starting point and Game notes, without leaving prep.
 - Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.
 - The coach card at the top of the Play tab — a heading saying where you are, a sentence of what is true, and one Next line. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.
 - Beside it, at some stages only: Ask an oracle · Call a plot beat · Write it down · Read the whole story.

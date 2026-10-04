@@ -1470,7 +1470,6 @@ body {
 .wz-was-filled textarea, .wz-was-filled input { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .wz-was-filled .lbl::after { content: "  \2022 filled for you"; color: var(--accent-text); text-transform: none; letter-spacing: 0; }
 .wz-filled .cite { margin-top: .25rem; }
-.wz-was-filled textarea { min-height: 9rem; }
 details.acc.wz-more { border-bottom: none; border-top: 1px dotted var(--rule-2); margin-top: .3rem; }
 details.acc.wz-more > summary { font-family: var(--sans); font-size: .88rem; color: var(--accent-text); }
 .wz-suggest { border-style: dashed; }
