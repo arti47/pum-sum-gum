@@ -55,8 +55,7 @@ const STATES = [
 
 const ROUTES = [
   ["play", "track"], ["play", "nodes"], ["play", "cast"],
-  ["scene", "arc"], ["scene", "explore"], ["scene", "battle"],
-  ["scene", "discovery"], ["scene", "people"],
+  ["scene", "arc"], ["scene", "sum"],
   ["oracles", "yesno"], ["oracles", "descriptive"], ["oracles", "story"],
   ["oracles", "granular"], ["oracles", "quantifiers"],
   ["journal", "entries"], ["journal", "dice"],
@@ -253,7 +252,7 @@ if (chipWorks !== true) finding(`glossary chip · ${chipWorks}`);
 const ROLLING = [
   ["oracles", "yesno"], ["oracles", "descriptive"], ["oracles", "story"],
   ["oracles", "granular"], ["oracles", "quantifiers"],
-  ["scene", "explore"], ["scene", "battle"], ["scene", "discovery"], ["scene", "people"],
+  ["scene", "sum"],
   ["more", "forge"],
 ];
 for (const [tab, section] of ROLLING) {

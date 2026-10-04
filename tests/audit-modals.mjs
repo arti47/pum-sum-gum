@@ -13,7 +13,7 @@ const MID = JSON.parse(readFileSync(join(root, "tests/fixtures/mid-session.json"
 
 const ROUTES = [
   ["play", "track"], ["play", "nodes"], ["play", "cast"],
-  ["scene", "arc"], ["scene", "explore"], ["scene", "people"],
+  ["scene", "arc"], ["scene", "sum"],
   ["oracles", "yesno"], ["oracles", "granular"],
   ["more", "forge"],
   ["journal", "entries"], ["journal", "dice"],

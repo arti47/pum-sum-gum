@@ -62,7 +62,7 @@ export const QUICK_START = [
     title: "5 · Open a scene",
     why: "SUM's scene opener exists for the moment you know a scene should happen but not how it begins. It is a d20 that tells you what to describe first.",
     act: "Scene → Roll a scene opener. If you already know how it opens, use 'Open it myself' — you never have to roll.",
-    to: { label: "Scene arc", go: ["scene", "arc"] },
+    to: { label: "This scene", go: ["scene", "arc"] },
   },
   {
     title: "6 · Roleplay, and ask when you don't know",
@@ -90,7 +90,7 @@ export const QUICK_START = [
     title: "10 · Close the scene",
     why: "SUM's closure asks how the world responds — fortunately or unfortunately — and hands you the hook into what comes next.",
     act: "Scene → Roll a scene closure. You get a summary of what changed, and a one-step undo if you closed it by mistake.",
-    to: { label: "Scene arc", go: ["scene", "arc"] },
+    to: { label: "This scene", go: ["scene", "arc"] },
   },
   {
     title: "11 · Read it back",
@@ -279,7 +279,7 @@ const WALKTHROUGH = [
     id: "scene-open",
     title: "Opening a scene",
     blocks: [
-      { tap: "Scene → Scene arc → Roll a scene opener" },
+      { tap: "Scene → This scene → Roll a scene opener" },
       { p: "SUM's opener is for the exact moment you know a scene should happen but not how it starts. It is a d20 that tells you what to describe first." },
       { roll: { what: "Scene opener", die: "d20", value: 14, result: "Describe a sensory effect — smells, sounds, or feeling", page: "SUM p.4",
         then: "So the scene does not open on the door, or the guard, or the plan. It opens on the smell of wet ash in the stairwell. What the opener is doing is stopping you writing the same establishing shot every time." } },
@@ -425,16 +425,17 @@ WALKTHROUGH.push(
     id: "scene-run",
     title: "Running and closing the scene",
     blocks: [
-      { tap: "Scene → Scene arc" },
+      { tap: "Scene → This scene" },
       { p: "Intervention check — roll it when the PCs are taking too long, tension is high, danger is near, or silence lingers. It is a d100, and it is SUM asking whether the world does something while you deliberate." },
       { roll: { what: "Intervention check", die: "d100", value: 40, result: "Places an element of interest behind a challenge", page: "SUM p.4",
         then: "Not an attack. The thing they want is now on the far side of something — which is more useful than another fight, and is the sort of answer you would not have written yourself at 11pm." } },
-      { p: "The Rule of Bias sits above the roll: Neutral rolls once, Favourable rolls twice and keeps the lowest, Trouble rolls twice and keeps the highest. Declare it before you roll. The result card shows both dice and marks the one it kept." },
+      { p: "The Rule of Bias is one row of three choices just above the roll it changes — Neutral rolls once, Favourable rolls twice and keeps the lowest, Trouble rolls twice and keeps the highest — with a line beneath saying what the chosen one does. Declare it before you roll. The result card shows both dice and marks the one it kept." },
       { warn: "This is not PUM's bias rule. PUM's hands you both answers and lets you choose; SUM's keeps the die for you according to what you declared. The app implements them separately and deliberately — conflating them would hand your authorship to the machine." },
       { p: "Scene closure — a d20 asking how the world responds, fortunately or unfortunately, and handing you the hook into what comes next. Closing summarises what changed: how long the scene ran, how many interventions fired, what was written. One Undo puts the whole thing back." },
       { roll: { what: "Scene closure", die: "d20", value: 18, result: "That was a bad move — now things get much harder", page: "SUM p.4",
         then: "High roll, so trouble — the ordering again. Close on this and you know what the next scene opens into, which is exactly what a closure is for." } },
-      { p: "The Scene tab also carries SUM's situation tables, three to a screen: Exploration (location features, core challenge, challenge conditions), Battle (terrain, enemy tactics, enemy composition), Discovery (type of clue, revealing finding, opposition activity). Each screen pins its first table as the primary action, and every table can be opened in full to read." },
+      { tap: "Scene → Roll a table" },
+      { p: "The Scene tab's second screen carries SUM's situation tables. Pick what the scene is doing — Exploring (location features, core challenge, challenge conditions), Fighting (terrain, enemy tactics, enemy composition), Discovering (type of clue, revealing finding, opposition activity) or Meeting someone (the twelve character tables, in four depths) — and its tables are listed one to a row, each with its die and a Roll button. The result appears under the row that rolled it; the first table is pinned as the primary action, and every table can be opened in full to read. While a scene is open, This scene links here with Roll a SUM table." },
     ],
   },
   {
@@ -528,7 +529,7 @@ const SCENARIOS = [
       { p: "Scene one. Opener rolled rather than written, because you know a scene starts here but not how:" },
       { roll: { what: "Scene opener", die: "d20", value: 14, result: "Describe a sensory effect — smells, sounds, or feeling", page: "SUM p.4",
         then: "Cold to the sternum, and the sound of the water finding a new way in somewhere below you. Not the doorway you would have described." } },
-      { p: "You explore. On the Scene tab, Exploration gives three tables; declare Trouble first, because you expect this place to be hostile — that is SUM's Rule of Bias, and it keeps the higher of two d20s." },
+      { p: "You explore. On the Scene tab, Roll a table → Exploring gives three tables; declare Trouble first, because you expect this place to be hostile — that is SUM's Rule of Bias, and it keeps the higher of two d20s." },
       { roll: { what: "Location features · bias high", die: "2d20 → 12", result: "Being watched or protected by an unseen entity", page: "SUM p.5",
         then: "Something is already down here — which is a node you wrote, arriving without a prompt asking for it. That is allowed and common: SUM's tables and PUM's nodes will agree with each other more often than chance suggests, because you wrote the nodes about this place." } },
 
@@ -732,11 +733,11 @@ const REFERENCE = [
     title: "Scene",
     blocks: [
       { bullets: [
-        "Scene arc — the Rule of Bias as three buttons: Neutral — roll once / Favourable — keep lowest / Trouble — keep highest · Roll a scene opener · Open it myself · Roll an intervention check · Roll a scene closure. While a scene runs the pinned action becomes Intervention check with Close beside it.",
+        "This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), Roll an intervention check · Roll a scene closure. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action becomes Intervention check with Close beside it.",
         "Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.",
-        "While the scene runs: Call a plot beat · Ask an oracle · Who is here?",
-        "Exploration · Battle · Discovery — three SUM tables each, the first pinned as the primary, each with the whole table readable in a fold.",
-        "Characters — the twelve character tables grouped by depth, and Go to the cast →.",
+        "While it runs: Call a plot beat · Ask an oracle · Who is here? · Roll a SUM table.",
+        "Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.",
+        "Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.",
         "Every result card: Re-roll · Dismiss.",
       ] },
     ],

@@ -1050,10 +1050,7 @@ body[data-tab="more"]    { --vignette: var(--art-more); }
 body[data-section="nodes"]       { --vignette: var(--art-list); }
 body[data-section="cast"]        { --vignette: var(--art-busts); }
 body[data-section="files"]       { --vignette: var(--art-folder); }
-body[data-section="explore"]     { --vignette: var(--art-map); }
-body[data-section="battle"]      { --vignette: var(--art-swords); }
-body[data-section="discovery"]   { --vignette: var(--art-lens); }
-body[data-section="people"]      { --vignette: var(--art-busts); }
+body[data-tab="scene"][data-section="sum"] { --vignette: var(--art-dice); }
 body[data-section="descriptive"] { --vignette: var(--art-quill); }
 body[data-section="story"]       { --vignette: var(--art-tutorial); }
 body[data-section="granular"]    { --vignette: var(--art-scales); }
@@ -1386,25 +1383,6 @@ body {
 .entry.person[data-kind="protagonist"]::after { background: var(--accent-text); }
 
 
-/* The scene arc drawn as one path: three stations on a dotted line, the one
-   reached filled in. On a phone the cards stack, so the path runs down them. */
-@media (max-width: 899px) {
-  .arc-step { margin-left: 1.6rem; }
-  .arc-step::before {
-    content: attr(data-step); position: absolute; left: -1.75rem; top: .8rem;
-    width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
-    font-family: var(--serif); font-size: .78rem; font-weight: 700;
-    background: var(--paper); color: var(--accent-text); border: 1.5px solid var(--accent-text);
-    z-index: 1;
-  }
-  .arc-step.reached::before { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-  .arc-step[data-step="1"]::after, .arc-step[data-step="2"]::after {
-    content: ""; position: absolute; left: calc(-1.75rem + .7rem - 1px);
-    top: 2.3rem; bottom: calc(-.85rem - .8rem);
-    border-left: 2px dotted var(--rule-2); pointer-events: none;
-  }
-}
-
 /* The active plot sheet on Home is sealed in wax. */
 .scope-list .pill.on {
   background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
@@ -1438,7 +1416,7 @@ body {
   .screen {
     max-width: 860px; display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 0 .9rem;
   }
-  .screen > *:not(.card), .screen > .coach-card, .screen > .notice, .screen > .arc-step,
+  .screen > *:not(.card), .screen > .coach-card, .screen > .notice, .screen > .arc-path,
   .screen > .result, .screen > .cover, .screen > .track-card { grid-column: 1 / -1; }
   .action-bar { max-width: 860px; }
 }
@@ -1454,8 +1432,6 @@ body {
     -webkit-mask: var(--art-fleuron) center / contain no-repeat; mask: var(--art-fleuron) center / contain no-repeat;
   }
   .app-header .plot-header { flex: 0 1 auto; text-align: center; }
-  .arc-step { margin-left: 0; }
-  .arc-step::before, .arc-step::after { display: none; }
 }
 
 
@@ -1684,3 +1660,75 @@ details.acc.group > summary .pill {
   background: var(--paper-2);
 }
 .file-preview audio { width: 100%; margin-top: .2rem; }
+
+/* The Scene tab. The arc is a stepper above the one card that is the scene:
+   three stations on a rule, the ones passed inked, the current one ringed. */
+.arc-path {
+  list-style: none; margin: 0 0 .7rem; padding: 0; display: flex; align-items: center;
+  font-family: var(--sans); font-size: .8rem; font-weight: 600; color: var(--ink-3);
+  counter-reset: arc;
+}
+.arc-path li { display: flex; align-items: center; gap: .35rem; flex: 0 0 auto; white-space: nowrap; counter-increment: arc; }
+.arc-path li:not(:last-child) { flex: 1 1 auto; }
+.arc-path li:not(:last-child)::after {
+  content: ""; flex: 1 1 auto; border-top: 2px dotted var(--rule-2); margin: 0 .4rem;
+}
+.arc-path li::before {
+  content: counter(arc); flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  display: grid; place-items: center; font-family: var(--serif); font-size: .78rem;
+  border: 1.5px solid var(--rule-2); background: var(--paper);
+}
+.arc-path li.done { color: var(--ink); }
+.arc-path li.done::before { content: "\2713"; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.arc-path li.done:not(:last-child)::after { border-top-style: solid; border-color: var(--accent); }
+.arc-path li.here { color: var(--accent-text); }
+.arc-path li.here::before { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-soft); }
+.scene-card .scene-opener { font-family: var(--serif); font-size: 1.08rem; margin: .2rem 0 .6rem; }
+.scene-card h3 { margin-top: .6rem; }
+.scene-card > .btn-row { margin-top: .4rem; }
+.scene-links { display: flex; flex-direction: column; gap: .2rem; margin: .2rem 0 1rem; }
+.scene-links .btn-row > .btn { flex: 0 1 auto; }
+
+/* The Rule of Bias as one row above the roll it modifies. */
+.bias-row { margin: .5rem 0 .6rem; }
+.bias-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; margin-bottom: .3rem; }
+.bias-head .label { font-family: var(--sans); font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+.bias-row > .cite { margin: .3rem 0 0; }
+.seg.seg-inline { flex-direction: row; }
+.seg.seg-inline > .btn { margin-top: 0; margin-left: -1px; justify-content: center; flex: 1 1 0; min-width: 0; padding-inline: .25rem; font-size: .78rem; overflow-wrap: normal; letter-spacing: 0; }
+.seg.seg-inline > .btn:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); margin-left: 0; }
+.seg.seg-inline > .btn:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.seg.seg-inline > .btn[aria-pressed="true"]::before { content: none; }
+
+/* The situation picker and the list of tables it chooses. */
+.sit-row { margin: 0 0 .7rem; }
+.sit-row > .btn { flex: 1 1 40%; white-space: nowrap; }
+/* The title's engraving follows the situation picked. */
+#screen h1[data-situation="explore"] { --vignette: var(--art-map); }
+#screen h1[data-situation="battle"] { --vignette: var(--art-swords); }
+#screen h1[data-situation="discovery"] { --vignette: var(--art-lens); }
+#screen h1[data-situation="people"] { --vignette: var(--art-busts); }
+.sum-depth > summary { font-family: var(--serif); }
+.sum-depth > summary .cite { margin-left: auto; font-weight: 400; white-space: nowrap; }
+.sum-depth[open] { padding-bottom: .2rem; }
+.sum-row { padding: .6rem 0; border-bottom: 1px solid var(--rule); }
+.sum-row:last-child { border-bottom: none; }
+.sum-row-head { display: flex; align-items: center; gap: .6rem; }
+.sum-row-text { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: .1rem; }
+.sum-row-text strong { font-family: var(--sans); font-size: .95rem; }
+.sum-row-text .muted { font-size: .85rem; line-height: 1.35; }
+.sum-row-head .btn { flex: none; min-width: 64px; }
+.sum-row > .result { margin: .6rem 0 .2rem; }
+.rows-fold { margin: .3rem 0 0; }
+.rows-fold > summary {
+  cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: .35rem;
+  min-height: 40px; font-family: var(--sans); font-size: .78rem; font-weight: 600; color: var(--accent-text);
+}
+.rows-fold > summary::-webkit-details-marker { display: none; }
+.rows-fold > summary::after {
+  content: ""; width: .4rem; height: .4rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px); transition: transform .15s ease;
+}
+.rows-fold[open] > summary::after { transform: rotate(-135deg) translateY(-1px); }
+.rows-fold > .body { margin-top: .3rem; }
+@media print { .arc-path { display: none; } }

@@ -19,8 +19,7 @@ const ROUTES = [
   ["more", "forge"],
   ["oracles", "yesno"], ["oracles", "descriptive"], ["oracles", "story"],
   ["oracles", "granular"], ["oracles", "quantifiers"],
-  ["scene", "arc"], ["scene", "explore"], ["scene", "battle"],
-  ["scene", "discovery"], ["scene", "people"],
+  ["scene", "arc"], ["scene", "sum"],
   ["journal", "entries"], ["journal", "dice"],
   ["more", "home"], ["more", "library"], ["more", "tutorial"], ["more", "settings"],
 ];

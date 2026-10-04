@@ -23,8 +23,7 @@ const tut = await import(join(root, "data-tutorial.js"));
 
 const ROUTES = [
   ["play", "track"], ["play", "nodes"], ["play", "cast"],
-  ["scene", "arc"], ["scene", "explore"], ["scene", "battle"],
-  ["scene", "discovery"], ["scene", "people"],
+  ["scene", "arc"], ["scene", "sum"],
   ["oracles", "yesno"], ["oracles", "descriptive"], ["oracles", "story"],
   ["oracles", "granular"], ["oracles", "quantifiers"],
   ["journal", "entries"], ["journal", "dice"],

@@ -244,7 +244,7 @@ The pinned bar at the foot carries the primary action — Random prompt — with
 
 ### Opening a scene
 
-`Scene → Scene arc → Roll a scene opener`
+`Scene → This scene → Roll a scene opener`
 
 SUM's opener is for the exact moment you know a scene should happen but not how it starts. It is a d20 that tells you what to describe first.
 
@@ -403,7 +403,7 @@ Open any character and SUM's twelve character tables are there, in four depths o
 
 ### Running and closing the scene
 
-`Scene → Scene arc`
+`Scene → This scene`
 
 Intervention check — roll it when the PCs are taking too long, tension is high, danger is near, or silence lingers. It is a d100, and it is SUM asking whether the world does something while you deliberate.
 
@@ -412,7 +412,7 @@ Intervention check — roll it when the PCs are taking too long, tension is high
 >
 > Not an attack. The thing they want is now on the far side of something — which is more useful than another fight, and is the sort of answer you would not have written yourself at 11pm.
 
-The Rule of Bias sits above the roll: Neutral rolls once, Favourable rolls twice and keeps the lowest, Trouble rolls twice and keeps the highest. Declare it before you roll. The result card shows both dice and marks the one it kept.
+The Rule of Bias is one row of three choices just above the roll it changes — Neutral rolls once, Favourable rolls twice and keeps the lowest, Trouble rolls twice and keeps the highest — with a line beneath saying what the chosen one does. Declare it before you roll. The result card shows both dice and marks the one it kept.
 
 > **Watch out.** This is not PUM's bias rule. PUM's hands you both answers and lets you choose; SUM's keeps the die for you according to what you declared. The app implements them separately and deliberately — conflating them would hand your authorship to the machine.
 
@@ -423,7 +423,9 @@ Scene closure — a d20 asking how the world responds, fortunately or unfortunat
 >
 > High roll, so trouble — the ordering again. Close on this and you know what the next scene opens into, which is exactly what a closure is for.
 
-The Scene tab also carries SUM's situation tables, three to a screen: Exploration (location features, core challenge, challenge conditions), Battle (terrain, enemy tactics, enemy composition), Discovery (type of clue, revealing finding, opposition activity). Each screen pins its first table as the primary action, and every table can be opened in full to read.
+`Scene → Roll a table`
+
+The Scene tab's second screen carries SUM's situation tables. Pick what the scene is doing — Exploring (location features, core challenge, challenge conditions), Fighting (terrain, enemy tactics, enemy composition), Discovering (type of clue, revealing finding, opposition activity) or Meeting someone (the twelve character tables, in four depths) — and its tables are listed one to a row, each with its die and a Roll button. The result appears under the row that rolled it; the first table is pinned as the primary action, and every table can be opened in full to read. While a scene is open, This scene links here with Roll a SUM table.
 
 ### The journal and the dice record
 
@@ -521,7 +523,7 @@ Scene one. Opener rolled rather than written, because you know a scene starts he
 >
 > Cold to the sternum, and the sound of the water finding a new way in somewhere below you. Not the doorway you would have described.
 
-You explore. On the Scene tab, Exploration gives three tables; declare Trouble first, because you expect this place to be hostile — that is SUM's Rule of Bias, and it keeps the higher of two d20s.
+You explore. On the Scene tab, Roll a table → Exploring gives three tables; declare Trouble first, because you expect this place to be hostile — that is SUM's Rule of Bias, and it keeps the higher of two d20s.
 
 > **Location features · bias high** — 2d20 → 12
 > “Being watched or protected by an unseen entity” — *SUM p.5*
@@ -768,11 +770,11 @@ Files
 
 ### Scene
 
-- Scene arc — the Rule of Bias as three buttons: Neutral — roll once / Favourable — keep lowest / Trouble — keep highest · Roll a scene opener · Open it myself · Roll an intervention check · Roll a scene closure. While a scene runs the pinned action becomes Intervention check with Close beside it.
+- This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), Roll an intervention check · Roll a scene closure. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action becomes Intervention check with Close beside it.
 - Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
-- While the scene runs: Call a plot beat · Ask an oracle · Who is here?
-- Exploration · Battle · Discovery — three SUM tables each, the first pinned as the primary, each with the whole table readable in a fold.
-- Characters — the twelve character tables grouped by depth, and Go to the cast →.
+- While it runs: Call a plot beat · Ask an oracle · Who is here? · Roll a SUM table.
+- Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
+- Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.
 - Every result card: Re-roll · Dismiss.
 
 ### Oracles

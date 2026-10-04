@@ -175,7 +175,9 @@ function endingDialog(game, scope) {
 // same action, without the steps. Playing happens on the Scene and Oracles tabs
 // as much as on Play, and a coach that only exists on one screen is a coach you
 // have to remember to go and consult.
-export function coachStrip() {
+// On This scene the scene card sits directly under the strip, so an action
+// that would only scroll to it is left off rather than repeated.
+export function coachStrip({ onScene = false } = {}) {
   const game = store.activeGame();
   const scope = store.currentScope();
   if (!game || !scope) return null;
@@ -188,7 +190,7 @@ export function coachStrip() {
     el("strong", { text: copy.title + ". " }),
     copy.next
   ));
-  if (act) {
+  if (act && !(onScene && act.run === goToScene)) {
     add(strip, el("button", { class: "btn small", onclick: act.run }, act.label));
   }
   return strip;

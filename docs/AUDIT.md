@@ -1936,3 +1936,20 @@ in a fourth place. *Fix:* `initial-lead`, `caveat` (what you do not know yet: "W
 the target is") and `nemesis-deeds` (an unexplained act with a who or why behind it: "Found, or
 stole something of importance"), chosen by reading all 43 tables' rows. `caveat` is shared with
 Potential problems; a caveat is both. No rule, roll or table changed.
+
+---
+
+## Reported from play — the Scene tab is messy
+
+**F-90 · Five Scene screens, each burying its own content under the same 600px.** *Rule:* SUM's
+24 tables, the Rule of Bias (SUM p.3) and the player-fired arc — unchanged. *Target:* measured at
+390×844 mid-scene: five sections, two cut off the strip; every screen opened with a note, the
+coach strip and a Rule of Bias card of a paragraph and three stacked buttons, so the open scene
+itself began ~850px down; the intervention offered three times on one screen; the coach strip
+saying "Back to the scene" to a player on it; three identical cards per situation screen and twelve
+loose buttons for characters. *Fix:* two sections — **This scene** (a stepper, then one card that
+is the scene, with its next rolls) and **Roll a table** (situation picker: Exploring · Fighting ·
+Discovering · Meeting someone; one row per table, its result under the row that rolled it; the four
+character depths folded, the first open). The Rule of Bias is one row of three above the roll it
+modifies, its paragraph moved into the note; the coach strip omits an action that would only
+scroll to the card beneath it. arc 1,782 → 1,454px; four table screens (1,612-1,820px each) → one.

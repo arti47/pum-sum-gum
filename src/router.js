@@ -10,7 +10,7 @@ import { cue } from "./feel.js";
 
 export const TABS = [
   { id: "play",    icon: "▤", label: "Play",    sections: ["track", "nodes", "cast", "files"] },
-  { id: "scene",   icon: "◗", label: "Scene",   sections: ["arc", "explore", "battle", "discovery", "people"] },
+  { id: "scene",   icon: "◗", label: "Scene",   sections: ["arc", "sum"] },
   { id: "oracles", icon: "◇", label: "Oracles", sections: ["yesno", "descriptive", "story", "granular", "quantifiers"] },
   { id: "journal", icon: "✎", label: "Journal", sections: ["entries", "dice"] },
   // The Forge is prep, not play: it lives under More so the tab bar stays five
@@ -25,8 +25,7 @@ const SECTION_LABELS = {
   seed: "Plot seed", world: "World", character: "Characters", grand: "Grand oracle",
   yesno: "Yes or No", descriptive: "Descriptive", story: "Story",
   granular: "Granular", quantifiers: "Quantifiers",
-  arc: "Scene arc", explore: "Exploration", battle: "Battle",
-  discovery: "Discovery", people: "Characters",
+  arc: "This scene", sum: "Roll a table",
   entries: "Entries", dice: "Dice",
   home: "Home", library: "Rules", tutorial: "Tutorial", settings: "Settings",
 };

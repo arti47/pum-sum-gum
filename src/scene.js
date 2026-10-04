@@ -21,6 +21,21 @@ const SECTION_TABLES = {
   discovery: ["type-of-clue", "revealing-finding", "opposition-activity"],
 };
 
+// The Scene tab has two screens: the scene you are in, and the SUM tables you
+// roll inside it. The situation tables used to be four screens of their own
+// (exploration, battle, discovery, characters), each repeating the same note,
+// coach and bias card above three buttons; they are one list now, picked by
+// the situation the scene is in. The tables, the dice and the Rule of Bias are
+// unchanged — this is where they sit, not what they do.
+const SITUATIONS = [
+  ["explore", "Exploring"],
+  ["battle", "Fighting"],
+  ["discovery", "Discovering"],
+  ["people", "Meeting someone"],
+];
+const PEOPLE = ["first-contact", "shallow", "trust", "deep"];
+let situation = "explore";
+
 export function renderScene(host, section) {
   const scope = store.currentScope();
   add(host, sectionNav("scene", section, { arc: !!(scope && scope.openScene) }));
@@ -33,19 +48,19 @@ export function renderScene(host, section) {
     }));
   }
 
-  if (section === "people") return renderPeopleTables(host);
-  if (SECTION_TABLES[section]) return renderTableGroup(host, section);
+  if (section === "sum") return renderTables(host);
   return renderArc(host, scope);
 }
 
-// --- the scene arc ----------------------------------------------------------
+// --- this scene --------------------------------------------------------------
 function renderArc(host, scope) {
-  add(host, el("h1", { text: "Scene arc" }));
+  add(host, el("h1", { text: "This scene" }));
   add(host, explain([
     "SUM's three boundary rolls, in play order: an opener when you don't know how to start, an intervention check mid-scene, and a closure to see how the world responds.",
     "None of them fires on its own — you decide when a scene needs one. Each writes a journal entry you can undo in one step.",
+    BIAS_NOTE,
   ], "scene-arc", openRule));
-  if (store.activeGame()) add(host, coachStrip());
+  if (store.activeGame()) add(host, coachStrip({ onScene: true }));
 
   if (!store.activeGame()) {
     add(host, emptyState("No game yet", "Scenes belong to a plot scope. Prepare a game first.",
@@ -54,120 +69,107 @@ function renderArc(host, scope) {
     return;
   }
 
-  add(host, biasCard());
-  // Only a controller roll belongs on this screen: an enemy-tactics result left
-  // over from the Battle tab reads as if this scene had rolled it.
-  if (last && last.result.table.section === "controller") add(host, renderLast());
-
   const open = scope && scope.openScene;
+  const checks = open ? open.interventions.length : 0;
 
-  // 1 — Open
-  // The three cards are drawn as one path: open → intervene → close, the arc
-  // SUM walks a scene through, with the stage reached marked along it.
-  const c1 = el("div", { class: `card arc-step${open ? " reached" : ""}`, "data-step": "1" });
-  add(c1, el("div", { class: "card-head" },
-    el("h2", { text: "1 · Open the scene" }),
-    open ? el("span", { class: "pill on", text: "open" }) : null
-  ));
+  // The arc as a stepper: where this scene is between open and close.
+  const steps = el("ol", { class: "arc-path", "aria-label": "Scene arc" });
+  [["Open", !!open], ["Intervene", checks > 0], ["Close", false]].forEach(([name, done], i) => {
+    const here = open ? (checks ? i === 1 : i === 0) : i === 0;
+    add(steps, el("li", { class: `${done ? "done" : ""}${here ? " here" : ""}`.trim() || null,
+      "aria-current": here ? "step" : null, text: name }));
+  });
+  add(host, steps);
+
+  // One card that is the scene: what opened it, what has interrupted it, and
+  // the next roll it can take. Anchored so the coach's "Open a scene" can
+  // scroll here rather than navigating to the screen its own strip is on.
+  const card = el("div", { class: "card scene-card" });
+  card.id = "scene-controls";
   if (open) {
-    add(c1, el("p", null, el("strong", { text: "Opened " + fmtTime(open.openedAt) })));
-    if (open.opener) add(c1, el("p", { text: open.opener }));
-  } else {
-    add(c1, el("p", { class: "muted", text: "Stuck on where to begin, or would rather not decide? Let the opener choose your focus." }));
-    add(c1, el("button", {
-      class: "btn primary wide",
-      onclick: () => fire("scene-opener", (r) => {
-        store.openScene(r.answer);
-        store.addJournal({ kind: "scene", title: "Scene opened", detail: r.answer, dice: diceOf(r) });
-      }),
-    }, "Roll a scene opener"));
-    add(c1, el("button", {
-      class: "btn wide",
-      onclick: () => promptModal({
-        title: "Open a scene",
-        label: "How does it open?",
-        multiline: true,
-        inspire: "scene-open",
-        hint: "You never have to roll. Write it yourself if you already know.",
-        onSubmit: (v) => {
-          store.openScene(v);
-          store.addJournal({ kind: "scene", title: "Scene opened", detail: v });
-          render();
-        },
-      }),
-    }, "Open it myself"));
-  }
-  // Anchored so the coach's "Open a scene" can scroll here rather than
-  // navigating to the screen its own strip is rendered on.
-  c1.id = "scene-controls";
-  add(host, c1);
-
-  // 2 — Intervene
-  const c2 = el("div", { class: `card arc-step${open && open.interventions && open.interventions.length ? " reached" : ""}`, "data-step": "2" });
-  add(c2, el("h2", { text: "2 · Intervention check" }));
-  add(c2, el("p", { class: "muted", text: "Roll when the PCs are taking too long, tension is high, danger is near, or silence lingers." }));
-  add(c2, el("button", {
-    class: "btn primary wide", disabled: !open || undefined,
-    onclick: () => fire("intervention", (r) => {
-      store.addIntervention(r.answer);
-      store.addJournal({ kind: "scene", title: "Intervention check", detail: r.answer, dice: diceOf(r) });
-    }),
-  }, "Roll an intervention check"));
-  if (!open) add(c2, el("p", { class: "cite", text: "Open a scene first — an intervention interrupts something." }));
-  if (open && open.interventions.length) {
-    for (const iv of open.interventions) {
-      add(c2, el("div", { class: "entry" },
-        el("div", { class: "entry-ts", text: fmtTime(iv.ts) }),
-        el("div", { text: iv.text })
-      ));
-    }
-  }
-  add(host, c2);
-
-  // 3 — Close
-  const c3 = el("div", { class: "card arc-step", "data-step": "3" });
-  add(c3, el("h2", { text: "3 · Close the scene" }));
-  add(c3, el("p", { class: "muted", text: "See how the world responds — a consequence, a shift, or a lead into what comes next." }));
-  add(c3, el("button", {
-    class: "btn primary wide", disabled: !open || undefined,
-    onclick: () => closeSceneFlow(open),
-  }, "Roll a scene closure"));
-  if (!open) add(c3, el("p", { class: "cite", text: "There is no scene open to close." }));
-  add(host, c3);
-
-  if (open) {
-    const loop = el("div", { class: "card" });
-    add(loop, el("div", { class: "card-head" },
-      el("h3", { text: "While the scene runs" }),
-      el("span", { class: "cite", text: "PUM p.5" })
+    add(card, el("div", { class: "card-head" },
+      el("h2", { text: "The scene" }),
+      el("span", { class: "pill on", text: "open" })
     ));
-    add(loop, el("p", { class: "muted", text: "Roleplay it. Ask when you genuinely do not know. Call a beat when a moment might matter to the bigger picture." }));
+    add(card, el("p", { class: "cite", text: "Opened " + fmtTime(open.openedAt) }));
+    if (open.opener) add(card, el("p", { class: "scene-opener", text: open.opener }));
+    if (checks) {
+      add(card, el("h3", { text: `Interventions (${checks})` }));
+      for (const iv of open.interventions) {
+        add(card, el("div", { class: "entry" },
+          el("div", { class: "entry-ts", text: fmtTime(iv.ts) }),
+          el("div", { text: iv.text })
+        ));
+      }
+    }
+    if (last && last.result.table.section === "controller") add(card, renderLast());
+    add(card, el("p", { class: "muted", text: "Roll an intervention when the PCs are taking too long, tension is high, danger is near, or silence lingers. Close it to see how the world responds." }));
+    add(card, biasRow());
+    add(card, el("div", { class: "btn-row" },
+      el("button", { class: "btn primary", onclick: intervene }, "Roll an intervention check"),
+      el("button", { class: "btn primary", onclick: () => closeSceneFlow(open) }, "Roll a scene closure")
+    ));
+  } else {
+    add(card, el("div", { class: "card-head" }, el("h2", { text: "No scene open" })));
+    if (last && last.result.table.section === "controller") add(card, renderLast());
+    add(card, el("p", { class: "muted", text: "Stuck on where to begin, or would rather not decide? Let the opener choose your focus — or write it yourself." }));
+    add(card, biasRow());
+    add(card, el("div", { class: "btn-row" },
+      el("button", { class: "btn primary", onclick: openByRoll }, "Roll a scene opener"),
+      el("button", {
+        class: "btn",
+        onclick: () => promptModal({
+          title: "Open a scene",
+          label: "How does it open?",
+          multiline: true,
+          inspire: "scene-open",
+          hint: "You never have to roll. Write it yourself if you already know.",
+          onSubmit: (v) => {
+            store.openScene(v);
+            store.addJournal({ kind: "scene", title: "Scene opened", detail: v });
+            render();
+          },
+        }),
+      }, "Open it myself")
+    ));
+  }
+  add(host, card);
+
+  if (open) {
+    // PUM p.5's loop runs through other tabs; the scene links straight to them.
+    const loop = el("div", { class: "scene-links" });
+    add(loop, el("span", { class: "cite", text: "While it runs · PUM p.5" }));
     add(loop, el("div", { class: "btn-row" },
-      el("button", { class: "btn", onclick: () => go("play", "track") }, "Call a plot beat"),
-      el("button", { class: "btn", onclick: () => go("oracles", "yesno") }, "Ask an oracle"),
-      el("button", { class: "btn", onclick: () => go("play", "cast") }, "Who is here?")
+      el("button", { class: "btn small ghost", onclick: () => go("play", "track") }, "Call a plot beat"),
+      el("button", { class: "btn small ghost", onclick: () => go("oracles", "yesno") }, "Ask an oracle"),
+      el("button", { class: "btn small ghost", onclick: () => go("play", "cast") }, "Who is here?"),
+      el("button", { class: "btn small ghost", onclick: () => go("scene", "sum") }, "Roll a SUM table")
     ));
     add(host, loop);
 
     actionBar({
       label: "Intervention check",
-      context: `scene open · ${open.interventions.length} check${open.interventions.length === 1 ? "" : "s"}`,
+      context: `scene open · ${checks} check${checks === 1 ? "" : "s"}`,
       secondary: { label: "Close", onClick: () => closeSceneFlow(open) },
-      onClick: () => fire("intervention", (r) => {
-        store.addIntervention(r.answer);
-        store.addJournal({ kind: "scene", title: "Intervention check", detail: r.answer, dice: diceOf(r) });
-      }),
+      onClick: intervene,
     });
   } else {
-    actionBar({
-      label: "Roll a scene opener",
-      context: "no scene open",
-      onClick: () => fire("scene-opener", (r) => {
-        store.openScene(r.answer);
-        store.addJournal({ kind: "scene", title: "Scene opened", detail: r.answer, dice: diceOf(r) });
-      }),
-    });
+    actionBar({ label: "Roll a scene opener", context: "no scene open", onClick: openByRoll });
   }
+}
+
+function openByRoll() {
+  fire("scene-opener", (r) => {
+    store.openScene(r.answer);
+    store.addJournal({ kind: "scene", title: "Scene opened", detail: r.answer, dice: diceOf(r) });
+  });
+}
+
+function intervene() {
+  fire("intervention", (r) => {
+    store.addIntervention(r.answer);
+    store.addJournal({ kind: "scene", title: "Intervention check", detail: r.answer, dice: diceOf(r) });
+  });
 }
 
 // Boundary events summarise what changed, with one-step undo (§6.4).
@@ -230,28 +232,30 @@ function diceOf(r) {
 }
 
 // --- the Rule of Bias — a mechanical modifier here, unlike PUM's ------------
-function biasCard() {
-  const card = el("div", { class: "card" });
-  add(card, el("div", { class: "card-head" },
-    el("h3", { text: "Rule of Bias" }),
+// One row above the roll it modifies. The paragraph explaining it lives in the
+// screen's note; the line under the row says what the chosen option does.
+const BIAS = [
+  ["none", "Neutral", "Rolls once."],
+  ["low", "Favourable", "Rolls twice, keeps the lower — low favours your protagonists."],
+  ["high", "Trouble", "Rolls twice, keeps the higher — high brings trouble."],
+];
+function biasRow() {
+  const wrap = el("div", { class: "bias-row" });
+  add(wrap, el("div", { class: "bias-head" },
+    el("span", { class: "label", text: "Rule of Bias" }),
     el("span", { class: "cite", text: "SUM p.3" })
   ));
-  add(card, el("p", { class: "muted", text: BIAS_NOTE }));
-  const row = el("div", { class: "btn-row seg", role: "group", "aria-label": "Rule of Bias" });
-  const opts = [
-    ["none", "Neutral — roll once"],
-    ["low", "Favourable — keep lowest"],
-    ["high", "Trouble — keep highest"],
-  ];
-  for (const [id, label] of opts) {
+  const row = el("div", { class: "btn-row seg seg-inline", role: "group", "aria-label": "Rule of Bias" });
+  for (const [id, label] of BIAS) {
     add(row, el("button", {
-      class: `btn small ${bias === id ? "primary" : ""}`.trim(),
+      class: "btn small",
       "aria-pressed": bias === id ? "true" : "false",
       onclick: () => { bias = id; render(); },
     }, label));
   }
-  add(card, row);
-  return card;
+  add(wrap, row);
+  add(wrap, el("p", { class: "cite", text: BIAS.find(([id]) => id === bias)[2] }));
+  return wrap;
 }
 
 function renderLast() {
@@ -276,70 +280,86 @@ function renderLast() {
   });
 }
 
-// --- the table groups (exploration, battle, discovery) ---------------------
-function renderTableGroup(host, section) {
-  const ids = SECTION_TABLES[section];
-  const titles = {
-    explore: ["Exploration", "For unknown regions and new locations — what the place is, what it asks of you, and what makes it harder."],
-    battle: ["Battle", "The battlefield, the enemy's plan, and who exactly is standing there."],
-    discovery: ["Discovery", "What is uncovered, how it presents itself, and what the opposition has been doing."],
-  };
-  add(host, el("h1", { text: titles[section][0] }));
+// --- the SUM tables, by situation -------------------------------------------
+function renderTables(host) {
+  add(host, el("h1", { "data-situation": situation, text: "Roll a table" }));
   add(host, explain([
-    titles[section][1],
+    "SUM's tables for what happens inside a scene. Pick the situation the scene is in; its tables are listed in the book's order.",
     "Every SUM table is ordered so low rolls favour your protagonists and high rolls bring trouble. Declare your expectation before rolling and the app keeps the right die for you.",
+    "Meeting someone reads a character in four depths of acquaintance — roll only the depth the scene has reached. To keep a result attached to someone, roll it from their entry in the cast instead.",
   ], "sum-bias", openRule));
-  if (store.activeGame()) add(host, coachStrip());
 
-  add(host, biasCard());
-  if (last && ids.includes(last.tableId)) add(host, renderLast());
+  const chips = el("div", { class: "btn-row seg-grid sit-row", role: "group", "aria-label": "Situation" });
+  for (const [id, label] of SITUATIONS) {
+    add(chips, el("button", {
+      class: "btn small",
+      "aria-pressed": situation === id ? "true" : "false",
+      onclick: () => { situation = id; render(); },
+    }, label));
+  }
+  add(host, chips);
 
-  for (const id of ids) {
-    const t = sumTable(id);
-    if (!t) continue;
-    const card = el("div", { class: "card" });
-    add(card, el("div", { class: "card-head" },
-      el("h3", { text: t.name }),
-      el("span", { class: "pill", text: `d${t.die}` }),
-      el("span", { class: "cite", text: `SUM p.${t.page}` })
-    ));
-    add(card, el("p", { class: "muted", text: t.blurb }));
-    add(card, el("button", {
-      class: "btn primary wide",
-      onclick: () => {
-        const r = rollSum({ tableId: id, bias });
-        last = { result: r, tableId: id };
-        journalRoll(r, { kind: "sum", title: `${t.name} — ${r.answer}`, detail: diceText(r.dice) });
-        announce(r.answer);
-        render();
-      },
-    }, `Roll ${t.name}`));
-    add(card, tableDetails(t));
-    add(host, card);
+  const card = el("div", { class: "card sum-list" });
+  add(card, biasRow());
+  const groups = situation === "people"
+    ? PEOPLE.map((sec) => [SUM_SECTIONS.find((s) => s.id === sec), SUM_TABLES.filter((t) => t.section === sec)])
+    : [[null, SECTION_TABLES[situation].map((id) => sumTable(id)).filter(Boolean)]];
+  for (const [section, tables] of groups) {
+    if (!section) { for (const t of tables) add(card, tableRow(t)); continue; }
+    // Four depths of acquaintance, and a scene is at one of them: each depth
+    // folds, the first open, and a depth holding the last roll opens with it.
+    const holds = last && tables.some((t) => t.id === last.tableId);
+    const fold = el("details", { class: "acc sum-depth", open: (section.id === PEOPLE[0] || holds) || undefined },
+      el("summary", null, section.name.replace(/^Character: /, ""),
+        el("span", { class: "cite", text: `SUM p.${section.page}` })));
+    for (const t of tables) add(fold, tableRow(t));
+    add(card, fold);
+  }
+  add(host, card);
+
+  if (situation === "people") {
+    add(host, el("button", { class: "btn wide", onclick: () => go("play", "cast") }, "Go to the cast →"));
   }
 
-  // Every other screen pins its primary action; these three left it inline at
-  // 365px. The book presents the section's tables in order, so the first is the
-  // one you came for.
-  const firstId = ids[0];
-  const first = sumTable(firstId);
+  // The book presents each situation's tables in order, so the first is the
+  // one the bar pins.
+  const first = groups[0][1][0];
   if (first) {
     actionBar({
       label: `Roll ${first.name}`,
       context: `d${first.die}${bias !== "none" ? " · bias " + bias : ""}`,
-      onClick: () => {
-        const r = rollSum({ tableId: firstId, bias });
-        last = { result: r, tableId: firstId };
-        journalRoll(r, { kind: "sum", title: `${first.name} — ${r.answer}`, detail: diceText(r.dice) });
-        announce(r.answer);
-        render();
-      },
+      onClick: () => rollTable(first),
     });
   }
 }
 
+function rollTable(t) {
+  const r = rollSum({ tableId: t.id, bias });
+  last = { result: r, tableId: t.id };
+  journalRoll(r, { kind: "sum", title: `${t.name} — ${r.answer}`, detail: diceText(r.dice) });
+  announce(r.answer);
+  render();
+}
+
+// One table as one row: its name and what it is for, its die, and Roll. The
+// result lands under the row that rolled it.
+function tableRow(t) {
+  const row = el("div", { class: "sum-row" });
+  add(row, el("div", { class: "sum-row-head" },
+    el("div", { class: "sum-row-text" },
+      el("strong", { text: t.name }),
+      el("span", { class: "muted", text: t.blurb })
+    ),
+    el("span", { class: "pill", text: `d${t.die}` }),
+    el("button", { class: "btn small", "aria-label": `Roll ${t.name}`, onclick: () => rollTable(t) }, "Roll")
+  ));
+  if (last && last.tableId === t.id) add(row, renderLast());
+  add(row, tableDetails(t));
+  return row;
+}
+
 function tableDetails(t, hitRoll = null) {
-  const d = el("details", { class: "explain" }, el("summary", null, `The whole table (${t.rows.length} rows)`));
+  const d = el("details", { class: "rows-fold" }, el("summary", null, `The whole table (${t.rows.length} rows)`));
   const body = el("div", { class: "body table-scroll" });
   const table = el("table", { class: "rows" });
   for (const [min, max, text] of t.rows) {
@@ -354,70 +374,6 @@ function tableDetails(t, hitRoll = null) {
   return d;
 }
 
-// --- the character tables live on the Cast screen, listed here too ---------
-function renderPeopleTables(host) {
-  add(host, el("h1", { text: "Character emulation" }));
-  add(host, explain([
-    "SUM reads non-protagonists in four depths of acquaintance. Roll only the depth the scene has actually reached.",
-    "To keep a result attached to someone, roll it from their entry in the cast instead — it is stored with them.",
-  ], "sum-characters", openRule));
-  if (store.activeGame()) add(host, coachStrip());
-  add(host, biasCard());
-  if (last && ["first-contact", "shallow", "trust", "deep"].includes(last.result.table.section)) {
-    add(host, renderLast());
-  }
-
-  const bySection = {};
-  for (const t of SUM_TABLES) {
-    if (!["first-contact", "shallow", "trust", "deep"].includes(t.section)) continue;
-    (bySection[t.section] = bySection[t.section] || []).push(t);
-  }
-  for (const [sec, tables] of Object.entries(bySection)) {
-    const section = SUM_SECTIONS.find((s) => s.id === sec);
-    const card = el("div", { class: "card" });
-    add(card, el("div", { class: "card-head" },
-      el("h3", { text: section ? section.name.replace(/^Character: /, "") : sec }),
-      el("span", { class: "cite", text: `SUM p.${tables[0].page}` })
-    ));
-    const grid = el("div", { class: "btn-grid" });
-    for (const t of tables) {
-      add(grid, el("button", {
-        class: "btn",
-        onclick: () => {
-          const r = rollSum({ tableId: t.id, bias });
-          last = { result: r, tableId: t.id };
-          journalRoll(r, { kind: "sum", title: `${t.name} — ${r.answer}`, detail: diceText(r.dice) });
-          announce(r.answer);
-          render();
-        },
-      }, t.name));
-    }
-    add(card, grid);
-    add(host, card);
-  }
-  add(host, el("button", {
-    class: "btn wide", onclick: () => go("play", "cast"),
-  }, "Go to the cast →"));
-
-  // The four depths are in the book's own order and the first is where a scene
-  // that has just met someone begins. Every other rolling screen pins its
-  // primary; this one left it inline, 521px down once the notes opened.
-  const firstMeet = sumTable("meet-reaction");
-  if (firstMeet) {
-    actionBar({
-      label: `Roll ${firstMeet.name}`,
-      context: `d${firstMeet.die} · first contact${bias !== "none" ? " · bias " + bias : ""}`,
-      onClick: () => {
-        const r = rollSum({ tableId: "meet-reaction", bias });
-        last = { result: r, tableId: "meet-reaction" };
-        journalRoll(r, { kind: "sum", title: `${firstMeet.name} — ${r.answer}`, detail: diceText(r.dice) });
-        announce(r.answer);
-        render();
-      },
-    });
-  }
-}
-
 export function currentBias() { return bias; }
-function resetSceneState() { last = null; bias = "none"; }
+function resetSceneState() { last = null; bias = "none"; situation = "explore"; }
 registerClearer(resetSceneState);

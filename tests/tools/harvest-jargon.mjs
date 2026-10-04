@@ -30,8 +30,7 @@ const MIN = Number(process.argv[2] || 1);
 
 const ROUTES = [
   ["play", "track"], ["play", "nodes"], ["play", "cast"],
-  ["scene", "arc"], ["scene", "explore"], ["scene", "battle"],
-  ["scene", "discovery"], ["scene", "people"],
+  ["scene", "arc"], ["scene", "sum"],
   ["oracles", "yesno"], ["oracles", "descriptive"], ["oracles", "story"],
   ["oracles", "granular"], ["oracles", "quantifiers"],
   ["journal", "entries"], ["journal", "dice"],

@@ -340,7 +340,7 @@ ok("every node-invoking prompt has a play note",
     const SECTIONS = [
       "Plot track", "Plot nodes", "Cast", "Forge", "Plot seed", "World", "Characters",
       "Grand oracle", "Yes or No", "Descriptive", "Story", "Granular", "Quantifiers",
-      "Scene arc", "Exploration", "Battle", "Discovery", "Entries", "Dice",
+      "This scene", "Roll a table", "Entries", "Dice",
       "Home", "Rules", "Tutorial", "Settings",
     ];
     const nav = new Set([...TABS, ...SECTIONS]);
