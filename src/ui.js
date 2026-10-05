@@ -194,7 +194,7 @@ let explainDecorator = null;
 
 export function registerExplainDecorator(fn) { explainDecorator = fn; }
 
-export function explain(text, ruleId = null, onRuleLink = null, { closed = false } = {}) {
+export function explain(text, ruleId = null, onRuleLink = null, { closed = false, stay = false } = {}) {
   const body = el("div", { class: "body" });
   const paras = Array.isArray(text) ? text : [text];
   // Open, the note leads with its first lines and holds the rest one tap away:
@@ -222,7 +222,9 @@ export function explain(text, ruleId = null, onRuleLink = null, { closed = false
   }
   if (explainDecorator) add(foot, explainDecorator(paras.join(" ")));
   if (foot.childNodes.length) add(body, foot);
-  return noteFold("What this does", body, "", { closed });
+  // `stay` keeps a note where it is written, out of the help drawer: on a
+  // screen whose note is its only opening sentence.
+  return noteFold("What this does", body, stay ? "stay" : "", { closed });
 }
 
 // A teaching fold that shares the notes' open state. Closing one closes them
@@ -323,7 +325,7 @@ export function noGameNotice({ what, onPrepare, onWalkthrough }) {
 // --- the result card --------------------------------------------------------
 // Shows the dice, the working and the consequence (§6.4). Takes plain data so it
 // stays free of engine imports; every roller surface renders through this one.
-function diceRow(dice) {
+export function diceRow(dice) {
   const row = el("div", { class: "dice" });
   for (const d of dice) {
     // Which die it is, so it can be drawn as that die rather than a square.
@@ -347,12 +349,14 @@ export function registerCue(fn) { cueFn = fn; }
 // opened) does not tumble its dice again: only a new roll arrives.
 let lastCardSig = "";
 
-export function resultCard({ kind, answer, second, question = "", dice = [], strip = null, actions = [], extra = null }) {
+// `variant` gives the result its object: a seal pressed into an oracle answer,
+// an index card for a beat, a torn slip for a SUM roll. Only the frame changes.
+export function resultCard({ kind, answer, second, question = "", dice = [], strip = null, actions = [], extra = null, variant = null }) {
   const sig = [kind, answer, ...dice.map((d) => `${d.label}:${d.value}`)].join("|");
   // A hidden document pauses animations, so a card drawn while hidden arrives still.
   const fresh = sig !== lastCardSig && document.visibilityState === "visible";
   lastCardSig = sig;
-  const card = el("div", { class: `result${fresh ? " fresh" : ""}`, role: "group", "aria-label": kind });
+  const card = el("div", { class: `result${fresh ? " fresh" : ""}`, role: "group", "aria-label": kind, "data-variant": variant });
   // Settled on a timer, so a card never stays mid-tumble (see router's page turn).
   if (fresh) setTimeout(() => card.classList.remove("fresh"), 800);
   if (fresh && dice.length && cueFn) cueFn("roll");

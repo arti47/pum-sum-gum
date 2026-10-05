@@ -456,6 +456,26 @@ function glossaryCard(q) {
     el("summary", null, "Glossary", el("span", { class: "pill", text: String(terms.length) })),
     body
   );
+  // An A–Z index rail over the terms: the glossary is grouped by topic, which
+  // is right for reading and slow for looking one word up.
+  const firsts = new Map();
+  for (const g of terms) {
+    const l = g.term.trim()[0].toUpperCase();
+    if (!firsts.has(l)) firsts.set(l, g.id);
+  }
+  const rail = el("nav", { class: "az-rail", "aria-label": "Glossary index" });
+  for (const l of [...firsts.keys()].sort()) {
+    add(rail, el("button", {
+      type: "button", "aria-label": `Terms starting with ${l}`,
+      onclick: () => {
+        const first = terms.filter((g) => g.term.trim()[0].toUpperCase() === l)
+          .map((g) => document.getElementById("term-" + g.id)).filter(Boolean)
+          .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
+        if (first) { first.scrollIntoView({ block: "center" }); first.classList.add("flash"); }
+      },
+    }, l));
+  }
+  if (!q && firsts.size > 3) add(body, rail);
   for (const group of [...new Set(terms.map((g) => g.group || "Terms"))]) {
     add(body, el("h4", { class: "term-group", text: group }));
     for (const g of terms.filter((x) => (x.group || "Terms") === group)) {
@@ -582,7 +602,7 @@ function renderSettings(host) {
   add(host, el("h1", { text: "Settings" }));
   add(host, explain([
     "Optional rules are off unless the books present them as the default. Everything here is stored on this device only.",
-  ]));
+  ], null, null, { stay: true }));
 
   // Data
   const data = el("div", { class: "card" });

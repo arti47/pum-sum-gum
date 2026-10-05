@@ -182,6 +182,8 @@ Three books, three jobs. Confusing them is the commonest way to get stuck, so it
 - SUM — Scene Unfolding Machine. A supplement. Once PUM says a beat happens, SUM tells you what the scene offers, how the fight goes, and how the people in it behave.
 - GUM — Game Unfolding Machine. Prep. Worlds, factions, objects, a nemesis, characters as concepts. Use it before you play, and when a blank field stops you mid-play.
 
+Every screen ends the same way: the screen's own work first, then a framed Help on this screen panel at its foot holding its What this does note, Which do I need? and, on the plot sheet, How the track and beats fit. The folds inside open for a new player and close everywhere for good the first time you close one.
+
 In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its four rows are Call a plot beat (what happens next, stuck, drifting?), See the track (where am I in the story, how long until it ends?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. It folds with the What this does notes. Home's machines card opens on the same three rows.
 
 > **Why.** The division that matters: GUM creates a character as a concept — an archetype, an edge, a flaw. SUM decides how that character behaves when you actually meet them. If you find yourself asking 'what is this person like', you want SUM. If you are asking 'who even is this person', you want GUM.
@@ -781,6 +783,7 @@ Files
 - Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
 - Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.
 - Every result card: Re-roll · Dismiss.
+- Results arrive as objects: an oracle answer pressed in as a seal, a beat as a ruled index card, a SUM roll as a slip torn from the pad. The words and dice are the same on all three.
 
 ### Oracles
 
@@ -796,7 +799,8 @@ Files
 ### Journal
 
 - Entries — thirteen filters, Write an entry (pinned), Session break, Show N more of M.
-- Per entry, behind Edit: Add note / Edit note · Delete.
+- Entries read as a ledger: each scene opens a chapter — Scene N and how it opened — with Back to the scene on the one still being played; a beat still waiting to be judged carries Go to the beat; dice are drawn as the dice that fell.
+- Per entry, behind Edit (the ⋯ at its corner): Add note / Edit note · Delete.
 - Dice — distribution per die size, and Clear the journal.
 
 ### More
@@ -830,7 +834,7 @@ Rules
 
 - Search, then collapsible groups of rule entries, each page-cited; “guidance” marks the ones the app deliberately does not enforce.
 - Glossary — twelve terms.
-- The glossary, open by default — twelve terms, a line each.
+- The glossary, open by default — twelve terms, a line each, with an A–Z index rail above them that jumps to the first term under each letter.
 - From the books (folded) — the three play states, the playing flowchart, the advice chapter, advanced mechanics.
 - Errata (folded) — where the books disagree with themselves.
 - Where the app does not roll (folded) — the eight fields with no inspiration block, and why.
