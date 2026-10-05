@@ -473,6 +473,8 @@ Every text field the app can serve carries a collapsed line: 'Stuck? Roll some i
 
 On a plot-node list in prep the same line sits above the slots and works list by list: Tap a result to add it as its own plot node, in the next empty slot. Each result is marked + Add as a node, then ✓ Added once it is in; Add all three as nodes puts each result into its own slot — never two in one — and the list's count climbs as they land.
 
+A rolled row is a prompt, not a finished node. Each result says above it what it describes — A kind of place, What a faction is after, Something a villain has done — because the book's rows describe types of thing, not the thing itself. Tapping one puts it in its slot with the text selected, ready to rewrite as your own: “A kind of place: Forgotten: ruins, outpost, camp…” becomes “The burned-out outpost at Red Ford”. Any slot with text has a ✕ to empty it, and Clear list empties the whole list.
+
 Each result says which table it came from, because several results come from several DIFFERENT tables and three unlabelled sentences read as three unrelated ones. A field that asks for a paragraph rolls its WHOLE mapped set rather than three of it, and 'Use all' writes them in as labelled lines — a skeleton to write over, not a sentence to keep.
 
 - Each word is a chip that appends to what you have written. It never replaces it.

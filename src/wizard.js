@@ -473,32 +473,63 @@ function stepNodes(host) {
     // Roll ideas first, above the slots they fill: each result becomes its own
     // node in the next empty slot, and the slots below show it land.
     const inputs = [];
-    const addItem = (text) => {
+    const addItem = (text, { bulk = false } = {}) => {
       const at = Array.from({ length: sheet.nodeSlots }, (_, i) => i).find((i) => !(list[i] || "").trim());
       if (at === undefined) { toast("This list is full."); return; }
       list[at] = text;
       recount();
-      if (inputs[at]) { inputs[at].value = text; return; }
+      // The row lands in its slot ready to be rewritten: a GUM row names a
+      // TYPE of thing, and the node is the player's own specific one.
+      const open = (input) => {
+        input.scrollIntoView({ block: "center" });
+        input.focus({ preventScroll: true });
+        input.setSelectionRange(0, input.value.length);
+        input.closest(".node-row")?.classList.add("just-added");
+      };
+      if (inputs[at]) {
+        inputs[at].value = text;
+        inputs[at].dispatchEvent(new Event("input"));
+        if (!bulk) open(inputs[at]);
+        return;
+      }
       visible[cat.id] = at + 1;
       render();
     };
     add(card, inspireBlock(cat.id, null, { addItem }));
+    const clearAll = el("button", {
+      type: "button", class: "btn small ghost", hidden: !list.some((x) => x && x.trim()) || undefined,
+      onclick: () => { list.length = 0; recount(); render(); },
+    }, "Clear list");
     for (let i = 0; i < shown; i++) {
       const input = el("input", { type: "text", placeholder: "Add new, choose, or reroll" });
       input.value = list[i] || "";
-      input.addEventListener("input", () => { list[i] = input.value; recount(); });
+      // ✕ empties one slot; shown only while there is something in it.
+      const clear = el("button", {
+        type: "button", class: "slot-clear", hidden: !input.value || undefined,
+        "aria-label": `Clear slot ${fmtRange(i * 2 + 1, i * 2 + 2)}`,
+        onclick: () => { input.value = ""; input.dispatchEvent(new Event("input")); input.focus(); },
+      }, "✕");
+      input.addEventListener("input", () => {
+        list[i] = input.value; recount();
+        clear.hidden = !input.value;
+        clearAll.hidden = !list.some((x) => x && x.trim());
+      });
       inputs.push(input);
       add(card, el("div", { class: "node-row" },
         el("span", { class: "node-idx", text: fmtRange(i * 2 + 1, i * 2 + 2) }),
-        input
+        input,
+        clear
       ));
     }
+    const foot = el("div", { class: "btn-row node-foot" });
     if (shown < sheet.nodeSlots) {
-      add(card, el("button", {
+      add(foot, el("button", {
         class: "btn small ghost",
         onclick: () => { visible[cat.id] = shown + 1; render(); },
       }, `Add another slot — ${sheet.nodeSlots - shown} left`));
     }
+    add(foot, clearAll);
+    add(card, foot);
     add(host, card);
   }
 

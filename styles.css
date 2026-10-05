@@ -1992,3 +1992,19 @@ details.entry-tools[open] > summary { position: absolute; top: .45rem; right: 0;
 .inspire-pick.used { opacity: .6; }
 .inspire-pick.used .ip-add { color: var(--ink-2); }
 .ip-how { margin: .1rem 0 .45rem; }
+
+/* What a rolled row describes, above it. */
+.inspire-pick .ip-reads { display: block; font-family: var(--sans); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-text); margin-bottom: .1rem; }
+
+/* Prep node slots: a ✕ to empty one, and the slot a roll just filled glows
+   while it waits to be rewritten. */
+.node-row { position: relative; }
+.slot-clear {
+  flex: none; min-width: 40px; min-height: 40px; border: none; background: transparent; cursor: pointer;
+  color: var(--ink-3); font-size: 1rem; border-radius: 50%;
+}
+.slot-clear:hover { color: var(--accent-text); background: var(--paper-sunk); }
+.slot-clear[hidden] { display: none; }
+.node-row.just-added input { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.node-foot { justify-content: space-between; margin-top: .3rem; }
+.node-foot .btn[hidden] { display: none; }

@@ -1147,6 +1147,57 @@ export const GUM_GRAND = ["grand-action", "grand-adjective", "grand-subject"];
 // A field with more tables than it needs rotates through them on a re-roll; a
 // field with fewer rolls several times within the ones it has, which GUM p.3
 // names as its own method ("roll multiple times within one table").
+// What each table's rows describe, in the app's own words, shown above a
+// rolled row. A GUM row is a TYPE of thing — "Transformation: Seeks deeply to
+// transform the world" is what a faction wants, with no faction named — and
+// pasted bare into a plot-node list it read as nonsense. Saying what the row
+// is about turns it back into a prompt the player can make specific.
+export const GUM_READ_AS = {
+  "location-archetype": "A kind of place",
+  "background-problem": "A problem hanging over the world",
+  "plot-hook": "Something that sets the story going",
+  motivation: "A reason to act",
+  mission: "A goal",
+  "initial-lead": "A lead to follow",
+  caveat: "Something unknown, or in the way",
+  opposition: "Who stands against you",
+  "faction-focus": "What a faction is after",
+  "faction-resource": "What a faction has too much or too little of",
+  "faction-society": "What kind of group a faction is",
+  "faction-beliefs": "What a faction believes",
+  "faction-politics": "How a faction is run",
+  "location-feature": "What a place looks like",
+  "location-purpose": "What a place is for",
+  "location-worth": "Why a place matters",
+  "location-content": "What is found in a place",
+  "object-function": "What an object does",
+  "object-state": "What condition an object is in",
+  "object-form": "What an object looks like",
+  "nemesis-deeds": "Something a villain has done",
+  "nemesis-impression": "How a villain comes across",
+  "nemesis-intentions": "What a villain intends",
+  "creature-type": "A kind of creature",
+  "creature-behavior": "How a creature behaves",
+  "creature-ability": "What a creature can do",
+  "character-edge": "A person's strength",
+  "character-flaw": "A person's flaw",
+  "character-weapon": "What a person fights with",
+  "character-possessions": "What a person carries",
+  "character-past": "A person's past",
+  "character-activity": "What a person is doing",
+  "character-impression": "How a person comes across",
+  "character-intentions": "What a person intends",
+  "archetypes-1": "A kind of person",
+  "archetypes-2": "A kind of person",
+  "good-purposes": "A good reason someone acts",
+  "evil-purposes": "A dark reason someone acts",
+  "good-deeds": "A good deed",
+  "evil-deeds": "A dark deed",
+  "grand-action": "An action",
+  "grand-adjective": "A quality",
+  "grand-subject": "A subject",
+};
+
 export const GUM_FOR_FIELDS = {
   // The eight plot-node lists (PUM p.28 and the p.27 extension).
   world: ["location-archetype", "background-problem", "faction-focus", "faction-society", "faction-politics"],
