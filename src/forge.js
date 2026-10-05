@@ -22,7 +22,7 @@ import { openRule } from "./screens.js";
 import { carryIntoWizard, inWizard } from "./wizard.js";
 import { registerClearer } from "./viewstate.js";
 import { GUM_TABLES, GUM_PLOT_SEED, GUM_GRAND, GUM_FOR_FIELDS, INSPIRE_WORDS,
-  GUM_SEED_EXAMPLE } from "../data-gum.js";
+  GUM_SEED_EXAMPLE, GUM_READ_AS } from "../data-gum.js";
 import { NODE_CATEGORIES } from "../data-pum-plot.js";
 
 // The last result, held so a re-render never re-rolls it (§5.1).
@@ -535,7 +535,7 @@ function inspireFor(fieldId, append, multiline = false, { list = false } = {}) {
     body
   );
 
-  const use = (parts) => append(keepInspiration(parts, fieldId, multiline));
+  const use = (parts, opts) => append(keepInspiration(parts, fieldId, multiline), opts);
 
   const show = (parts, all) => {
     out.replaceChildren();
@@ -548,7 +548,7 @@ function inspireFor(fieldId, append, multiline = false, { list = false } = {}) {
     // A list (plot nodes in prep) takes each result as its own entry, and says
     // so on every offer: a result tapped there used to vanish into whichever
     // slot was empty, with nothing on the card saying that is what it would do.
-    if (list) add(out, el("p", { class: "cite ip-how", text: "Tap a result to add it as its own plot node, in the next empty slot." }));
+    if (list) add(out, el("p", { class: "cite ip-how", text: "Tap a result to add it as its own plot node, in the next empty slot — then make it yours: name the who, where or what. “A kind of place: Forgotten ruins…” becomes “The burned-out outpost at Red Ford”." }));
     const picks = [];
     const added = (btn) => {
       btn.disabled = true;
@@ -562,6 +562,7 @@ function inspireFor(fieldId, append, multiline = false, { list = false } = {}) {
         "aria-label": list ? `Add as a plot node: ${p.answer}` : `Use the ${p.table.name} result: ${p.answer}`,
         onclick: () => { use([p]); if (list) added(btn); },
       },
+        GUM_READ_AS[p.tableId] ? el("span", { class: "ip-reads", text: GUM_READ_AS[p.tableId] }) : null,
         el("span", { class: "ip-table", text: `${p.table.name} ${p.roll}` }),
         el("span", { class: "ip-text", text: p.answer }),
         list ? el("span", { class: "ip-add", text: "+ Add as a node" }) : null
@@ -576,7 +577,7 @@ function inspireFor(fieldId, append, multiline = false, { list = false } = {}) {
       onclick: () => {
         if (!list) return use(parts);
         // One node per result, each in its own slot.
-        for (const [p, btn] of picks) if (!btn.disabled) { use([p]); added(btn); }
+        for (const [p, btn] of picks) if (!btn.disabled) { use([p], { bulk: true }); added(btn); }
       },
     }, list
       ? (parts.length === INSPIRE_WORDS ? "Add all three as nodes" : `Add all ${parts.length} as nodes`)

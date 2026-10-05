@@ -2098,3 +2098,18 @@ to add it as its own plot node, in the next empty slot", every result reads **+ 
 turns **✓ Added** once in, **Add all three as nodes** puts each into its own slot (more slots open
 if the visible ones are full), and the list's count updates as they land. Single text fields keep
 the old behaviour.
+
+---
+
+## Reported from play — "nodes textbox also some way to clear… I still don't get how to use the rolls. Some don't make sense"
+
+**F-98 · A rolled row was pasted as a node with nothing saying what it describes or that it is
+meant to be rewritten; node slots could not be cleared.** *Rule:* none — the same rows, unedited.
+*Target:* GUM rows describe a *type* of thing ("Transformation: Seeks deeply to transform the world
+in their ways" is a faction's aim with no faction named), so dropped bare into Game or world
+elements they read as nonsense; prep's node slots had no clear. *Fix:* new `GUM_READ_AS` (all 43
+tables, the app's own words) puts what each row describes above it — *A kind of place*, *What a
+faction is after*, *Something a villain has done*; tapping a result puts it in its slot, scrolls
+to it and selects the text for rewriting, with the list's instruction giving a worked example;
+**Add all three as nodes** fills without stealing focus; every filled slot has a ✕ and every list
+**Clear list**.
