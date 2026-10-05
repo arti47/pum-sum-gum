@@ -9,8 +9,9 @@ import { sumTable } from "./rules.js";
 import { sectionNav, render, go } from "./router.js";
 import { openRule } from "./screens.js";
 import { SUM_TABLES, SUM_SECTIONS, BIAS_NOTE } from "../data-sum.js";
+import { SCENE_PLAY_STEPS } from "../data-guidance.js";
 import { registerClearer } from "./viewstate.js";
-import { coachStrip, whichMachine, bookTag } from "./coach.js";
+import { coachStrip, whichMachine, bookTag, nextMove } from "./coach.js";
 
 let last = null;      // the last SUM roll, held so re-render never re-rolls it
 let bias = "none";    // none | low | high — the Rule of Bias, declared before rolling
@@ -105,12 +106,28 @@ function renderArc(host, scope) {
       }
     }
     if (last && last.result.table.section === "controller") add(card, renderLast());
-    add(card, el("p", { class: "muted", text: "Roll an intervention when the PCs are taking too long, tension is high, danger is near, or silence lingers. Close it to see how the world responds." }));
+    // While the scene runs: the moves in the order a player reaches for them,
+    // each saying when, with its button beside it. Before this the card
+    // offered two rolls and a row of links, and nothing said that most of a
+    // scene is narrating with no roll at all.
+    add(card, el("h3", { text: "While you play" }));
+    const moves = {
+      oracle: ["Ask an oracle", () => go("oracles", "yesno")],
+      beat: ["Call a plot beat", () => go("play", "track")],
+      table: ["Roll a SUM table", () => go("scene", "sum")],
+      intervene: ["Roll an intervention check", intervene],
+      close: ["Roll a scene closure", () => closeSceneFlow(open)],
+    };
+    const ol = el("ol", { class: "play-steps" });
+    for (const st of SCENE_PLAY_STEPS) {
+      const m = st.move && moves[st.move];
+      add(ol, el("li", { class: m ? null : "lead" },
+        el("span", { text: st.when }),
+        m ? el("button", { class: "btn small", onclick: m[1] }, m[0]) : null));
+    }
+    add(card, ol);
     add(card, biasRow());
-    add(card, el("div", { class: "btn-row" },
-      el("button", { class: "btn primary", onclick: intervene }, "Roll an intervention check"),
-      el("button", { class: "btn primary", onclick: () => closeSceneFlow(open) }, "Roll a scene closure")
-    ));
+    add(card, el("p", { class: "cite", text: "The Rule of Bias applies to the intervention and the closure." }));
   } else {
     add(card, el("div", { class: "card-head" }, el("h2", { text: "No scene open" })));
     if (last && last.result.table.section === "controller") add(card, renderLast());
@@ -138,23 +155,27 @@ function renderArc(host, scope) {
   add(host, card);
 
   if (open) {
-    // PUM p.5's loop runs through other tabs; the scene links straight to them.
-    const loop = el("div", { class: "scene-links" });
-    add(loop, el("span", { class: "cite", text: "While it runs · PUM p.5" }));
-    add(loop, el("div", { class: "btn-row" },
-      el("button", { class: "btn small ghost", onclick: () => go("play", "track") }, "Call a plot beat"),
-      el("button", { class: "btn small ghost", onclick: () => go("oracles", "yesno") }, "Ask an oracle"),
-      el("button", { class: "btn small ghost", onclick: () => go("play", "cast") }, "Who is here?"),
-      el("button", { class: "btn small ghost", onclick: () => go("scene", "sum") }, "Roll a SUM table")
-    ));
-    add(host, loop);
-
-    actionBar({
-      label: "Intervention check",
-      context: `scene open · ${checks} check${checks === 1 ? "" : "s"}`,
-      secondary: { label: "Close", onClick: () => closeSceneFlow(open) },
-      onClick: intervene,
-    });
+    // The pinned call follows the coach (PUM p.10: one beat per scene is the
+    // way in): until this scene has had its beat, that beat; once it has,
+    // closing the scene. An intervention pinned here instead was a button a
+    // newcomer could press forever without the scene going anywhere.
+    const move = nextMove();
+    if (move && move.stage === "scene-beat") {
+      actionBar({
+        label: "Call this scene's beat", context: "narrate first",
+        secondary: { label: "Close", onClick: () => closeSceneFlow(open) },
+        onClick: () => go("play", "track"),
+      });
+    } else if (move && move.stage === "beat-open") {
+      actionBar({ label: "Go to the beat", context: "a beat is waiting", onClick: () => go("play", "track") });
+    } else {
+      actionBar({
+        label: "Close the scene",
+        context: `${checks} intervention${checks === 1 ? "" : "s"}`,
+        secondary: { label: "Intervention", onClick: intervene },
+        onClick: () => closeSceneFlow(open),
+      });
+    }
   } else {
     actionBar({ label: "Roll a scene opener", context: "no scene open", onClick: openByRoll });
   }

@@ -7,7 +7,7 @@ import * as store from "./store.js";
 import { Settings, applyTheme, cycleTheme } from "./settings.js";
 import { plotSheet } from "./rules.js";
 import {
-  scopeSummary, crossed, trackLength, hasTrack, isResolved, nodeList, currentSection,
+  scopeSummary, crossed, trackLength, hasTrack, isResolved, isEnded, nodeList, currentSection,
   categoryName,
 } from "./derived.js";
 import { sectionNav, go, render } from "./router.js";
@@ -192,6 +192,18 @@ function renderHome(host) {
   add(host, gamesCard(game));
   add(host, machinesCard());
 
+  // A storyline that is finished and written down has one next move: the next
+  // plot sheet. Pinning "Go to the plot sheet" there sent the coach's own
+  // "Start the next plot sheet" round in a circle between Home and Play.
+  if (isEnded(scope) && game.journal.some((e) => e.kind === "ending" && e.scopeId === scope.id)) {
+    actionBar({
+      label: "New plot sheet",
+      context: `${scope.name} · finished`,
+      secondary: { label: "Read it", onClick: () => go("journal", "entries") },
+      onClick: () => addScopeDialog(),
+    });
+    return;
+  }
   actionBar({
     label: "Go to the plot sheet",
     context: hasTrack(scope)

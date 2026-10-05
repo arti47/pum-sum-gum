@@ -19,7 +19,7 @@ import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-
 import { BEAT_TRIGGERS, FIRST_BEAT_COACH, BEAT_STEPS, TRACK_CAPTION, TRACK_LOOP } from "../data-guidance.js";
 import { renderCast } from "./cast.js";
 import { renderFiles } from "./files.js";
-import { coachCard, whichMachine, bookTag } from "./coach.js";
+import { coachCard, whichMachine, bookTag, nextMove, endingDialog } from "./coach.js";
 import { registerClearer } from "./viewstate.js";
 import { cue } from "./feel.js";
 
@@ -96,22 +96,20 @@ function renderTrack(host, scope) {
   // confirmed, when the newcomer line that used to sit apart joins them.
   const game = store.activeGame();
   const newcomer = !!game && !game.journal.some((e) => e.kind === "track");
+  // On the plot sheet the next move leads and the teaching sits one tap below
+  // the sheet, folded: the note and Which do I need? above the track stood
+  // between a new player and the one thing to do next.
   const note = explain([
     "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
     "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
-  ], "confirm", openRule);
+  ], "confirm", openRule, { closed: true });
   if (openBeat) {
     // A beat on the table is the one thing to deal with, and its card carries
-    // its own steps: the sheet leads, and the coach shrinks to its heading
-    // and sentence, with the teaching folds after the sheet.
+    // its own steps: the sheet leads, and the coach shrinks to its heading.
     add(host, trackCard(scope));
     add(host, coachCard({ compact: true, brief: true }));
-    add(host, note);
-    add(host, whichMachine("play"));
   } else {
     add(host, coachCard({ compact: true, newcomer, newcomerLine: newcomer ? FIRST_BEAT_COACH : null }));
-    add(host, note);
-    add(host, whichMachine("play"));
     // The sheet itself: the track, and the beat called on it, in one card.
     add(host, trackCard(scope));
   }
@@ -141,16 +139,27 @@ function renderTrack(host, scope) {
     add(host, d);
   }
 
-  // The primary action stays above the fold, pinned, carrying its context (§6.3.2).
-  if (!openBeat) {
-    actionBar({
-      label: "Random prompt",
-      context: hasTrack(scope)
-        ? `${crossed(scope)}/${trackLength(scope)} · ${currentSection(scope) ? currentSection(scope).name : ""}`
-        : (sheet ? sheet.name : ""),
-      secondary: { label: "Proposal", onClick: () => doProposal(scope) },
-      onClick: () => doPrompt(scope),
-    });
+  add(host, note);
+  add(host, whichMachine("play", { closed: true }));
+
+  // The pinned bar carries the coach's next move — the same one the card
+  // names — not a beat. A beat pinned on every visit told a player who had
+  // just finished prep to roll before a scene had opened (PUM p.5 opens with
+  // roleplay), while the coach above said "open a scene": two next steps.
+  // The beat calls stay in the track card, where the track they cross is.
+  const move = nextMove();
+  if (!openBeat && move) {
+    if (move.stage === "scene-beat" || move.stage === "endgame") {
+      // The next move IS a beat, and this is the sheet it is called on: the
+      // bar rolls it rather than scrolling to the buttons that would.
+      actionBar({
+        label: "Random prompt", context: move.context,
+        secondary: { label: "Proposal", onClick: () => doProposal(scope) },
+        onClick: () => doPrompt(scope),
+      });
+    } else {
+      actionBar({ label: move.label, context: move.context, onClick: move.run });
+    }
   }
 }
 
@@ -547,8 +556,11 @@ function reportAdvance(out, title) {
     modal({
       title: "The scope has resolved",
       body: el("p", { text: "The track is full. Bring this thread to its end — then start a new plot sheet for whatever comes next." }),
+      // Ending first, next sheet after: the primary used to skip the ending
+      // and go straight to a new plot sheet, so the storyline just stopped.
       actions: [
-        { label: "Start another plot sheet", primary: true, onClick: () => go("more", "home") },
+        { label: "Write how it ended", primary: true, onClick: () => endingDialog(store.activeGame(), store.currentScope()) },
+        { label: "Start another plot sheet", onClick: () => go("more", "home") },
         { label: "Stay here" },
       ],
     });

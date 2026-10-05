@@ -21,6 +21,7 @@
     "pdf": "node tests/tools/gen-pdf.mjs",
     "audit:reach": "node tests/audit-reach.mjs",
     "probe:firstrun": "node tests/probe-firstrun.mjs",
+    "probe:guided": "node tests/probe-guided.mjs",
     "cycle": "node tests/cycle.mjs",
     "cycle:watch": "node tests/cycle.mjs --watch",
     "audit:functions": "node tests/audit-functions.mjs",

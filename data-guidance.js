@@ -202,6 +202,18 @@ export const TRACK_LOOP = [
   { k: "The end", text: "When every box is crossed, this storyline is over. Tell its ending." },
 ];
 
+// --- While a scene is open: the moves, in the order you reach for them -----
+// PUM p.5's loop as it plays inside one SUM scene. The first is the game and
+// needs no button; each of the rest says when, and carries the button.
+export const SCENE_PLAY_STEPS = [
+  { when: "Narrate. Say what your character does, two sentences at a time. Most of the game is this — no roll needed." },
+  { when: "Not sure of a fact?", move: "oracle" },
+  { when: "Stuck, or the story drifting?", move: "beat" },
+  { when: "Need detail — what is here, how the fight goes, how someone reacts?", move: "table" },
+  { when: "The scene stalling, or tension high?", move: "intervene" },
+  { when: "Something changed and the moment is over?", move: "close" },
+];
+
 // The book each in-play tab belongs to, on its title line.
 export const BOOK_TAGS = {
   play: "PUM · the story",
@@ -260,16 +272,33 @@ export const SESSION_STAGES = {
     next: "Open a scene and say the first two sentences.",
   },
   "scene-open": {
-    title: "You are in the scene. Here is the loop",
-    say: "This is the whole game, and it is four steps you repeat. The machine stays quiet until you need it.",
+    title: "This scene has had its beat",
+    say: "Keep playing it out. When the moment is over — something changed, or the scene has nowhere left to go — close it and see how the world responds.",
     steps: [
       "Say what your protagonist does. Two sentences is plenty.",
       "Ask yourself one question: do I know what happens next?",
-      "If you DO — say it, and go back to step 1. You do not need to roll anything.",
-      "If you DO NOT — tap Ask an oracle for a yes/no or a detail. If you are not uncertain but stuck — nothing is pulling the story anywhere — Call a plot beat instead.",
+      "If you DO — say it, and go back to step 1. If you DO NOT — Ask an oracle. If you are stuck, you may Call a plot beat again.",
+      "When the moment is over, close the scene.",
     ],
-    example: "“Nell pushes the door open and steps into the smoke.” Do I know what she finds in there? No — so ask the oracle.",
-    next: "Say the next thing your protagonist does, then ask yourself whether you know what happens.",
+    example: "“The smoke clears and the stranger is gone.” The moment is over — close the scene.",
+    next: "Play it out, then close the scene when the moment is over.",
+  },
+  // The app's own split of the scene, from PUM p.10's advice: "When learning
+  // the system, matching one beat to one scene is the easiest way in." Until
+  // this scene has had its beat, the one next move is that beat; after it, the
+  // next move is to close the scene. Nothing forces either — it is the path
+  // the pinned button follows.
+  "scene-beat": {
+    title: "You are in the scene. Play toward its beat",
+    say: "Narrate first — the machine stays quiet until you need it. When a moment might matter, or nothing is pulling the story anywhere, call this scene's beat. One beat per scene is the easiest way in.",
+    steps: [
+      "Say what your protagonist does. Two sentences is plenty.",
+      "Not sure of a fact? Ask an oracle. Otherwise keep narrating — you do not need to roll.",
+      "When a moment might matter, or you are stuck, call this scene's beat: a random prompt if you have no idea, a modified proposal if you have one.",
+      "Play the beat out, then judge it: did it change where the story is going?",
+    ],
+    example: "“Nell pushes the door open and steps into the smoke.” Something should happen here — call the beat.",
+    next: "Narrate, then call this scene's beat when a moment might matter.",
   },
   "beat-open": {
     title: "A beat is on the table",

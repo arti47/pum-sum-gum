@@ -194,7 +194,7 @@ let explainDecorator = null;
 
 export function registerExplainDecorator(fn) { explainDecorator = fn; }
 
-export function explain(text, ruleId = null, onRuleLink = null) {
+export function explain(text, ruleId = null, onRuleLink = null, { closed = false } = {}) {
   const body = el("div", { class: "body" });
   const paras = Array.isArray(text) ? text : [text];
   // Open, the note leads with its first lines and holds the rest one tap away:
@@ -222,15 +222,17 @@ export function explain(text, ruleId = null, onRuleLink = null) {
   }
   if (explainDecorator) add(foot, explainDecorator(paras.join(" ")));
   if (foot.childNodes.length) add(body, foot);
-  return noteFold("What this does", body);
+  return noteFold("What this does", body, "", { closed });
 }
 
 // A teaching fold that shares the notes' open state. Closing one closes them
 // everywhere, and for good: a reader who has taken the point should not have
 // to take it again on every screen. Re-opening one brings them all back, so
 // the gesture is symmetrical.
-export function noteFold(summary, body, extraClass = "") {
-  const open = explainState ? explainState.isOpen() : false;
+// `closed` starts this one shut without touching the shared state — for a screen
+// whose own next move should lead, with the teaching one tap below it.
+export function noteFold(summary, body, extraClass = "", { closed = false } = {}) {
+  const open = !closed && (explainState ? explainState.isOpen() : false);
   const d = el("details", { class: `explain${extraClass ? " " + extraClass : ""}` },
     el("summary", null, summary),
     body

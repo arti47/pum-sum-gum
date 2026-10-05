@@ -2016,3 +2016,30 @@ gains "Where am I in the story? → See the track"; `scrollToBeat` navigates whe
 scroll to. *Found by the cycle:* the guide audit read the Part 4 bullet's quoted step headings ("Read it",
 "Play it out") as labels the app never renders alone; the bullet now names the steps as steps and
 lists only the controls.
+
+---
+
+## Reported from play — "not sure where to go after setting up… so many buttons"
+
+**F-94 · The app's own next move led nowhere, three times over.** *Rule:* none changed — PUM p.5's
+loop, PUM p.10's "matching one beat to one scene is the easiest way in", the gate and the track.
+*Found by:* a new walk that presses only the one orange button on each screen from an empty app
+(now `tests/probe-guided.mjs`, a cycle pass). (1) **Play pinned a beat on every visit** —
+"Random prompt" — while the coach above it said "Open a scene": two next moves, and the pinned
+one wrong straight after prep, since p.5 opens with roleplay. (2) **The protagonists step stalled**:
+Next disabled, "Add protagonist" unmarked, the reason truncated in the bar. (3) **Inside a scene the
+pinned call was Intervention check**, a button a newcomer could press forever while the scene went
+nowhere. (4) **The resolved dialog's primary skipped the ending** ("Start another plot sheet"),
+and (5) **Home pinned "Go to the plot sheet" after a finished storyline**, so the coach's "Start the
+next plot sheet" went round in a circle. *Fix:* the pinned bar on Play is `coach.nextMove()` — the
+coach's own action — and rolls a beat only when the stage is a beat; a new stage, **scene-beat**
+(an open scene with no beat since it opened), makes "Call this scene's beat" the move until the
+scene has had one, then "Close the scene"; the Scene tab's bar follows the same stages; the open
+scene card lists six numbered moves (narrate, then oracle · beat · SUM table · intervention ·
+closure, each beside the moment it is for); on the plot sheet the note and Which do I need? fold
+below the sheet (`explain(..., { closed })`); Next on the protagonists step adds a typed name; the
+resolved dialog leads with Write how it ended; Home pins New plot sheet once a storyline is finished
+and written. *Guard:* the guided probe, watched failing on the old Intervention bar (0 boxes, no
+ending) and passing after — 11 boxes over 10 scenes, ending written, next storyline started. *Found by the cycle:* the smoke walk pressed the pinned bar expecting a beat, where the bar now
+asks for the starting point first; it presses the track card's Random prompt instead. The function
+audit's random-roll journey missed the unprinted-list block once and reached it on the rerun.

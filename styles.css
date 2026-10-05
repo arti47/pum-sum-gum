@@ -1820,3 +1820,20 @@ details.acc.group > summary .pill {
 .track-loop li strong { font-family: var(--sans); font-size: .85rem; color: var(--ink); }
 .track-loop li span { font-size: .88rem; color: var(--ink-2); line-height: 1.35; }
 .track-card .loop-fold { margin: .4rem 0 .2rem; }
+
+/* While a scene is open: the moves in the order you reach for them. */
+.play-steps { list-style: none; padding: 0; margin: .3rem 0 .4rem; counter-reset: ps; }
+.play-steps li {
+  counter-increment: ps; position: relative; display: flex; align-items: center; gap: .6rem;
+  padding: .45rem 0 .45rem 2rem; border-top: 1px solid var(--rule);
+}
+.play-steps li:first-child { border-top: none; }
+.play-steps li::before {
+  content: counter(ps); position: absolute; left: 0; top: .5rem;
+  width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
+  font-family: var(--serif); font-size: .78rem; font-weight: 700;
+  border: 1.5px solid var(--accent-text); color: var(--accent-text); background: var(--paper);
+}
+.play-steps li > span { flex: 1 1 auto; font-size: .93rem; line-height: 1.35; color: var(--ink-2); }
+.play-steps li.lead > span { color: var(--ink); font-family: var(--serif); font-size: 1rem; }
+.play-steps li > .btn { flex: none; max-width: 48%; }

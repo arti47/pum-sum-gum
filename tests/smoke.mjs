@@ -471,7 +471,9 @@ for (const theme of ["light", "dark"]) {
 
   // Roll a beat and confirm it
   await goto(page, "play", "track");
-  await page.locator("#action-bar .btn.primary").click();   // random prompt
+  // The pinned bar follows the coach now (here: write the starting point), so
+  // the beat is called from the track card, where the beat calls always are.
+  await page.locator("#screen .beat-call button", { hasText: "Random prompt" }).click();
   await page.waitForTimeout(80);
   ok("a beat card appears", await page.locator("#screen .result").first().isVisible());
   const dice = await page.locator("#screen .result .die").count();
@@ -525,7 +527,7 @@ for (const theme of ["light", "dark"]) {
 {
   const { ctx, page } = await newPage(FIXTURES.mid);
   await goto(page, "play", "track");
-  await page.locator("#action-bar button", { hasText: "Random prompt" }).first().click();
+  await page.locator("#screen .beat-call button", { hasText: "Random prompt" }).first().click();
   await page.waitForTimeout(160);
   const named = async (pg) => pg.evaluate(() => [...document.querySelectorAll("button")]
     .filter((n) => n.offsetParent && !n.classList.contains("term"))

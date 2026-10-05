@@ -240,7 +240,7 @@ This is the screen you will spend most of your time on. Top to bottom:
 - The plot track card — the track itself and what the current section is for, then Call a plot beat right under it: the two beat controls, When to call which (the p.28 cheat sheet, folded) and the last beat you rolled. A beat you roll opens in the same place. Track options folds the track's occasional permissions beneath.
 - This scope — a fold holding your mission, starting point and game notes. Context you re-read occasionally, not every beat.
 
-The pinned bar at the foot carries the primary action — Random prompt — with Proposal beside it, and the track position as its context line. Those two are the same actions the card above spells out; the card explains them, the bar performs them.
+The pinned bar at the foot carries your one next move — always the same move the coach card names, so the screen never suggests two different things. Before the first scene it is Open a scene; once a scene is open and has not had its beat yet, it is Random prompt with Proposal beside it, because PUM p.10 says one beat per scene is the easiest way in; once the beat is judged it is Back to the scene; at the end it is Write how it ended. You can always call a beat yourself from the track card. Pressing only the orange button takes a new player from an empty app, through prep and scene after scene, to a written ending — the app checks that it does.
 
 ### Opening a scene
 
@@ -736,7 +736,8 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 Plot track
 
 - Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.
-- Random prompt (pinned) / Proposal — the two beat controls. The card above repeats them as Modified proposal and Random prompt.
+- The pinned bar — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet. The track card always carries Modified proposal and Random prompt.
+- The coach card's button follows the same stages; while a scene is open and has had no beat yet, it reads Call this scene's beat.
 - On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged. While a beat is open the track card moves to the top and the coach keeps only its heading.
 - Under the track: Each box is one beat that mattered — cross all N and this storyline ends; and How the track and beats fit, a fold of five stations.
 - On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Make up a new one · Pick from your cast (N), on a list this sheet does not print — the count is how many are in the cast.
@@ -747,7 +748,7 @@ Plot track
 - This scope fold → Add game notes / Edit game notes.
 - A blank starting point is the coach's next step: Write the starting point.
 - What now → Open a scene / Back to the scene · Ask an oracle · Write it down · Start another plot sheet when the scope has finished.
-- Dialogs that can fire on confirming: A timed plot beat fires (Play it) · The scope has resolved (Start another plot sheet / Stay here) · The scope is finished.
+- Dialogs that can fire on confirming: A timed plot beat fires (Play it) · The scope has resolved (Write how it ended / Start another plot sheet / Stay here) · The scope is finished.
 
 Plot nodes
 
@@ -775,9 +776,8 @@ Files
 ### Scene
 
 - Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.
-- This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), Roll an intervention check · Roll a scene closure. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action becomes Intervention check with Close beside it.
+- This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), and While you play — six numbered moves in the order you reach for them: narrate (no button), then Ask an oracle · Call a plot beat · Roll a SUM table · Roll an intervention check · Roll a scene closure, each beside the moment it is for. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action is Call this scene's beat (with Close) until the scene has had its beat, then Close the scene (with Intervention).
 - Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
-- While it runs: Call a plot beat · Ask an oracle · Who is here? · Roll a SUM table.
 - Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
 - Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.
 - Every result card: Re-roll · Dismiss.
@@ -864,7 +864,7 @@ Each of these opens over the screen, traps focus, closes on Escape, and returns 
 - Advance without a beat · A timed plot beat fires · The scope has resolved · The scope is finished — the four dialogs the track can raise.
 - Add a new plot node · Name your list (“What is this list of?”) · Rename this list · Invoke this node.
 - Note this beat / Note this answer (“How did you read it?”) / Note — the three note dialogs.
-- Add a protagonist (the wizard's inline form uses “Add protagonist”, disabled until there is a name) · Protagonist · Remove this protagonist? (its notes field is labelled “A line about them (optional)”) · Add a character / Add a location · Rename · Add to plot nodes, which offers “Back to the cast” when the sheet prints no such list.
+- Add a protagonist (the wizard's inline form uses “Add protagonist”, then “Add another protagonist”; a typed name is also added when you press Next) · Protagonist · Remove this protagonist? (its notes field is labelled “A line about them (optional)”) · Add a character / Add a location · Rename · Add to plot nodes, which offers “Back to the cast” when the sheet prints no such list.
 - Open a scene — “How does it open?”
 - Scene closed — Open the next scene / Back to the plot sheet / Write it down / Undo.
 - Keep this (the Forge) — Name them / Name the place, or “Open Settings” when GUM is off.

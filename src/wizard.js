@@ -43,6 +43,7 @@ export function carryIntoWizard(parts) {
 }
 
 export function startWizard(after = null, parts = null) {
+  pcTyped = { name: "", notes: "" };
   step = 0;
   onDone = after;
   filled = null;
@@ -99,10 +100,10 @@ function applyRoll(parts, from) {
 
 export function inWizard() { return draft !== null; }
 
-function cancelWizard() { draft = null; step = 0; filled = null; render(); }
+function cancelWizard() { draft = null; step = 0; filled = null; pcTyped = { name: "", notes: "" }; render(); }
 
 // Switching game mid-prep discards the draft rather than carrying it across.
-registerClearer(() => { draft = null; step = 0; onDone = null; visible = {}; filled = null; });
+registerClearer(() => { draft = null; step = 0; onDone = null; visible = {}; filled = null; pcTyped = { name: "", notes: "" }; });
 
 export function renderWizard(host) {
   const s = STEPS[step];
@@ -132,17 +133,41 @@ export function renderWizard(host) {
       ? { label: "Back", onClick: () => { step -= 1; render(); } }
       : { label: "Cancel", onClick: () => cancelWizard() },
     onClick: () => {
+      if (step === 2 && pcTyped.name.trim()) addTypedProtagonist();
       if (step < STEPS.length - 1) { step += 1; render(); return; }
       finish();
     },
   });
 }
 
+// Re-evaluate the pinned action's legality without a full re-render.
+function refreshBar() {
+  const legal = legalNow();
+  const btn = document.querySelector("#action-bar .btn.primary");
+  const ctx = document.querySelector("#action-bar .ab-ctx");
+  if (btn) btn.disabled = !legal.ok;
+  if (ctx) ctx.textContent = legal.ok ? `step ${STEPS[step].n}/${STEPS.length}` : legal.why;
+}
+
+// A protagonist's name typed but not yet added. Next adds it: the step asks
+// for at least one protagonist, and a stranger who has typed a name and
+// presses the one orange button has given one — a disabled Next beside an
+// unmarked "Add protagonist" stopped the follow-the-button walk dead here.
+let pcTyped = { name: "", notes: "" };
+
+function addTypedProtagonist() {
+  const v = pcTyped.name.trim();
+  if (!v) return false;
+  draft.protagonists.push({ id: uid("pc"), name: v, notes: pcTyped.notes.trim() });
+  pcTyped = { name: "", notes: "" };
+  return true;
+}
+
 // Legality per step (template §9.2 Phase 1).
 function legalNow() {
   if (step === 0 && !draft.title.trim()) return { ok: false, why: "Name the game to continue" };
   if (step === 1 && !draft.scopeName.trim()) return { ok: false, why: "Name the plot scope to continue" };
-  if (step === 2 && !draft.protagonists.length) return { ok: false, why: "Add at least one protagonist" };
+  if (step === 2 && !draft.protagonists.length && !pcTyped.name.trim()) return { ok: false, why: "Name a protagonist" };
   return { ok: true, why: "" };
 }
 
@@ -183,12 +208,7 @@ function field(label, key, { multiline = false, placeholder = "", hint = "", ins
   input.value = draft[key] || "";
   input.addEventListener("input", () => {
     draft[key] = input.value;
-    // Re-evaluate the pinned action's legality without a full re-render.
-    const legal = legalNow();
-    const btn = document.querySelector("#action-bar .btn.primary");
-    const ctx = document.querySelector("#action-bar .ab-ctx");
-    if (btn) btn.disabled = !legal.ok;
-    if (ctx) ctx.textContent = legal.ok ? `step ${STEPS[step].n}/${STEPS.length}` : legal.why;
+    refreshBar();
   });
   // The wizard's fields are inline on the screen rather than in a dialog, so the
   // block mounts beside the input instead of inside promptModal.
@@ -300,18 +320,20 @@ function stepProtagonists(host) {
   }
   const name = el("input", { type: "text", placeholder: "Name" });
   const notes = el("input", { type: "text", placeholder: "A line about them (optional)" });
-  const addBtn = el("button", { class: "btn wide", disabled: true }, "Add protagonist");
-  const addOne = () => {
-    const v = name.value.trim();
-    if (!v) return;
-    draft.protagonists.push({ id: uid("pc"), name: v, notes: notes.value.trim() });
-    name.value = ""; notes.value = "";
-    render();
-  };
+  const addBtn = el("button", { class: "btn wide" }, draft.protagonists.length ? "Add another protagonist" : "Add protagonist");
+  if (!draft.protagonists.length) add(card, el("p", { class: "cite", text: "Type a name, then Next — or Add protagonist to add more than one." }));
+  name.value = pcTyped.name; notes.value = pcTyped.notes;
+  addBtn.disabled = !name.value.trim();
+  const addOne = () => { if (addTypedProtagonist()) render(); };
   addBtn.addEventListener("click", addOne);
   // A control that silently does nothing is worse than one that says why it
   // cannot act yet (§6.4): it stays disabled until there is a name to add.
-  name.addEventListener("input", () => { addBtn.disabled = !name.value.trim(); });
+  name.addEventListener("input", () => {
+    pcTyped.name = name.value;
+    addBtn.disabled = !name.value.trim();
+    refreshBar();
+  });
+  notes.addEventListener("input", () => { pcTyped.notes = notes.value; });
   name.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addOne(); } });
   add(card, el("label", { class: "field" }, el("span", { class: "lbl", text: "Name" }), name));
   add(card, el("label", { class: "field" }, el("span", { class: "lbl", text: "Notes" }), notes));

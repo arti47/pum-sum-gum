@@ -65,7 +65,14 @@ function stageOf(game, scope) {
   }
   if (!scope.startingPoint || !scope.startingPoint.trim()) return "no-start";
   if (scope.lastBeat && scope.lastBeat.open) return "beat-open";
-  if (scope.openScene) return "scene-open";
+  if (scope.openScene) {
+    // Has this scene had its beat yet? A beat rolled, played or confirmed
+    // since the scene opened (PUM p.10: one beat per scene is the way in).
+    const since = scope.openScene.openedAt || 0;
+    const beaten = game.journal.some((e) => e.scopeId === scope.id && e.ts >= since
+      && (e.kind === "beat" || e.kind === "track"));
+    return beaten ? "scene-open" : "scene-beat";
+  }
   // One box left is the endgame, and saying so changes how the next beat is
   // played — which is the whole point of telling the player.
   if (hasTrack(scope) && trackLength(scope) - crossed(scope) === 1) return "endgame";
@@ -78,6 +85,18 @@ function stageOf(game, scope) {
   const played = crossed(scope) > 0
     || game.journal.some((e) => e.scopeId === scope.id && PLAY_KINDS.has(e.kind));
   return played ? "scene-over" : "first-scene";
+}
+
+// The one next move, for the pinned bar: the same action the coach card names,
+// so the screen never offers two different "next" things. Its context line is
+// the stage's own title — where you are, in the coach's words.
+export function nextMove() {
+  const game = store.activeGame();
+  const scope = store.currentScope();
+  const stage = stageOf(game, scope);
+  const act = actionFor(stage, game, scope);
+  const copy = SESSION_STAGES[stage];
+  return act ? { ...act, stage, context: copy ? copy.title : "" } : null;
 }
 
 // The concrete action for a stage: a label and what it does. Kept beside the
@@ -93,6 +112,8 @@ function actionFor(stage, game, scope) {
       return { label: "Open a scene", run: goToScene };
     case "scene-over":
       return { label: "Open the next scene", run: goToScene };
+    case "scene-beat":
+      return { label: "Call this scene's beat", run: scrollToBeat };
     case "scene-open":
       return { label: "Back to the scene", run: goToScene };
     case "beat-open":
@@ -112,6 +133,7 @@ function actionFor(stage, game, scope) {
 // Two more things worth offering at some stages, never more — a coach that
 // lists five options is a menu, and a menu is what the player already had.
 function extrasFor(stage) {
+  if (stage === "scene-beat") return [{ label: "Ask an oracle", run: () => go("oracles", "yesno") }];
   if (stage === "scene-open") {
     return [
       { label: "Ask an oracle", run: () => go("oracles", "yesno") },
@@ -148,7 +170,7 @@ function startingPointDialog(scope) {
 // Ending well. Neither book has an epilogue procedure — the app is not
 // pretending otherwise — but a storyline that just stops is the commonest way a
 // solo game feels unfinished, and the questions below are the app's own.
-function endingDialog(game, scope) {
+export function endingDialog(game, scope) {
   promptModal({
     title: "How did it end?",
     label: "The ending",
@@ -272,8 +294,8 @@ export function coachCard({ compact = false, brief = false, newcomer = false, ne
 // question comes up, folded with the notes. The row for the tab you are on
 // says so instead of offering a button that would navigate to this screen
 // (the F-67 defect).
-export function whichMachine(here) {
-  return noteFold(WHICH_MACHINE.title, whichBody(here), "which");
+export function whichMachine(here, { closed = false } = {}) {
+  return noteFold(WHICH_MACHINE.title, whichBody(here), "which", { closed });
 }
 
 // The rows themselves; Home shows them open, above the three books.

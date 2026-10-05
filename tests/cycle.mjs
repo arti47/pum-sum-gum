@@ -41,6 +41,7 @@ const PASSES = [
   { id: "hostile", label: "oversized, malformed and adversarial input", cmd: ["node", "tests/audit-hostile.mjs"] },
   { id: "functions", label: "every function, reached by clicking", cmd: ["node", "tests/audit-functions.mjs"] },
   { id: "firstrun", label: "a stranger, cold open to a played scene", cmd: ["node", "tests/probe-firstrun.mjs"], probe: true },
+  { id: "guided", label: "only the orange button, empty app to an ending", cmd: ["node", "tests/probe-guided.mjs"], probe: true },
   { id: "flow", label: "the book's loop, without the tab bar", cmd: ["node", "tests/probe-flow.mjs"], probe: true },
   { id: "layout", label: "measured layout at 320/360/390", cmd: ["node", "tests/probe-layout.mjs"], probe: true },
 ];
