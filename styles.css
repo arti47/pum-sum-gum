@@ -397,19 +397,19 @@ p  { margin: .4rem 0; text-wrap: pretty; }
 
 /* A margin note, not a box: a hairline on the left, a small sans label, and —
    open — its first lines with the rest one tap away. */
-.explain {
+.explain, .scope-fold {
   border: none; border-left: 2px solid var(--rule-2);
   background: transparent; margin: 0 0 .9rem; padding: 0 0 0 .75rem;
 }
-.explain > summary {
+.explain > summary, .scope-fold > summary {
   cursor: pointer; list-style: none; padding: .25rem 0;
   font-family: var(--sans); font-size: .74rem; font-weight: 600;
   letter-spacing: .06em; text-transform: uppercase;
   color: var(--ink-3); min-height: 40px;
   display: flex; align-items: center; gap: .45rem;
 }
-.explain > summary::-webkit-details-marker { display: none; }
-.explain > summary::before {
+.explain > summary::-webkit-details-marker, .scope-fold > summary::-webkit-details-marker { display: none; }
+.explain > summary::before, .scope-fold > summary::before {
   content: "?"; display: grid; place-items: center;
   width: 1.15rem; height: 1.15rem; border-radius: 50%;
   border: 1.5px solid var(--accent-text); color: var(--accent-text);
@@ -417,15 +417,15 @@ p  { margin: .4rem 0; text-wrap: pretty; }
 }
 /* Open/closed state, as .acc folds have — a static marker gives no clue that
    the row does anything. */
-.explain > summary::after {
+.explain > summary::after, .scope-fold > summary::after {
   content: "Show"; margin-left: auto; color: var(--accent-text);
   font-size: .72rem; letter-spacing: .04em;
 }
-.explain[open] > summary::after { content: "Hide"; }
+.explain[open] > summary::after, .scope-fold[open] > summary::after { content: "Hide"; }
 /* The inspiration block is not an explanation; it should not wear the "?". */
 .explain.inspire > summary::before { content: "\2684"; border: none; font-size: 1rem; width: auto; }
-.explain .body { padding: 0 0 .2rem; font-size: .9rem; color: var(--ink-2); }
-.explain .body p { margin: .1rem 0 .4rem; }
+.explain .body, .scope-fold .body { padding: 0 0 .2rem; font-size: .9rem; color: var(--ink-2); }
+.explain .body p, .scope-fold .body p { margin: .1rem 0 .4rem; }
 .explain:hover { border-left-color: var(--accent); }
 
 /* The teaser: about three lines painted, the rest held behind "More". */
@@ -1546,7 +1546,7 @@ details.acc.group > summary .pill {
     clip: rect(0 0 0 0); white-space: nowrap;
   }
   .action-bar { padding: .3rem .9rem; }
-  .explain > summary { min-height: 40px; }
+  .explain > summary, .scope-fold > summary { min-height: 40px; }
   .screen > .section-nav:first-child { position: static; }
 }
 
@@ -1868,15 +1868,15 @@ details.acc.group > summary .pill {
 .help-drawer {
   margin: 1.4rem 0 .6rem; padding: .7rem .8rem .4rem;
   border: 1px solid var(--rule); border-radius: var(--radius);
-  background: color-mix(in srgb, var(--paper-sunk) 55%, transparent);
+  background: var(--paper-2);
 }
 .help-head {
   display: flex; align-items: center; gap: .5rem; margin-bottom: .3rem;
   font-family: var(--sans); font-size: .74rem; font-weight: 700; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--ink-3);
+  text-transform: uppercase; color: var(--ink-2);
 }
 .help-head::before {
-  content: ""; width: 18px; height: 18px; flex: none; background: var(--ink-3);
+  content: ""; width: 18px; height: 18px; flex: none; background: var(--ink-2);
   -webkit-mask: var(--art-library) center / contain no-repeat; mask: var(--art-library) center / contain no-repeat;
 }
 .help-head::after { content: ""; flex: 1; border-top: 1px solid var(--rule); }
@@ -1887,7 +1887,7 @@ details.acc.group > summary .pill {
 .jchapter {
   display: flex; flex-direction: column; gap: .15rem; margin: 1rem 0 .3rem; padding: .55rem .7rem .55rem 2.6rem;
   position: relative; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-2);
-  background: color-mix(in srgb, var(--accent-soft) 40%, transparent);
+  background: var(--paper-2);
 }
 .jchapter::before {
   content: ""; position: absolute; left: .6rem; top: .55rem; width: 26px; height: 26px; background: var(--accent-text);

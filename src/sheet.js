@@ -118,7 +118,9 @@ function renderTrack(host, scope) {
   // A missing starting point is the coach's next step, so it is not repeated
   // here as a card of its own.
   if (scope.mission || scope.startingPoint || scope.notes) {
-    const d = el("details", { class: "explain" }, el("summary", null, "This scope"));
+    // The scope's own words — content, not teaching — so it is not a note and
+    // stays on the sheet rather than going to the help drawer.
+    const d = el("details", { class: "scope-fold" }, el("summary", null, "This scope"));
     const body = el("div", { class: "body" });
     if (scope.mission) add(body, el("p", null, el("strong", { text: "Mission. " }), scope.mission));
     if (scope.startingPoint) add(body, el("p", null, el("strong", { text: "Starting point. " }), scope.startingPoint));
