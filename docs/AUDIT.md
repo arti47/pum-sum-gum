@@ -2065,4 +2065,8 @@ to the beat; results arrive as objects (`resultCard({ variant })`: seal for orac
 card for beats, torn slip for SUM); the track's acts carry engravings by name (compass, swords,
 laurel, map, curtain); the glossary gains an A–Z rail; filter strips fade at the edge.
 *Links:* every tab still reaches every other in-page; the journal gained the two routes back into
-play it lacked; Cast ↔ Scene was already linked both ways.
+play it lacked; Cast ↔ Scene was already linked both ways. *Found by the cycle:* round one's smoke failed the contrast gate on the drawer's translucent
+background and the chapter label, and its note checks read the plot sheet's This scope fold — game
+content carrying the note class — as the first note; the drawer is solid paper, the chapter plain,
+and This scope has its own `scope-fold` class and stays on the sheet. Two complete rounds clean
+after; the rest stopped at the owner's request.
