@@ -2083,3 +2083,18 @@ press reads **Suggest another** and replaces the last suggestion, provided the f
 exactly as it left them — anything typed since is the player's and is kept, with the new lines
 appended as before; **Undo the suggestion** restores every field it touched; any prep field with
 text carries **Clear** beside its label, outside the label so the field keeps its accessible name.
+
+---
+
+## Reported from play — "how to use the roll results for filling up the node elements… not intuitive"
+
+**F-97 · Roll results for plot nodes did not say what tapping them did, and "Use all" joined three
+nodes into one.** *Rule:* none — the same GUM tables (`GUM_FOR_FIELDS`), rolled the same way.
+*Target:* in prep's node step the roll block sat under the slots, each result a bare card; tapping
+one dropped it into the first empty slot without saying so, and **Use all three** appended all
+three to one slot, joined with middots — three nodes as one entry. *Fix:* `inspireBlock(…, {
+addItem })` puts the block in list mode: it sits above the slots it fills, opens with "Tap a result
+to add it as its own plot node, in the next empty slot", every result reads **+ Add as a node** and
+turns **✓ Added** once in, **Add all three as nodes** puts each into its own slot (more slots open
+if the visible ones are full), and the list's count updates as they land. Single text fields keep
+the old behaviour.

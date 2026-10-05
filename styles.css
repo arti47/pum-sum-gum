@@ -1986,3 +1986,9 @@ details.entry-tools[open] > summary { position: absolute; top: .45rem; right: 0;
 .wz-clear:hover { text-decoration: underline; }
 .wz-clear[hidden] { display: none; }
 .wz-filled > .btn { margin-top: .4rem; }
+
+/* A list's roll results say what tapping does, and show it once done. */
+.inspire-pick .ip-add { display: block; margin-top: .25rem; font-family: var(--sans); font-size: .76rem; font-weight: 700; color: var(--accent-text); }
+.inspire-pick.used { opacity: .6; }
+.inspire-pick.used .ip-add { color: var(--ink-2); }
+.ip-how { margin: .1rem 0 .45rem; }

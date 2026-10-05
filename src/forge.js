@@ -523,7 +523,7 @@ function keepInspiration(parts, fieldId, multiline = false) {
   return text;
 }
 
-function inspireFor(fieldId, append, multiline = false) {
+function inspireFor(fieldId, append, multiline = false, { list = false } = {}) {
   if (!Settings.gum()) return null;
   const ids = inspireTables(fieldId);
   let offset = 0;
@@ -545,21 +545,42 @@ function inspireFor(fieldId, append, multiline = false) {
     // and the player had to map them back by counting. Each line now says what
     // it is, so the set reads as a seed.
     const words = el("div", { class: "btn-col" });
+    // A list (plot nodes in prep) takes each result as its own entry, and says
+    // so on every offer: a result tapped there used to vanish into whichever
+    // slot was empty, with nothing on the card saying that is what it would do.
+    if (list) add(out, el("p", { class: "cite ip-how", text: "Tap a result to add it as its own plot node, in the next empty slot." }));
+    const picks = [];
+    const added = (btn) => {
+      btn.disabled = true;
+      btn.classList.add("used");
+      const tag = btn.querySelector(".ip-add");
+      if (tag) tag.textContent = "✓ Added";
+    };
     for (const p of parts) {
-      add(words, el("button", {
+      const btn = el("button", {
         class: "btn small inspire-pick",
-        "aria-label": `Use the ${p.table.name} result: ${p.answer}`,
-        onclick: () => use([p]),
+        "aria-label": list ? `Add as a plot node: ${p.answer}` : `Use the ${p.table.name} result: ${p.answer}`,
+        onclick: () => { use([p]); if (list) added(btn); },
       },
         el("span", { class: "ip-table", text: `${p.table.name} ${p.roll}` }),
-        el("span", { class: "ip-text", text: p.answer })
-      ));
+        el("span", { class: "ip-text", text: p.answer }),
+        list ? el("span", { class: "ip-add", text: "+ Add as a node" }) : null
+      );
+      picks.push([p, btn]);
+      add(words, btn);
     }
     add(out, words);
     const tools = el("div", { class: "btn-row" });
     add(tools, el("button", {
-      class: "btn small primary", onclick: () => use(parts),
-    }, parts.length === INSPIRE_WORDS ? "Use all three" : `Use all ${parts.length}`));
+      class: "btn small primary",
+      onclick: () => {
+        if (!list) return use(parts);
+        // One node per result, each in its own slot.
+        for (const [p, btn] of picks) if (!btn.disabled) { use([p]); added(btn); }
+      },
+    }, list
+      ? (parts.length === INSPIRE_WORDS ? "Add all three as nodes" : `Add all ${parts.length} as nodes`)
+      : (parts.length === INSPIRE_WORDS ? "Use all three" : `Use all ${parts.length}`)));
     add(tools, el("button", { class: "btn small", onclick: () => roll() }, "Roll again"));
     // GUM p.3's own method is combination, so the whole mapped set stays one tap
     // away — rendered here rather than in a dialog of its own.
