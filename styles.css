@@ -1975,3 +1975,14 @@ details.entry-tools[open] > summary { position: absolute; top: .45rem; right: 0;
   -webkit-mask: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
   mask: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
 }
+
+/* Prep: a field with text carries a Clear beside its label. */
+.wz-field { position: relative; }
+.wz-clear {
+  position: absolute; top: -.35rem; right: 0; z-index: 1; min-height: 32px; padding: 0 .5rem; border: none; background: transparent; cursor: pointer;
+  font-family: var(--sans); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent-text);
+}
+.wz-clear:hover { text-decoration: underline; }
+.wz-clear[hidden] { display: none; }
+.wz-filled > .btn { margin-top: .4rem; }

@@ -75,8 +75,17 @@ const LINE_NAMES = {
 };
 
 function applyRoll(parts, from) {
+  // A second suggestion replaces the first rather than stacking under it —
+  // but only while the fields still read exactly as the first one left them.
+  // Anything the player has typed since is theirs, and the new lines are
+  // appended to it as before.
+  if (filled && filled.after && [...filled.fields].every((k) => (draft[k] || "") === filled.after[k])) {
+    undoFilled();
+  }
+  const before = {};
   const add = (key, text) => {
     if (!text) return;
+    if (!(key in before)) before[key] = draft[key] || "";
     const was = (draft[key] || "").trim();
     draft[key] = was ? `${was}\n${text}` : text;
     keys.add(key);
@@ -93,6 +102,8 @@ function applyRoll(parts, from) {
   }
   filled = {
     fields: keys,
+    before,
+    after: Object.fromEntries([...keys].map((k) => [k, draft[k] || ""])),
     from,
     dice: parts.map((p) => `${(p.table && p.table.name) || LINE_NAMES[p.tableId] || p.tableId} ${p.roll}`).join(" · "),
   };
@@ -171,8 +182,15 @@ function legalNow() {
   return { ok: true, why: "" };
 }
 
+// Put every field the last suggestion touched back as it was before it.
+function undoFilled() {
+  if (!filled || !filled.before) return;
+  for (const [k, v] of Object.entries(filled.before)) draft[k] = v;
+  filled = null;
+}
+
 // What a roll just filled, said in one line, with the dice beside it. The
-// fields themselves are marked; there is nothing further to choose.
+// fields themselves are marked; Undo the suggestion takes it all back out.
 function filledNote() {
   if (!filled || !filled.fields.size) return null;
   const names = { title: "Name this game", universe: "Universe or RPG", tone: "World, tone and theme",
@@ -182,7 +200,10 @@ function filledNote() {
   return el("div", { class: "coach wz-filled" },
     el("strong", { text: `Filled from ${filled.from}: ` }),
     `${where.join(", ")}${onScope && step !== 1 ? " (step 2)" : ""}. Read it, change anything, keep what fits.`,
-    el("div", { class: "cite", text: filled.dice })
+    el("div", { class: "cite", text: filled.dice }),
+    filled.before ? el("button", {
+      class: "btn small", onclick: () => { undoFilled(); render(); },
+    }, "Undo the suggestion") : null
   );
 }
 
@@ -199,7 +220,7 @@ function suggestCard() {
       applyRoll(set.parts, "GUM's plot seed");
       render();
     },
-  }, "Suggest a starting situation"));
+  }, filled && filled.from === "GUM's plot seed" ? "Suggest another" : "Suggest a starting situation"));
   return card;
 }
 
@@ -212,7 +233,22 @@ function field(label, key, { multiline = false, placeholder = "", hint = "", ins
   });
   // The wizard's fields are inline on the screen rather than in a dialog, so the
   // block mounts beside the input instead of inside promptModal.
-  return el("div", { class: filled && filled.fields.has(key) ? "wz-was-filled" : null },
+  // A field with text in it can be emptied in one tap — a suggestion, or two,
+  // can leave more in a box than anyone wants to delete by hand on a phone.
+  const clear = el("button", {
+    type: "button", class: "wz-clear", hidden: !input.value || undefined,
+    "aria-label": `Clear ${label}`,
+    onclick: (e) => {
+      e.preventDefault();
+      draft[key] = ""; input.value = "";
+      clear.hidden = true;
+      refreshBar();
+      input.focus();
+    },
+  }, "Clear");
+  input.addEventListener("input", () => { clear.hidden = !input.value; });
+  return el("div", { class: `wz-field${filled && filled.fields.has(key) ? " wz-was-filled" : ""}` },
+    clear,
     el("label", { class: "field" },
       el("span", { class: "lbl", text: label }),
       input,

@@ -2070,3 +2070,16 @@ background and the chapter label, and its note checks read the plot sheet's This
 content carrying the note class — as the first note; the drawer is solid paper, the chapter plain,
 and This scope has its own `scope-fold` class and stays on the sheet. Two complete rounds clean
 after; the rest stopped at the owner's request.
+
+---
+
+## Reported from play — "some way to clear this all"
+
+**F-96 · Prep's suggested text could pile up and could only be deleted by hand.** *Rule:* none —
+GUM's plot seed, the same six tables. *Target:* pressing Suggest a starting situation twice
+appended a second hook, mission and notes beneath the first (the screenshot showed two Hooks in
+Starting point), and the only way out was selecting and deleting on a phone keyboard. *Fix:* a second
+press reads **Suggest another** and replaces the last suggestion, provided the fields still read
+exactly as it left them — anything typed since is the player's and is kept, with the new lines
+appended as before; **Undo the suggestion** restores every field it touched; any prep field with
+text carries **Clear** beside its label, outside the label so the field keeps its accessible name.
