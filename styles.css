@@ -397,19 +397,19 @@ p  { margin: .4rem 0; text-wrap: pretty; }
 
 /* A margin note, not a box: a hairline on the left, a small sans label, and —
    open — its first lines with the rest one tap away. */
-.explain {
+.explain, .scope-fold {
   border: none; border-left: 2px solid var(--rule-2);
   background: transparent; margin: 0 0 .9rem; padding: 0 0 0 .75rem;
 }
-.explain > summary {
+.explain > summary, .scope-fold > summary {
   cursor: pointer; list-style: none; padding: .25rem 0;
   font-family: var(--sans); font-size: .74rem; font-weight: 600;
   letter-spacing: .06em; text-transform: uppercase;
   color: var(--ink-3); min-height: 40px;
   display: flex; align-items: center; gap: .45rem;
 }
-.explain > summary::-webkit-details-marker { display: none; }
-.explain > summary::before {
+.explain > summary::-webkit-details-marker, .scope-fold > summary::-webkit-details-marker { display: none; }
+.explain > summary::before, .scope-fold > summary::before {
   content: "?"; display: grid; place-items: center;
   width: 1.15rem; height: 1.15rem; border-radius: 50%;
   border: 1.5px solid var(--accent-text); color: var(--accent-text);
@@ -417,15 +417,15 @@ p  { margin: .4rem 0; text-wrap: pretty; }
 }
 /* Open/closed state, as .acc folds have — a static marker gives no clue that
    the row does anything. */
-.explain > summary::after {
+.explain > summary::after, .scope-fold > summary::after {
   content: "Show"; margin-left: auto; color: var(--accent-text);
   font-size: .72rem; letter-spacing: .04em;
 }
-.explain[open] > summary::after { content: "Hide"; }
+.explain[open] > summary::after, .scope-fold[open] > summary::after { content: "Hide"; }
 /* The inspiration block is not an explanation; it should not wear the "?". */
 .explain.inspire > summary::before { content: "\2684"; border: none; font-size: 1rem; width: auto; }
-.explain .body { padding: 0 0 .2rem; font-size: .9rem; color: var(--ink-2); }
-.explain .body p { margin: .1rem 0 .4rem; }
+.explain .body, .scope-fold .body { padding: 0 0 .2rem; font-size: .9rem; color: var(--ink-2); }
+.explain .body p, .scope-fold .body p { margin: .1rem 0 .4rem; }
 .explain:hover { border-left-color: var(--accent); }
 
 /* The teaser: about three lines painted, the rest held behind "More". */
@@ -1546,7 +1546,7 @@ details.acc.group > summary .pill {
     clip: rect(0 0 0 0); white-space: nowrap;
   }
   .action-bar { padding: .3rem .9rem; }
-  .explain > summary { min-height: 40px; }
+  .explain > summary, .scope-fold > summary { min-height: 40px; }
   .screen > .section-nav:first-child { position: static; }
 }
 
@@ -1821,19 +1821,157 @@ details.acc.group > summary .pill {
 .track-loop li span { font-size: .88rem; color: var(--ink-2); line-height: 1.35; }
 .track-card .loop-fold { margin: .4rem 0 .2rem; }
 
-/* While a scene is open: the moves in the order you reach for them. */
-.play-steps { list-style: none; padding: 0; margin: .3rem 0 .4rem; counter-reset: ps; }
-.play-steps li {
-  counter-increment: ps; position: relative; display: flex; align-items: center; gap: .6rem;
-  padding: .45rem 0 .45rem 2rem; border-top: 1px solid var(--rule);
+/* While a scene is open: the moves in the order you reach for them — the
+   first spoken, the rest as numbered tiles, two to a row. */
+.play-steps {
+  list-style: none; padding: 0; margin: .3rem 0 .5rem; counter-reset: ps;
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem;
 }
-.play-steps li:first-child { border-top: none; }
-.play-steps li::before {
-  content: counter(ps); position: absolute; left: 0; top: .5rem;
+.play-steps li { counter-increment: ps; position: relative; }
+.play-steps li.lead {
+  grid-column: 1 / -1; padding: .2rem 0 .2rem 2rem;
+  font-family: var(--serif); font-size: 1rem; color: var(--ink); line-height: 1.4;
+}
+.play-steps li.lead::before, .play-tile::before {
+  content: counter(ps); position: absolute; left: 0; top: .25rem;
   width: 1.4rem; height: 1.4rem; border-radius: 50%; display: grid; place-items: center;
   font-family: var(--serif); font-size: .78rem; font-weight: 700;
   border: 1.5px solid var(--accent-text); color: var(--accent-text); background: var(--paper);
 }
-.play-steps li > span { flex: 1 1 auto; font-size: .93rem; line-height: 1.35; color: var(--ink-2); }
-.play-steps li.lead > span { color: var(--ink); font-family: var(--serif); font-size: 1rem; }
-.play-steps li > .btn { flex: none; max-width: 48%; }
+.play-tile {
+  position: relative; width: 100%; height: 100%; min-height: 96px; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; justify-content: space-between; gap: .4rem;
+  padding: .6rem .65rem .6rem .65rem; padding-top: 2.1rem;
+  border: 1px solid var(--rule-2); border-radius: var(--radius-sm);
+  background: var(--paper-2); color: var(--ink); font: inherit;
+  box-shadow: 0 1px 0 var(--rule);
+}
+.play-tile::before { left: .55rem; top: .55rem; }
+.play-tile::after {
+  content: ""; position: absolute; top: .45rem; right: .5rem; width: 26px; height: 26px; opacity: .55;
+  background: var(--accent-text);
+  -webkit-mask: var(--tile-art, var(--art-fleuron)) center / contain no-repeat; mask: var(--tile-art, var(--art-fleuron)) center / contain no-repeat;
+}
+.play-tile:hover { border-color: var(--accent); }
+.play-tile:active { transform: translateY(1px); }
+.play-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.play-tile .when { font-size: .84rem; color: var(--ink-2); line-height: 1.3; }
+.play-tile strong { font-family: var(--sans); font-size: .86rem; color: var(--accent-text); line-height: 1.25; }
+.play-steps li[data-move="oracle"] { --tile-art: var(--art-oracles); }
+.play-steps li[data-move="beat"] { --tile-art: var(--art-play); }
+.play-steps li[data-move="table"] { --tile-art: var(--art-dice); }
+.play-steps li[data-move="intervene"] { --tile-art: var(--art-hourglass); }
+.play-steps li[data-move="close"] { --tile-art: var(--art-curtain); }
+.play-steps li:last-child:nth-child(even) { grid-column: 1 / -1; }
+
+/* The help drawer: every screen's teaching, gathered at its foot. */
+.help-drawer {
+  margin: 1.4rem 0 .6rem; padding: .7rem .8rem .4rem;
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--paper-2);
+}
+.help-head {
+  display: flex; align-items: center; gap: .5rem; margin-bottom: .3rem;
+  font-family: var(--sans); font-size: .74rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-2);
+}
+.help-head::before {
+  content: ""; width: 18px; height: 18px; flex: none; background: var(--ink-2);
+  -webkit-mask: var(--art-library) center / contain no-repeat; mask: var(--art-library) center / contain no-repeat;
+}
+.help-head::after { content: ""; flex: 1; border-top: 1px solid var(--rule); }
+.help-drawer > details { margin: .2rem 0; }
+.help-drawer > details + details { border-top: 1px dashed var(--rule); padding-top: .2rem; }
+
+/* The journal as a ledger: a chapter per scene, curtain at its head. */
+.jchapter {
+  display: flex; flex-direction: column; gap: .15rem; margin: 1rem 0 .3rem; padding: .55rem .7rem .55rem 2.6rem;
+  position: relative; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-2);
+  background: var(--paper-2);
+}
+.jchapter::before {
+  content: ""; position: absolute; left: .6rem; top: .55rem; width: 26px; height: 26px; background: var(--accent-text);
+  -webkit-mask: var(--art-curtain) center / contain no-repeat; mask: var(--art-curtain) center / contain no-repeat;
+}
+.jchapter-n { font-family: var(--sans); font-size: .74rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-text); }
+.jchapter-open { font-family: var(--serif); font-style: italic; font-size: .98rem; color: var(--ink); }
+.entry.jentry .entry-title { font-family: var(--serif); font-size: 1.06rem; color: var(--ink); }
+.entry.jentry .entry-dice { margin-top: .3rem; }
+.entry.jentry .entry-dice .dice { gap: .3rem; }
+.entry.jentry .entry-dice .die { transform: scale(.72); transform-origin: left center; margin-right: -.55rem; }
+.entry.jentry { padding-right: 2.2rem; }
+.entry.jentry > .entry-tools { position: absolute; top: .45rem; right: 0; }
+.entry.jentry > .entry-tools[open] { position: static; margin-top: .3rem; }
+details.entry-tools > summary { list-style: none; cursor: pointer; min-width: 40px; min-height: 40px; display: grid; place-items: center; border-radius: 50%; color: var(--ink-3); font-size: 1.2rem; }
+details.entry-tools > summary::-webkit-details-marker { display: none; }
+details.entry-tools > summary:hover { background: var(--paper-sunk); color: var(--ink); }
+details.entry-tools[open] > summary { position: absolute; top: .45rem; right: 0; }
+.entry.jentry .entry-head { padding-right: .4rem; }
+
+/* Results as objects. An oracle answer is pressed in as a seal; a beat is an
+   index card; a SUM roll is a slip torn from the pad. The words are untouched. */
+@keyframes press { 0% { transform: rotate(-6deg) scale(1.35); opacity: 0; } 60% { transform: rotate(-1deg) scale(.96); opacity: 1; } 100% { transform: rotate(-1.5deg); } }
+.result[data-variant="seal"] .result-answer {
+  display: inline-block; padding: .3rem .75rem .35rem; margin: .1rem 0 .15rem;
+  border: 3px double var(--accent-text); border-radius: 8px;
+  color: var(--accent-text); font-family: var(--serif);
+  transform: rotate(-1.5deg);
+  background: radial-gradient(circle at 30% 40%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
+}
+.result.fresh[data-variant="seal"] .result-answer { animation: press .36s cubic-bezier(.2, .8, .3, 1) both; }
+
+@keyframes settle { from { transform: translateY(-8px) rotate(-1.6deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.result[data-variant="card"] { border-top: 1px solid var(--rule); position: relative; }
+.result[data-variant="card"] .result-head { border-bottom: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); padding-left: 2rem; }
+.result[data-variant="card"]::before {
+  content: ""; position: absolute; left: .7rem; top: .7rem; width: .7rem; height: .7rem; border-radius: 50%;
+  background: var(--paper); box-shadow: inset 0 1px 2px rgba(0,0,0,.35); z-index: 1;
+}
+.result[data-variant="card"] .result-body {
+  background-image: repeating-linear-gradient(transparent 0 1.62rem, color-mix(in srgb, var(--rule) 70%, transparent) 1.62rem calc(1.62rem + 1px));
+  background-position: 0 .55rem;
+}
+.result.fresh[data-variant="card"] { animation: settle .34s ease-out both; }
+
+.result[data-variant="slip"] {
+  border-top: 1px dashed var(--rule-2); border-radius: 0 0 var(--radius) var(--radius); padding-top: 4px;
+  -webkit-mask: linear-gradient(#000 0 0) bottom / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 12px 6px repeat-x;
+  mask: linear-gradient(#000 0 0) bottom / 100% calc(100% - 6px) no-repeat, conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 12px 6px repeat-x;
+}
+
+/* The track's acts carry their engravings: setting out, the fight, the laurel. */
+.track-sec-name { display: flex; align-items: center; gap: .3rem; }
+.track-sec[data-sec] .track-sec-name::after {
+  content: ""; order: -1; width: 15px; height: 15px; flex: none; background: currentColor; opacity: .75;
+  -webkit-mask: var(--act-art, var(--art-fleuron)) center / contain no-repeat; mask: var(--act-art, var(--art-fleuron)) center / contain no-repeat;
+}
+.track-sec[data-sec="Exposition"], .track-sec[data-sec="Intro"], .track-sec[data-sec="Entrance"], .track-sec[data-sec="Arrival"] { --act-art: var(--art-compass); }
+.track-sec[data-sec="Confrontation"], .track-sec[data-sec="Rising action"], .track-sec[data-sec="Climax"], .track-sec[data-sec="Rising"] { --act-art: var(--art-swords); }
+.track-sec[data-sec="Resolution"], .track-sec[data-sec="Falling action"], .track-sec[data-sec="Falling"], .track-sec[data-sec="Wrap-up"], .track-sec[data-sec="Way out"], .track-sec[data-sec="Conclusion"] { --act-art: var(--art-laurel); }
+.track-sec[data-sec^="Room"], .track-sec[data-sec*="Area"] { --act-art: var(--art-map); }
+.track-sec[data-sec^="Scene"], .track-sec[data-sec^="Part"] { --act-art: var(--art-curtain); }
+
+/* The bar's context reads in full: two lines of small capitals, not a
+   truncated run of mono ("This scene has had its …"). */
+.action-bar .ab-ctx {
+  white-space: normal; overflow: hidden; text-overflow: clip;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  font-family: var(--sans); font-variant: all-small-caps; letter-spacing: .04em;
+  font-size: .8rem; line-height: 1.15;
+}
+
+/* The glossary's A–Z rail. */
+.az-rail { display: flex; flex-wrap: wrap; gap: .25rem; margin: .3rem 0 .6rem; }
+.az-rail button {
+  min-width: 40px; min-height: 40px; border: 1px solid var(--rule-2); border-radius: var(--radius-sm);
+  background: var(--paper); color: var(--accent-text); font-family: var(--serif); font-weight: 700; cursor: pointer;
+}
+.az-rail button:hover { border-color: var(--accent); background: var(--accent-soft); }
+.jchapter > .btn { align-self: flex-start; margin-top: .3rem; }
+.entry.jentry > .btn { margin-top: .4rem; }
+
+/* Filter strips fade at the edge that has more, and keep the active chip in view. */
+.screen .section-nav.pills, #screen h1 ~ .section-nav {
+  -webkit-mask: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+  mask: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+}

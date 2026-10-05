@@ -211,7 +211,29 @@ export function render() {
   document.body.dataset.tab = current.tab;
   document.body.dataset.section = current.section || "";
   if (fn) fn(screen, current.section);
+  gatherHelp(screen);
   const sub = $("#brand-sub");
   const game = store.activeGame();
   if (sub) sub.textContent = game ? game.title : "PUM v9 · SUM v8";
+}
+
+// One help drawer per screen, at its foot. Every screen's teaching folds —
+// "What this does", "Which do I need?", the track-and-beats loop — used to sit
+// wherever each renderer put them, open above the content on some tabs and
+// below it on others. They are gathered here after the screen is drawn, so no
+// renderer has to know about the drawer and every screen ends the same way:
+// the screen's own work first, then the help. The folds keep their shared
+// open state (closed for good the first time one is closed), and every word
+// in them is unchanged.
+function gatherHelp(screen) {
+  const folds = [...screen.querySelectorAll(":scope > details.explain:not(.stay), :scope > details.which, :scope > details.loop-fold")];
+  if (!folds.length) return;
+  const drawer = document.createElement("section");
+  drawer.className = "help-drawer";
+  drawer.setAttribute("aria-label", "Help on this screen");
+  const head = document.createElement("div");
+  head.className = "help-head";
+  head.textContent = "Help on this screen";
+  drawer.append(head, ...folds);
+  screen.append(drawer);
 }

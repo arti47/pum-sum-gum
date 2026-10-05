@@ -21,7 +21,7 @@ export function renderCast(host) {
     "Your protagonists, plus everyone and everywhere the story has actually met.",
     "Roll SUM's character tables from a person's entry and the result is stored with them, so next time you know how they talk and what they want.",
     "Keeping someone here does not put them in the story's reach: a random prompt can only land on a plot node, so use \u201cAdd to plot nodes\u201d for anyone the plot should be able to bring back on its own.",
-  ], "nodes", openRule));
+  ], "nodes", openRule, { stay: true }));
 
   // Protagonists
   const pcs = el("div", { class: "card" });

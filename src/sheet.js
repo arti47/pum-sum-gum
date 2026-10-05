@@ -102,7 +102,7 @@ function renderTrack(host, scope) {
   const note = explain([
     "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
     "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
-  ], "confirm", openRule, { closed: true });
+  ], "confirm", openRule);
   if (openBeat) {
     // A beat on the table is the one thing to deal with, and its card carries
     // its own steps: the sheet leads, and the coach shrinks to its heading.
@@ -118,7 +118,9 @@ function renderTrack(host, scope) {
   // A missing starting point is the coach's next step, so it is not repeated
   // here as a card of its own.
   if (scope.mission || scope.startingPoint || scope.notes) {
-    const d = el("details", { class: "explain" }, el("summary", null, "This scope"));
+    // The scope's own words — content, not teaching — so it is not a note and
+    // stays on the sheet rather than going to the help drawer.
+    const d = el("details", { class: "scope-fold" }, el("summary", null, "This scope"));
     const body = el("div", { class: "body" });
     if (scope.mission) add(body, el("p", null, el("strong", { text: "Mission. " }), scope.mission));
     if (scope.startingPoint) add(body, el("p", null, el("strong", { text: "Starting point. " }), scope.startingPoint));
@@ -139,8 +141,12 @@ function renderTrack(host, scope) {
     add(host, d);
   }
 
+  // The teaching — the note, the loop of track and beats, Which do I need? —
+  // is gathered by the router into the help drawer at the screen's foot. The
+  // loop is left out while a beat is open: its card carries the steps.
   add(host, note);
-  add(host, whichMachine("play", { closed: true }));
+  if (!openBeat && hasTrack(scope)) add(host, trackLoopFold());
+  add(host, whichMachine("play"));
 
   // The pinned bar carries the coach's next move — the same one the card
   // names — not a beat. A beat pinned on every visit told a player who had
@@ -217,7 +223,7 @@ function trackCard(scope) {
   let index = 0;
   for (const sec of sections) {
     const isCurrent = done < total && sectionOfBox(sections, done).section === sec;
-    const secEl = el("div", { class: `track-sec ${isCurrent ? "current" : ""}`.trim() },
+    const secEl = el("div", { class: `track-sec ${isCurrent ? "current" : ""}`.trim(), "data-sec": sec.name },
       el("div", { class: "track-sec-name", text: sec.name })
     );
     const boxes = el("div", { class: "track-boxes" });
@@ -252,9 +258,7 @@ function trackCard(scope) {
   // itself, where "2/11" otherwise stood with nothing to say what it counts.
   if (!isEnded(scope)) {
     add(card, el("p", { class: "track-caption", text: TRACK_CAPTION.replace("{n}", String(total)) }));
-    // While a beat is open its card carries the steps; the loop would only
-    // stand between the track and the beat.
-    if (!openBeat) add(card, trackLoopFold());
+
   }
 
   if (isEnded(scope)) {
@@ -695,6 +699,7 @@ function beatCard(scope) {
   });
 
   return resultCard({
+    variant: "card",
     kind: isProposal ? "Modified proposal" : "Random prompt",
     answer: b.text,
     second: isProposal

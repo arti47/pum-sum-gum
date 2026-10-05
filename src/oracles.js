@@ -204,6 +204,7 @@ function renderLast() {
       ));
     }
     add(wrap, resultCard({
+      variant: "seal",
       kind: "Yes or No · bias",
       question: result.question,
       answer: "Two answers — you pick",
@@ -235,6 +236,7 @@ function renderLast() {
   }
 
   add(wrap, resultCard({
+      variant: "seal",
     kind, answer, second,
     question: result.question,
     dice: result.dice,

@@ -2,7 +2,7 @@
 // This is the roll log (§1) and the session record (§14.1.3) in one surface.
 
 import { el, add, fmtTime, fmtDay } from "./core.js";
-import { explain, promptModal, confirmModal, toast, emptyState, actionBar } from "./ui.js";
+import { explain, promptModal, confirmModal, toast, emptyState, actionBar, diceRow } from "./ui.js";
 import * as store from "./store.js";
 import { sectionNav, render, go, keepCurrentInView } from "./router.js";
 import { openRule } from "./screens.js";
@@ -73,14 +73,48 @@ function renderEntries(host, game) {
 
   // Lists that grow without bound page (§6.5).
   const page = all.slice(0, shown);
+  // The record read as a ledger in chapters: each scene opens a chapter, headed
+  // with its number and how it opened, and the rolls and words of that scene
+  // sit beneath it. Numbered in the order the scenes were played, the same
+  // "Scene N" the readable export uses.
+  const order = [];
+  for (const e of [...game.journal].reverse()) {
+    if (e.sceneId && !order.includes(e.sceneId)) order.push(e.sceneId);
+  }
+  const openers = new Map(game.journal
+    .filter((e) => e.kind === "scene" && e.title === "Scene opened" && e.sceneId)
+    .map((e) => [e.sceneId, e.detail]));
+  const scope = store.currentScope();
+  const waiting = scope && scope.lastBeat && scope.lastBeat.open ? scope.lastBeat.journalId : null;
   let lastDay = "";
+  let lastScene = null;
+  let liveShown = false;
   for (const e of page) {
     const day = fmtDay(e.ts);
     if (day !== lastDay) {
       lastDay = day;
+      lastScene = null;
       add(host, el("h3", { class: "jday", text: day }));
     }
-    add(host, entryEl(e));
+    if (e.sceneId && e.sceneId !== lastScene) {
+      lastScene = e.sceneId;
+      const n = order.indexOf(e.sceneId) + 1;
+      // The chapter of the scene still being played leads back to it.
+      const live = !liveShown && scope && scope.openScene && scope.openScene.id === e.sceneId;
+      if (live) liveShown = true;
+      add(host, el("div", { class: "jchapter" },
+        el("span", { class: "jchapter-n", text: `Scene ${n}` }),
+        openers.get(e.sceneId) ? el("span", { class: "jchapter-open", text: openers.get(e.sceneId) }) : null,
+        live ? el("button", { class: "btn small", onclick: () => go("scene", "arc") }, "Back to the scene") : null));
+    } else if (!e.sceneId) {
+      lastScene = null;
+    }
+    const entry = entryEl(e);
+    // A beat still waiting to be judged leads back to its card.
+    if (waiting && e.id === waiting) {
+      add(entry, el("button", { class: "btn small", onclick: () => go("play", "track") }, "Go to the beat"));
+    }
+    add(host, entry);
   }
   if (all.length > shown) {
     add(host, el("button", {
@@ -132,8 +166,12 @@ function entryEl(e) {
   if (e.title) add(wrap, el("div", { class: "entry-title", text: e.title }));
   if (e.detail) add(wrap, el("div", { class: "entry-detail", text: e.detail }));
   if (e.dice && e.dice.length) {
-    add(wrap, el("div", { class: "entry-dice",
+    // Drawn as the dice themselves, the same solids the result card uses; the
+    // written form stays in the document for assistive tech and search.
+    const dice = el("div", { class: "entry-dice" }, diceRow(e.dice));
+    add(dice, el("span", { class: "sr-only",
       text: e.dice.map((d) => `${d.label} ${d.value}${d.kept === false ? "✗" : ""}`).join(" · ") }));
+    add(wrap, dice);
   }
   if (e.linkedTo) add(wrap, el("div", { class: "cite", text: "↳ follows an earlier roll" }));
   if (e.note) add(wrap, el("div", { class: "entry-note", text: e.note }));
@@ -177,7 +215,8 @@ function entryEl(e) {
     }),
   }, "Delete"));
   add(wrap, el("details", { class: "entry-tools" },
-    el("summary", null, "Edit"),
+    el("summary", { "aria-label": "Edit" }, el("span", { class: "sr-only", text: "Edit" }),
+      el("span", { "aria-hidden": "true", class: "dots", text: "⋯" })),
     tools
   ));
   return wrap;

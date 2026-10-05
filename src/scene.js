@@ -118,12 +118,17 @@ function renderArc(host, scope) {
       intervene: ["Roll an intervention check", intervene],
       close: ["Roll a scene closure", () => closeSceneFlow(open)],
     };
+    // The first move needs no button; the rest are tiles — the moment it is
+    // for, then the move — so a long label wraps inside its tile instead of
+    // squeezing a button beside a sentence.
     const ol = el("ol", { class: "play-steps" });
     for (const st of SCENE_PLAY_STEPS) {
       const m = st.move && moves[st.move];
-      add(ol, el("li", { class: m ? null : "lead" },
-        el("span", { text: st.when }),
-        m ? el("button", { class: "btn small", onclick: m[1] }, m[0]) : null));
+      if (!m) { add(ol, el("li", { class: "lead" }, el("span", { text: st.when }))); continue; }
+      add(ol, el("li", { class: "tile", "data-move": st.move },
+        el("button", { class: "play-tile", onclick: m[1] },
+          el("span", { class: "when", text: st.when }),
+          el("strong", { text: m[0] }))));
     }
     add(card, ol);
     add(card, biasRow());
@@ -284,6 +289,7 @@ function biasRow() {
 function renderLast() {
   const { result } = last;
   return resultCard({
+    variant: "slip",
     kind: `${result.table.name} · d${result.table.die}${result.bias !== "none" ? " · bias " + result.bias : ""}`,
     answer: result.answer,
     second: result.table.lead,

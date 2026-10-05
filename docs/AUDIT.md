@@ -2043,3 +2043,30 @@ and written. *Guard:* the guided probe, watched failing on the old Intervention 
 ending) and passing after — 11 boxes over 10 scenes, ending written, next storyline started. *Found by the cycle:* the smoke walk pressed the pinned bar expecting a beat, where the bar now
 asks for the starting point first; it presses the track card's Random prompt instead. The function
 audit's random-roll journey missed the unprinted-list block once and reached it on the rerun.
+
+---
+
+## Audit round — UX, UI, aesthetics and links (requested)
+
+**F-95 · Teaching, results and the record each lacked one shape.** *Rule:* none changed.
+Measured at 390×844 across 14 routes in both themes: two step-lists on the plot sheet (the coach's
+and the track loop); three identical ⓘ folds stacked at its foot while Scene put the same folds
+**above** its content (the scene card at ~950px); "While you play" button labels wrapping to three
+lines; the bar's context truncated mid-word; journal entries indistinguishable (kind, a bare
+title, dice in tiny mono, "Edit" on every one) with no sign of which scene they belonged to; filter
+chips running off the edge; the rules glossary with no way to jump to a word. *Fix:* the router
+gathers every screen's teaching folds into one **Help on this screen** drawer at its foot
+(`gatherHelp`; Cast and Settings keep their note in place via `explain(…, { stay })`, being their
+only opening sentence — the novice audit caught both); the track loop moves into the drawer, so
+the coach holds the only step-list; the scene's moves are numbered icon tiles; the bar's context is
+two lines of small capitals; the journal is a ledger in chapters (Scene N and its opener, drawn
+dice, Edit behind ⋯), the live scene's chapter offering Back to the scene and a waiting beat Go
+to the beat; results arrive as objects (`resultCard({ variant })`: seal for oracles, ruled index
+card for beats, torn slip for SUM); the track's acts carry engravings by name (compass, swords,
+laurel, map, curtain); the glossary gains an A–Z rail; filter strips fade at the edge.
+*Links:* every tab still reaches every other in-page; the journal gained the two routes back into
+play it lacked; Cast ↔ Scene was already linked both ways. *Found by the cycle:* round one's smoke failed the contrast gate on the drawer's translucent
+background and the chapter label, and its note checks read the plot sheet's This scope fold — game
+content carrying the note class — as the first note; the drawer is solid paper, the chapter plain,
+and This scope has its own `scope-fold` class and stays on the sheet. Two complete rounds clean
+after; the rest stopped at the owner's request.
