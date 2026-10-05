@@ -455,9 +455,12 @@ function stepNodes(host) {
     // no slots here either — writing into one would be writing into nothing.
     if (cat.custom && !draft.customNames[cat.id]) continue;
     const card = el("div", { class: "card" });
+    const count = el("span", { class: "cite" });
+    const recount = () => { count.textContent = `${(draft.nodes[cat.id] || []).filter((x) => x && x.trim()).length}/${sheet.nodeSlots}`; };
+    recount();
     add(card, el("div", { class: "card-head" },
       el("h3", { text: draft.customNames[cat.id] || cat.name }),
-      el("span", { class: "cite", text: `${(draft.nodes[cat.id] || []).filter(Boolean).length}/${sheet.nodeSlots}` })
+      count
     ));
     add(card, el("p", { class: "muted", text: cat.definition }));
     add(card, el("p", { class: "cite", text: "e.g. " + cat.examples }));
@@ -467,31 +470,29 @@ function stepNodes(host) {
     // player call for more; the slots all still exist on the plot sheet.
     const shown = Math.min(sheet.nodeSlots, Math.max(SLOTS_AT_FIRST, visible[cat.id] || 0,
       list.filter((x) => x && x.trim()).length + 1));
+    // Roll ideas first, above the slots they fill: each result becomes its own
+    // node in the next empty slot, and the slots below show it land.
     const inputs = [];
+    const addItem = (text) => {
+      const at = Array.from({ length: sheet.nodeSlots }, (_, i) => i).find((i) => !(list[i] || "").trim());
+      if (at === undefined) { toast("This list is full."); return; }
+      list[at] = text;
+      recount();
+      if (inputs[at]) { inputs[at].value = text; return; }
+      visible[cat.id] = at + 1;
+      render();
+    };
+    add(card, inspireBlock(cat.id, null, { addItem }));
     for (let i = 0; i < shown; i++) {
       const input = el("input", { type: "text", placeholder: "Add new, choose, or reroll" });
       input.value = list[i] || "";
-      input.addEventListener("input", () => { list[i] = input.value; });
+      input.addEventListener("input", () => { list[i] = input.value; recount(); });
       inputs.push(input);
       add(card, el("div", { class: "node-row" },
         el("span", { class: "node-idx", text: fmtRange(i * 2 + 1, i * 2 + 2) }),
         input
       ));
     }
-    // One block per list rather than one per slot: a rolled word lands in the
-    // first empty slot, which is where writeNodeToFirstEmpty puts one in play.
-    // Getter and setter must agree on which slot they mean, or appending to a
-    // full list would overwrite the last entry instead of extending it.
-    const slot = () => inputs.find((x) => !x.value.trim()) || inputs[inputs.length - 1];
-    const target = {
-      tagName: "INPUT",
-      get value() { return slot().value; },
-      set value(v) { const n = slot(); n.value = v; list[inputs.indexOf(n)] = v; },
-      focus() { slot().focus(); },
-      setSelectionRange() {},
-      dispatchEvent() { return true; },
-    };
-    add(card, inspireBlock(cat.id, target));
     if (shown < sheet.nodeSlots) {
       add(card, el("button", {
         class: "btn small ghost",

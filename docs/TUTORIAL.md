@@ -471,6 +471,8 @@ With no game open — which is when a plot seed is most useful, since GUM is a p
 
 Every text field the app can serve carries a collapsed line: 'Stuck? Roll some ideas'. Open it and GUM tables roll, chosen by what the field is for — a character field pulls archetypes and flaws, a location field pulls features and purpose, the mission field pulls the whole plot seed.
 
+On a plot-node list in prep the same line sits above the slots and works list by list: Tap a result to add it as its own plot node, in the next empty slot. Each result is marked + Add as a node, then ✓ Added once it is in; Add all three as nodes puts each result into its own slot — never two in one — and the list's count climbs as they land.
+
 Each result says which table it came from, because several results come from several DIFFERENT tables and three unlabelled sentences read as three unrelated ones. A field that asks for a paragraph rolls its WHOLE mapped set rather than three of it, and 'Use all' writes them in as labelled lines — a skeleton to write over, not a sentence to keep.
 
 - Each word is a chip that appends to what you have written. It never replaces it.

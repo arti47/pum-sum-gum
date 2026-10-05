@@ -125,8 +125,11 @@ function appendToField(input, text) {
 
 // The mountable block, or null when there is nothing to offer (no factory
 // registered, or GUM switched off).
-export function inspireBlock(fieldId, input) {
+// `addItem` makes the block serve a LIST rather than one field: each result
+// becomes its own entry (a plot node per result), never several joined in one.
+export function inspireBlock(fieldId, input, { addItem = null } = {}) {
   if (!inspireFactory || !fieldId) return null;
+  if (addItem) return inspireFactory(fieldId, addItem, false, { list: true });
   // A field that asks for a paragraph and one that asks for a handle want
   // different things from the same tables, so the block is told which it is.
   const multiline = !!(input && input.tagName === "TEXTAREA");
