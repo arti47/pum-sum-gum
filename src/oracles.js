@@ -3,8 +3,8 @@
 import { el, add, announce } from "./core.js";
 import { explain, actionBar, resultCard, toast, promptModal, noGameNotice } from "./ui.js";
 import * as store from "./store.js";
-import { rollYesNo, rollGranular, rollOracle, enrichOracle, journalRoll, diceText, rollProposal, rollPrompt }
-  from "./roller.js";
+import { rollYesNo, rollGranular, rollOracle, enrichOracle, journalRoll, diceText, rollProposal, rollPrompt,
+  journalDice } from "./roller.js";
 import { yesNoRegisters, granularBands, enrichmentFor } from "./rules.js";
 import { sectionNav, render, go } from "./router.js";
 import { openRule } from "./screens.js";
@@ -95,7 +95,8 @@ function renderYesNo(host) {
     onClick: () => {
       const r = rollYesNo({ register: ynRegister, bias: ynBias, question });
       commit(r, r.needsChoice
-        ? { title: `Yes/No (${ynRegister}) — bias, awaiting your pick`, detail: r.options.map((o) => `${o.roll}: ${o.answer}`).join(" | ") }
+        ? { title: `Yes/No (${ynRegister}) — bias, awaiting your pick`, detail: r.options.map((o) => `${o.roll}: ${o.answer}`).join(" | "),
+            pick: { register: ynRegister, rolls: r.options.map((o) => o.roll), question } }
         : { title: `Yes/No (${ynRegister}) — ${r.options[0].answer}`, detail: question });
       if (!r.needsChoice) announce(r.options[0].answer);
     },
@@ -190,10 +191,7 @@ function renderLast() {
       add(chips, el("button", {
         class: "chip",
         onclick: () => {
-          store.updateJournal(entryId, {
-            title: `Yes/No (${result.register}) — ${o.answer}`,
-            detail: `Chose ${o.roll} of ${result.options.map((x) => x.roll).join(" and ")}`,
-          });
+          store.resolvePick(entryId, o.roll, o.answer);
           last = { result: { ...result, needsChoice: false, chosen: o }, entryId };
           announce(o.answer);
           render();
@@ -304,7 +302,7 @@ function rerollActions(result) {
         if (!enriched.enrichment) return;
         store.updateJournal(last.entryId, {
           detail: `${question}${question ? " — " : ""}${enriched.enrichment.name} ${enriched.enrichment.roll}: ${enriched.enrichment.word}`,
-          dice: enriched.dice.map((d) => ({ label: d.label, value: d.value, kept: d.kept })),
+          dice: journalDice(enriched),
         });
         last = { result: enriched, entryId: last.entryId };
         announce(`${enriched.enrichment.name}: ${enriched.enrichment.word}`);
@@ -320,7 +318,10 @@ function rerollActions(result) {
         const prev = last.entryId;
         if (result.kind === "yesno") {
           const r = rollYesNo({ register: result.register, bias: result.bias, question });
-          commitLinked(r, prev, `Yes/No (${result.register}) — re-rolled`);
+          commitLinked(r, prev, r.needsChoice
+            ? `Yes/No (${result.register}) — bias, awaiting your pick`
+            : `Yes/No (${result.register}) — re-rolled: ${r.options[0].answer}`,
+          r.needsChoice ? { register: result.register, rolls: r.options.map((o) => o.roll), question } : null);
         } else if (result.kind === "granular") {
           const r = rollGranular({ register: result.register, band: result.band, question });
           commitLinked(r, prev, `Granular — re-rolled: ${r.answer}`);
@@ -347,8 +348,8 @@ function rerollActions(result) {
   ]);
 }
 
-function commitLinked(result, previousId, title) {
-  const entry = journalRoll(result, { title, detail: question, linkedTo: previousId });
+function commitLinked(result, previousId, title, pick = null) {
+  const entry = journalRoll(result, { title, detail: question, linkedTo: previousId, pick });
   last = { result, entryId: entry.id };
   render();
 }

@@ -2008,3 +2008,10 @@ details.entry-tools[open] > summary { position: absolute; top: .45rem; right: 0;
 .node-row.just-added input { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .node-foot { justify-content: space-between; margin-top: .3rem; }
 .node-foot .btn[hidden] { display: none; }
+
+/* A bias Yes/No still waiting for its pick, on its journal entry */
+.entry-pick { margin-top: .4rem; padding: .4rem .5rem; border-left: 2px solid var(--accent); background: var(--paper, transparent); }
+.entry-pick p { margin: 0 0 .3rem; font-size: .9em; }
+
+/* A cross-link to a sibling screen */
+.see-also { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; margin: .8rem 0; padding: .4rem 0; border-top: 1px dashed var(--line, currentColor); }

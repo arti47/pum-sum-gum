@@ -755,21 +755,7 @@ function nodeBlock(scope, beat) {
   const row = el("div", { class: "btn-row" });
   add(row, el("button", {
     class: "btn small",
-    onclick: () => promptModal({
-      title: "Add a new plot node",
-      label: cat ? cat.name : "New node",
-      inspire: n.categoryId,
-      hint: "Something new or unexpected at this point. It becomes a permanent entry in this list.",
-      onSubmit: (v) => {
-        if (!v) return;
-        const slots = nodeSlots(scope, n.categoryId);
-        const at = store.writeNodeToFirstEmpty(n.categoryId, v, slots);
-        openBeat.node = { ...n, text: v, empty: false, slot: at >= 0 ? at : n.slot };
-        persistBeat();
-        store.addJournal({ kind: "node", title: "Plot node invented", detail: `${cat ? cat.name : ""}: ${v}`, linkedTo: beat.journalId });
-        render();
-      },
-    }),
+    onclick: () => addNewNodeDialog(scope, n, beat),
   }, "Add new"));
   add(row, el("button", {
     class: "btn small", onclick: () => chooseNodeDialog(scope, n, beat),
@@ -864,13 +850,42 @@ function unprintedListBlock(scope, wrap, n, cat, beat) {
   return wrap;
 }
 
+// "Add new" on an empty slot: the Conversion — what you invent here becomes a
+// permanent entry in the list (PUM p.6).
+function addNewNodeDialog(scope, n, beat) {
+  const name = categoryName(scope, n.categoryId);
+  promptModal({
+    title: "Add a new plot node",
+    label: name || "New node",
+    inspire: n.categoryId,
+    hint: "Something new or unexpected at this point. It becomes a permanent entry in this list.",
+    onSubmit: (v) => {
+      if (!v) return;
+      const slots = nodeSlots(scope, n.categoryId);
+      const at = store.writeNodeToFirstEmpty(n.categoryId, v, slots);
+      openBeat.node = { ...n, text: v, empty: false, slot: at >= 0 ? at : n.slot };
+      persistBeat();
+      store.addJournal({ kind: "node", title: "Plot node invented", detail: `${name}: ${v}`, linkedTo: beat.journalId });
+      render();
+    },
+  });
+}
+
 function chooseNodeDialog(scope, n, beat) {
-  const cat = nodeCategory(n.categoryId);
+  const name = categoryName(scope, n.categoryId);
   const list = nodeList(scope, n.categoryId);
   const body = el("div");
   const written = list.map((t, i) => ({ t, i })).filter((x) => x.t && x.t.trim());
   if (!written.length) {
-    add(body, el("p", { class: "muted", text: "Nothing is written in this list yet. Add a new node instead." }));
+    // It used to say "Add a new node instead" and offer only Cancel — a
+    // capability named with no way to take it. The way is now the dialog's
+    // own primary action.
+    add(body, el("p", { class: "muted", text: "Nothing is written in this list yet, so there is nothing to choose. Add a new node instead." }));
+    modal({ title: `Choose from ${name}`, body, actions: [
+      { label: "Add a new node", primary: true, onClick: () => addNewNodeDialog(scope, n, beat) },
+      { label: "Cancel" },
+    ] });
+    return;
   }
   for (const { t, i } of written) {
     add(body, el("button", {
@@ -883,7 +898,7 @@ function chooseNodeDialog(scope, n, beat) {
       },
     }, t));
   }
-  modal({ title: `Choose from ${cat ? cat.name : "the list"}`, body, actions: [{ label: "Cancel" }] });
+  modal({ title: `Choose from ${name}`, body, actions: [{ label: "Cancel" }] });
 }
 
 // PUM p.28's cheat sheet, folded under the two calls it chooses between.
@@ -1033,7 +1048,7 @@ function nodeCard(scope, cat, slots) {
         class: `node-txt ${text ? "" : "empty"} btn ghost`.trim(),
         style: "text-align:left;justify-content:flex-start;flex:1;min-height:40px;padding:.2rem .3rem",
         onclick: () => promptModal({
-          title: cat.name,
+          title: categoryName(scope, cat.id),
           label: `Slot ${lo}-${hi}`,
           value: text,
           inspire: cat.id,
@@ -1079,12 +1094,12 @@ function invokeDeliberately(scope, cat, index, text) {
           const node = invokeNode(scope, cat.id, { chosen: index });
           openBeat = {
             kind: "beat", beatType: "prompt", roll: 0,
-            text: `${cat.name} (chosen)`, prompt: { label: cat.name, node: cat.id },
+            text: `${categoryName(scope, cat.id)} (chosen)`, prompt: { label: categoryName(scope, cat.id), node: cat.id },
             dice: [], repeat: false, key: "chosen:" + cat.id + ":" + index,
             node, event: null, journalId: null,
           };
           const entry = store.addJournal({
-            kind: "beat", title: "Plot node invoked deliberately", detail: `${cat.name}: ${text}`,
+            kind: "beat", title: "Plot node invoked deliberately", detail: `${categoryName(scope, cat.id)}: ${text}`,
           });
           openBeat.journalId = entry.id;
           persistBeat();

@@ -2113,3 +2113,33 @@ faction is after*, *Something a villain has done*; tapping a result puts it in i
 to it and selects the text for rewriting, with the list's instruction giving a worked example;
 **Add all three as nodes** fills without stealing focus; every filled slot has a ✕ and every list
 **Clear list**.
+
+---
+
+## Loose ends from play, closed (2026-10-10)
+
+The four *Reported, not fixed* findings from the second played story were numbered F-76–F-79,
+and those numbers were later reused by the layout pass. They are renumbered here.
+
+**F-99 (was F-76) · A biased Yes/No left unpicked was stranded.** *Rule:* PUM's bias — both
+answers offered, the player picks (ruling A4). *Fix:* the entry stores `pick`; the journal draws
+the two chips on the entry; `store.resolvePick` settles it. Old saves are recovered from the
+entry's title and its two d10s in `normalize()`. A biased re-roll now carries its pick too, which
+it did not — its chips silently wrote nothing. *Guard:* unit — legacy entry recovered, malformed
+pick dropped, journal source offers the pick. Watched failing.
+
+**F-100 (was F-77) · The disruption die was never journalled.** *Fix:* `roller.journalDice`
+adds the disruption d10 to the entry's dice, recorded as kept whether or not it fired ("not kept"
+means a die the Rule of Bias dropped); Enrich it uses the same helper so it does not drop it.
+
+**F-101 (was F-78) · The empty "Choose from …" dialog was a dead end.** *Fix:* its primary is
+**Add a new node**, the same dialog as the beat card's Add new (`addNewNodeDialog`).
+
+**F-102 (was F-79) · A player-named list lost its name.** *Fix:* every surface that showed
+`cat.name` for a node list reads `derived.categoryName()` — the Choose and Add new dialogs, the
+journal line, the slot editor, a deliberate invocation, and the Forge's "Written into" toast.
+
+**GUM named where PUM and SUM are.** Not a defect report — the question "what happened to GUM"
+had no on-screen answer in play. *Which do I need?* gains a fifth row while GUM is on, and the
+Forge carries a book tag. Off, both go with the Forge.
+

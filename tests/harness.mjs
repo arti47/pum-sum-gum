@@ -763,6 +763,33 @@ const core = await import("../src/core.js");
   ok("no bias needs no choice", plain.needsChoice === false);
 }
 
+// A bias Yes/No left unpicked is never stranded (play-reported F-76): the
+// entry holds its pick, an old save's pending entry is recovered from its own
+// title and dice, and resolving it writes the chosen answer.
+{
+  const legacy = derived.normalize({ games: [{ title: "g", journal: [{
+    kind: "yesno", title: "Yes/No (conversation) — bias, awaiting your pick",
+    detail: "7: x | 6: y", dice: [{ label: "d10 #1", value: 7 }, { label: "d10 #2", value: 6 }],
+  }, { kind: "yesno", title: "Yes/No (subjective) — No", dice: [{ label: "d10", value: 2 }] }] }] });
+  const [pending, settled] = legacy.games[0].journal;
+  ok("an old pending bias entry is recovered as a pick",
+    pending.pick && pending.pick.register === "conversation" && pending.pick.rolls.join() === "7,6",
+    JSON.stringify(pending.pick));
+  eq("a settled entry carries no pick", settled.pick, null);
+  const junk = derived.normalize({ games: [{ title: "g", journal: [{ pick: { register: 1, rolls: [0, 99] } }] }] });
+  eq("a malformed pick is dropped", junk.games[0].journal[0].pick, null);
+  const src = readFileSync(join(root, "src/journal.js"), "utf8");
+  ok("the journal offers the pick on the entry itself", src.includes("e.pick") && src.includes("resolvePick"));
+}
+
+// The disruption die is journalled with the roll it interrupted (F-77)
+{
+  const withD = roller.journalDice({ dice: [{ label: "d10", value: 8, kept: true }], disruption: { roll: 3, fires: null, die: { label: "disruption d10" } } });
+  eq("the disruption d10 is among the journalled dice", withD.length, 2);
+  eq("with its face", withD[1].value, 3);
+  eq("no disruption, no extra die", roller.journalDice({ dice: [{ label: "d10", value: 8 }] }).length, 1);
+}
+
 // SUM bias is mechanical: keep low / keep high (ruling A4)
 {
   let lowOk = true, highOk = true, both = true;

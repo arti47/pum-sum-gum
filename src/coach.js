@@ -16,6 +16,7 @@ import { promptModal, toast, noteFold } from "./ui.js";
 import * as store from "./store.js";
 import { isResolved, isEnded, hasTrack, crossed, trackLength } from "./derived.js";
 import { go, render } from "./router.js";
+import { Settings } from "./settings.js";
 
 // The beat controls are further down THIS screen, so "go to the beat" is a
 // scroll, not a navigation. Three coach actions used go("play","track") from
@@ -301,8 +302,11 @@ export function whichMachine(here, { closed = false } = {}) {
 // The rows themselves; Home shows them open, above the three books.
 export function whichBody(here = null) {
   const body = el("div", { class: "body which-body" });
-  add(body, el("p", { class: "which-line", text: WHICH_MACHINE.line }));
+  const gum = Settings.gum();
+  add(body, el("p", { class: "which-line",
+    text: gum ? `${WHICH_MACHINE.line} ${WHICH_MACHINE.gumLine}` : WHICH_MACHINE.line }));
   for (const row of WHICH_MACHINE.rows) {
+    if (row.gum && !gum) continue;
     const isHere = row.go[0] === here;
     add(body, el("div", { class: `which-row${isHere ? " here" : ""}` },
       el("div", { class: "which-text" },
