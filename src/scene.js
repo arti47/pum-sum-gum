@@ -57,6 +57,7 @@ export function renderScene(host, section) {
 // --- this scene --------------------------------------------------------------
 function renderArc(host, scope) {
   add(host, el("h1", { text: "This scene" }));
+  add(host, el("p", { class: "lede", text: "Open, interrupt and close the scene you are in." }));
   add(host, explain([
     "SUM's three boundary rolls, in play order: an opener when you don't know how to start, an intervention check mid-scene, and a closure to see how the world responds.",
     "None of them fires on its own — you decide when a scene needs one. Each writes a journal entry you can undo in one step.",
@@ -311,6 +312,7 @@ function renderLast() {
 // --- the SUM tables, by situation -------------------------------------------
 function renderTables(host) {
   add(host, el("h1", { "data-situation": situation, text: "Roll a table" }));
+  add(host, el("p", { class: "lede", text: "What happens inside the scene, by the situation it is in." }));
   add(host, explain([
     "SUM's tables for what happens inside a scene. Pick the situation the scene is in; its tables are listed in the book's order.",
     "Every SUM table is ordered so low rolls favour your protagonists and high rolls bring trouble. Declare your expectation before rolling and the app keeps the right die for you.",

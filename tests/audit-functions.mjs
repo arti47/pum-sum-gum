@@ -525,6 +525,13 @@ const journeys = [];
   journeys.push(`bias Yes/No → picked from the journal: ${picked ? "taken" : "NOT OFFERED"}`);
 }
 
+// 6e. The ? in the header opens the screen's help.
+{
+  await seed(MID, "play", "track");
+  const opened = await tapText(/./, "#btn-help");
+  journeys.push(`header ? → help: ${opened ? "opened" : "NOT OFFERED"}`);
+}
+
 // 6b. The oracle result card's own follow-ups, named rather than hoped for:
 // re-roll writes a LINKED journal entry, and "Enrich it" rolls only the second
 // die into the same entry. Both are controls on a card that exists only after a

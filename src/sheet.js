@@ -1003,6 +1003,7 @@ function triggersFold() {
 export function renderNodes(host, scope) {
   const sheet = plotSheet(scope.sheetId);
   add(host, el("h1", { text: "Plot nodes" }));
+  add(host, el("p", { class: "lede", text: "What a random prompt can reach into." }));
   add(host, explain([
     "Plot nodes are your game's own content — the things a random prompt can reach into. Write them at the start and keep them alive as you play.",
     "The die above each list is the one the app will roll: 1d10 while a list is less than half full, 1d20 from the halfway entry on.",

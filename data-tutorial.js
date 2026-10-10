@@ -799,7 +799,7 @@ const REFERENCE = [
         "Plot sheets in this game: Switch to this · Edit (scope name, mission, starting point) · Delete · New plot sheet.",
         "Your games: Open · Archive / Restore · Prepare another game.",
         "The machines — which do I need? (folded: the four rows Call a plot beat · See the track · Ask an oracle · Go to the scene, and Open the Forge while GUM is on, then what PUM, SUM and GUM each do).",
-        "With no game: Never played solo before? — three pictures (You tell the story · The machine answers · Your rules resolve) and Tell me more, which unfolds the three lines behind them · Prepare a game (floating, with Walkthrough beside it).",
+        "With no game: Never played solo before? — three pictures — you tell it, the machine answers, your rules resolve — and Tell me more, which unfolds the three lines behind them · Prepare a game (floating, with Walkthrough beside it).",
       ] },
       { p: "Forge (hidden when GUM is off)" },
       { bullets: [

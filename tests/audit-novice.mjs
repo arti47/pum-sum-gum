@@ -73,7 +73,9 @@ const readScreen = () => page.evaluate((TERMS) => {
   const firstContent = (() => {
     const kids = [...screen.children].filter(vis);
     for (const k of kids) {
-      if (k.tagName === "H1" || k.classList.contains("section-nav") || k.tagName === "NAV") continue;
+      // The way back to the Table is chrome too: the same row on every room off it.
+      if (k.tagName === "H1" || k.classList.contains("section-nav") || k.tagName === "NAV"
+        || k.classList.contains("table-back")) continue;
       if (k.matches("p, .lede, details.explain, .coach")) return "prose";
       if (k.querySelector("button")) return "control";
       return "other";

@@ -12,7 +12,7 @@
 // correct, because it is derived, never remembered.
 
 import { el, add } from "./core.js";
-import { promptModal, toast, noteFold } from "./ui.js";
+import { promptModal, toast } from "./ui.js";
 import * as store from "./store.js";
 import { isResolved, isEnded, hasTrack, crossed, trackLength } from "./derived.js";
 import { go, render } from "./router.js";

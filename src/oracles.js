@@ -26,6 +26,7 @@ export function renderOracles(host, section) {
   add(host, tableBack("PUM · one question"));
   add(host, sectionNav("oracles", section));
   add(host, el("h1", { text: "Ask the oracle" }));
+  add(host, el("p", { class: "lede", text: "One question the story cannot answer yet." }));
   add(host, explain([
     "Ask a question, pick the oracle that fits, and read the answer as inspiration rather than instruction.",
     NO_TASK_RESOLUTION,
@@ -126,7 +127,8 @@ function yesNoBar() {
     ariaLabel: `Ask the Yes or No oracle — 1d10, ${ynRegister} register${bias ? ", with bias: roll twice and pick" : ""}`,
     context: `1d10 · ${ynRegister}${bias ? " · bias" : ""}`,
     onClick: () => {
-      const r = rollYesNo({ register: ynRegister, bias: bias, question });
+      // Read at the press, not at the render: the box can be ticked in between.
+      const r = rollYesNo({ register: ynRegister, bias: ynBias && !Settings.simple(), question });
       commit(r, r.needsChoice
         ? { title: `Yes/No (${ynRegister}) — bias, awaiting your pick`, detail: r.options.map((o) => `${o.roll}: ${o.answer}`).join(" | "),
             pick: { register: ynRegister, rolls: r.options.map((o) => o.roll), question } }
