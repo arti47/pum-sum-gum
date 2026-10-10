@@ -81,6 +81,29 @@
   --grain-a:    .05;
 }
 
+:root[data-theme="candle"] {
+  /* Candlelight: warm black paper, gold ink. A third theme, chosen, never automatic. */
+  color-scheme: dark;
+  --paper:      #17110b;
+  --paper-2:    #211810;
+  --paper-sunk: #110c07;
+  --ink:        #f3e3c3;
+  --ink-2:      #d4bf98;
+  --ink-3:      #a8946f;
+  --rule:       #3a2c1d;
+  --rule-2:     #57442c;
+  --accent:     #e0a841;
+  --accent-text:#e8b456;
+  --accent-ink: #17110b;
+  --accent-soft:#3a2a12;
+  --good:       #9cc48a;
+  --warn:       #e8a35b;
+  --shadow:     0 1px 0 rgba(0,0,0,.4), 0 2px 12px rgba(0,0,0,.45);
+  --lift:       0 1px 0 rgba(0,0,0,.4), 0 10px 28px -10px rgba(0,0,0,.7), 0 0 40px -20px rgba(224,168,65,.25);
+  --press:      inset 0 -2px 0 rgba(0,0,0,.4);
+  --grain-a:    .06;
+}
+
 * { box-sizing: border-box; }
 
 /* Everything on these screens is text the PLAYER wrote, and a player can paste a
@@ -2015,3 +2038,195 @@ details.entry-tools[open] > summary { position: absolute; top: .45rem; right: 0;
 
 /* A cross-link to a sibling screen */
 .see-also { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; margin: .8rem 0; padding: .4rem 0; border-top: 1px dashed var(--line, currentColor); }
+
+/* ======================================================================
+   The Table (2026-10-10): one play surface. The track along the top as a
+   road of milestones, the one thing happening now in the middle, the three
+   machines as big drawn buttons underneath, the drawers as chips.
+   ====================================================================== */
+.table-kicker {
+  margin: .1rem 0 0; font-family: var(--sans); font-size: .7rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+}
+#screen h1.table-title { font-size: 1.45rem; margin-top: .1rem; }
+
+/* --- the track as a road ------------------------------------------------ */
+.track-card { padding-top: .8rem; }
+.track { margin: .5rem 0 .2rem; }
+.track-sec { display: grid; grid-template-columns: 38px 1fr; column-gap: .55rem; align-items: center; margin-bottom: .35rem; }
+.track-sec-name { grid-column: 2; margin: 0 0 .15rem; }
+.track-sec::before {
+  content: ""; grid-row: 1 / span 2; grid-column: 1; width: 38px; height: 38px; border-radius: 50%;
+  border: 1.5px solid var(--rule-2); background: var(--paper);
+  -webkit-mask: none; mask: none;
+  box-shadow: inset 0 0 0 4px var(--paper-2);
+}
+.track-sec.current::before { border-color: var(--accent); box-shadow: inset 0 0 0 4px var(--paper-2), 0 0 0 3px var(--accent-soft); }
+.track-boxes { grid-column: 2; position: relative; gap: 6px; padding: 2px 0; }
+.track-boxes::before {
+  content: ""; position: absolute; left: 6px; right: 6px; top: 50%; border-top: 2px dashed var(--rule-2); z-index: 0;
+}
+.track-box {
+  z-index: 1; flex: 0 0 40px; max-width: 40px; height: 40px; border-radius: 50%;
+  border-width: 2px; background: var(--paper-2);
+}
+.track-box.crossed { border-radius: 50%; }
+.track-box.next {
+  border-style: solid; background: var(--paper-2); color: var(--accent-text); font-weight: 700;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.track-box.next::after {
+  /* the token: where you stand on the road */
+  content: ""; position: absolute; top: -13px; left: 50%; width: 12px; height: 14px; margin-left: -6px;
+  background: var(--accent); border-radius: 6px 6px 3px 3px;
+  clip-path: polygon(50% 0, 80% 20%, 70% 55%, 100% 100%, 0 100%, 30% 55%, 20% 20%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .track-box.next::after { animation: token-bob 2.4s ease-in-out infinite; }
+}
+@keyframes token-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.track-caption { margin-top: .4rem; }
+
+/* --- the middle of the table -------------------------------------------- */
+.table-now { margin: .9rem 0 .2rem; }
+.table-now > .card { margin-bottom: .6rem; }
+.table-now .beat-call { margin-top: .2rem; }
+
+/* --- the three machines -------------------------------------------------- */
+.table-tiles {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin: 1rem 0 .7rem;
+}
+.tile {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: .15rem;
+  padding: .8rem .3rem .7rem; min-height: 118px;
+  border: 1.5px solid var(--rule-2); border-radius: 16px; background: var(--paper-2);
+  box-shadow: var(--lift); cursor: pointer; color: var(--ink); font: inherit;
+  transition: transform .12s ease, border-color .12s ease;
+}
+.tile:hover { border-color: var(--ink-3); }
+.tile:active { transform: translateY(1px) scale(.98); }
+.tile-art {
+  width: 52px; height: 52px; background: var(--ink-2);
+  -webkit-mask: var(--tile-art) center / contain no-repeat; mask: var(--tile-art) center / contain no-repeat;
+}
+.tile-ask   { --tile-art: var(--art-oracles); }
+.tile-beat  { --tile-art: var(--art-play); }
+.tile-scene { --tile-art: var(--art-curtain); }
+.tile-label { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; line-height: 1.1; }
+.tile-book  { font-family: var(--sans); font-size: .62rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); text-align: center; }
+.tile .badge {
+  position: absolute; top: 8px; right: 8px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 2px var(--paper-2);
+}
+@media (forced-colors: active) { .tile-art { background: CanvasText; } }
+
+/* --- drawers ------------------------------------------------------------- */
+.drawer-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin: .2rem 0 1rem; }
+.drawer-chip { min-height: 40px; padding: .3rem .9rem; }
+.drawer-h { font-family: var(--sans); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: .8rem 0 .2rem; }
+.drawer-list { margin: 0; padding-left: 1.1rem; }
+.drawer-list li { margin: .15rem 0; font-family: var(--serif); }
+
+/* --- a plot beat's two calls --------------------------------------------- */
+.beat-calls { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin: .5rem 0; }
+.beat-pick {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .15rem; text-align: left;
+  min-height: 84px; padding: .7rem .8rem; white-space: normal;
+}
+.beat-pick strong { font-family: var(--serif); font-size: 1.05rem; }
+.beat-pick small { font-weight: 400; color: var(--ink-3); font-size: .78rem; line-height: 1.3; }
+@media (max-width: 359px) { .beat-calls { grid-template-columns: 1fr; } }
+
+/* --- a room off the table ------------------------------------------------ */
+.table-back { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin: 0 0 .3rem; }
+.table-back .book-tag { margin: 0; }
+
+/* --- the next move floats, a pill above the tab bar ----------------------- */
+.action-bar-mount { pointer-events: none; }
+.action-bar {
+  pointer-events: auto; width: calc(100% - 24px); max-width: 460px; margin: 0 auto 8px;
+  border: 1px solid var(--rule); border-radius: 999px;
+  padding: .35rem .4rem .35rem 1rem;
+  box-shadow: var(--lift), 0 12px 28px -14px rgba(27, 33, 48, .45);
+}
+.action-bar .btn { border-radius: 999px; }
+/* The landmark is the act's own engraving, standing beside its stretch of road. */
+.track-sec[data-sec] .track-sec-name::after { display: none; }
+.track-sec::before {
+  border: none; box-shadow: none; border-radius: 0; width: 34px; height: 34px;
+  background: var(--ink-3);
+  -webkit-mask: var(--act-art, var(--art-fleuron)) center / contain no-repeat; mask: var(--act-art, var(--art-fleuron)) center / contain no-repeat;
+}
+.track-sec.current::before { background: var(--accent-text); box-shadow: none; }
+.drawer-chips .chip { flex: 0 0 auto; text-align: center; }
+#btn-help > span { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27black%27%20stroke-width%3D%271.7%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2712%27%20r%3D%279%27/%3E%3Cpath%20d%3D%27M9.5%209.5a2.5%202.5%200%201%201%203.5%202.3c-.7.3-1%20.9-1%201.6v.6%27/%3E%3Ccircle%20cx%3D%2712%27%20cy%3D%2717%27%20r%3D%27.6%27%20fill%3D%27black%27/%3E%3C/svg%3E"); }
+.hdr-btn[hidden] { display: none; }
+details.help-drawer > summary.help-head { cursor: pointer; list-style: none; margin: 0; min-height: 40px; }
+details.help-drawer > summary.help-head::-webkit-details-marker { display: none; }
+details.help-drawer:not([open]) { padding-bottom: .7rem; }
+details.help-drawer[open] > summary.help-head { margin-bottom: .3rem; }
+
+/* The cold open: the machine, and three pictures for what a solo game is. */
+.solo-card { text-align: center; }
+.solo-card h2 { margin: .2rem 0 .6rem; }
+.solo-steps { list-style: none; padding: 0; margin: .4rem 0 .6rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; counter-reset: solo; }
+.solo-steps li { display: flex; flex-direction: column; align-items: center; gap: .35rem; font-family: var(--serif); font-size: .95rem; line-height: 1.2; counter-increment: solo; }
+.solo-art { width: 56px; height: 56px; background: var(--ink-2);
+  -webkit-mask: var(--solo-art) center / contain no-repeat; mask: var(--solo-art) center / contain no-repeat; }
+.solo-steps li[data-art="quill"]   { --solo-art: var(--art-quill); }
+.solo-steps li[data-art="oracles"] { --solo-art: var(--art-oracles); }
+.solo-steps li[data-art="scales"]  { --solo-art: var(--art-scales); }
+.solo-card .rows-fold { text-align: left; }
+details.machines > summary { font-family: var(--serif); font-weight: 700; }
+:root[data-theme="candle"] body { background-image: radial-gradient(90% 60% at 50% 0%, rgba(224, 168, 65, .10), transparent 65%); }
+.show-all { color: var(--accent-text); font-weight: 700; }
+.ask-field .ask-q { font-size: 1.1rem; min-height: 52px; font-family: var(--serif); }
+.ask-hint { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; min-height: 1.4rem; margin: -.3rem 0 .6rem; font-size: .88rem; }
+.reg-blurb { margin-top: .35rem; }
+
+/* Prep as a conversation: the machine asks, you answer beneath it. */
+.wz-ask { display: flex; align-items: flex-end; gap: .6rem; margin: .4rem 0 .9rem; }
+.wz-ask-art { flex: none; width: 46px; height: 46px; background: var(--ink-2);
+  -webkit-mask: var(--art-play) center / contain no-repeat; mask: var(--art-play) center / contain no-repeat; }
+.wz-ask-q {
+  position: relative; margin: 0; padding: .7rem .9rem; border-radius: 16px 16px 16px 4px;
+  background: var(--paper-2); border: 1.5px solid var(--rule-2); box-shadow: var(--lift);
+  font-family: var(--serif); font-size: 1.15rem; font-weight: 700; line-height: 1.25;
+}
+
+/* Each screen opens on its engraving, set large over a centred title — a
+   frontispiece rather than an icon beside a heading. */
+@media (min-height: 500px) {
+  #screen h1 {
+    flex-direction: column; align-items: center; text-align: center; gap: .35rem;
+    background: linear-gradient(var(--rule-2), var(--rule-2)) center bottom 4.5px / 70% 1px no-repeat;
+  }
+  #screen h1::before { width: 84px; height: 84px; background: var(--ink-2); opacity: .9; }
+  #screen h1::after { left: 50%; margin-left: -14px; background: var(--paper); box-shadow: 0 0 0 6px var(--paper); background-color: var(--rule-2); }
+  #screen h1.table-title::before { width: 64px; height: 64px; }
+  .table-kicker { text-align: center; }
+}
+
+/* Dice as the hero of a result: drawn large, the face that fell inside. */
+.result-head .die[data-d="10"], .result-head .die[data-d="20"] { min-width: 54px; height: 54px; font-size: 1.05rem; }
+.result-head .die[data-d="100"] { min-width: 58px; height: 58px; font-size: .98rem; }
+.result-head .die:not([data-d]) { min-width: 42px; height: 42px; font-size: 1rem; }
+
+/* A result card can be swiped: left re-rolls, right puts it away, up notes it. */
+.result.swipeable { touch-action: pan-y; }
+.result.swiping { transition: none; }
+.result.swipe-back { transition: transform .2s ease; }
+.swipe-hint { margin: .3rem 0 0; font-family: var(--sans); font-size: .68rem; color: var(--ink-3); text-align: center; letter-spacing: .04em; }
+
+/* The journal as a storybook: your own words in a hand, the machine's rolls
+   set small, as stamps in the margin of your story. */
+:root { --hand: "Bradley Hand", "Segoe Print", "Snell Roundhand", "Apple Chancery", "URW Chancery L", cursive; }
+.jentry[data-kind="note"] .entry-detail, .jentry[data-kind="ending"] .entry-detail,
+.jentry[data-kind="session"] .entry-detail, .jentry .entry-note {
+  font-family: var(--hand); font-size: 1.12rem; line-height: 1.45; color: var(--ink);
+}
+.jentry[data-kind="note"], .jentry[data-kind="ending"] { background: var(--paper-2); }
+.jentry:not([data-kind="note"]):not([data-kind="ending"]):not([data-kind="session"]) .entry-title { font-size: .92rem; }
+.jentry .entry-dice { float: right; margin: -.2rem 0 .2rem .6rem; transform: rotate(-4deg); opacity: .9; }
+.jentry .entry-dice .die { min-width: 30px; height: 30px; font-size: .7rem; }
+#screen:has(.solo-card) > h1::before { display: none; }

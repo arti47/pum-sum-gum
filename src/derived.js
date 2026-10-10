@@ -384,7 +384,7 @@ export function normalize(input = {}) {
   const set = obj(raw.settings);
   const state = {
     version: STATE_VERSION,
-    theme: ["light", "dark", "system"].includes(raw.theme) ? raw.theme : "system",
+    theme: ["light", "dark", "system", "candle"].includes(raw.theme) ? raw.theme : "system",
     textScale: Number(raw.textScale) >= 0.85 && Number(raw.textScale) <= 1.4
       ? Number(raw.textScale) : 1,
     settings: {
@@ -395,6 +395,9 @@ export function normalize(input = {}) {
       explainOpen: typeof set.explainOpen === "boolean" ? set.explainOpen : true,
       seenTutorial: !!set.seenTutorial,
       feel: !!set.feel,
+      // Simple view: a first game shows the tools a first game needs. Unset, it
+      // is on for a fresh install and off for anyone who already has a game.
+      simple: typeof set.simple === "boolean" ? set.simple : null,
     },
     activeGameId: str(raw.activeGameId) || null,
     // Tables the player typed in from a book this app has never read. They sit
@@ -419,5 +422,6 @@ export function normalize(input = {}) {
     state.activeGameId = state.games[0].id;
   }
   if (!state.games.length) state.activeGameId = null;
+  if (state.settings.simple === null) state.settings.simple = !state.games.length;
   return state;
 }

@@ -39,6 +39,14 @@ export const Settings = {
   feel: () => !!getState().settings.feel,
   setFeel: (v) => setSetting("feel", !!v),
 
+  // Simple view (the app's own, not a rule): a first game sees the tools a first
+  // game needs — Yes or No among the oracles, no bias box, the main pages of
+  // the Story and Setup — and every other tool is one "Show everything" away.
+  // Nothing a book grants is removed: each screen that hides something says so
+  // and offers the switch. It turns itself off once a first storyline is written.
+  simple: () => !!getState().settings.simple,
+  setSimple: (v) => setSetting("simple", !!v),
+
   seenTutorial: () => !!getState().settings.seenTutorial,
   setSeenTutorial: (v) => setSetting("seenTutorial", !!v),
 
@@ -57,14 +65,14 @@ export function applyTheme() {
   root.style.setProperty("--scale", String(Settings.textScale()));
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    const dark = t === "dark"
+    const dark = t === "dark" || t === "candle"
       || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    meta.setAttribute("content", dark ? "#1c1f28" : "#fffaf0");   // the header bar, which the status bar sits on
+    meta.setAttribute("content", t === "candle" ? "#211810" : dark ? "#1c1f28" : "#fffaf0");   // the header bar, which the status bar sits on
   }
 }
 
 export function cycleTheme() {
-  const order = ["system", "light", "dark"];
+  const order = ["system", "light", "dark", "candle"];
   const next = order[(order.indexOf(Settings.theme()) + 1) % order.length];
   Settings.setTheme(next);
   applyTheme();

@@ -48,6 +48,15 @@ async function newPage(fixture, width = 390) {
   return { ctx, page, errors };
 }
 
+// A beat is called from the Table: its two calls sit in the middle when the
+// next move is a beat, and otherwise behind the Beat button.
+async function callBeat(page, label) {
+  const inline = page.locator("#screen .beat-call button", { hasText: label });
+  if (await inline.count()) return inline.first().click();
+  await page.locator("#screen .tile-beat").click();
+  await page.locator(".modal .beat-call button", { hasText: label }).first().click();
+}
+
 async function goto(page, tab, section) {
   await page.evaluate(async ([t, s]) => {
     const r = await import("./src/router.js");
@@ -335,6 +344,8 @@ for (const theme of ["light", "dark"]) {
     return r.TABS.map((t) => ({ id: t.id, sections: r.liveSections(t) }));
   });
   for (const t of tabs) {
+    // A tab with one page has no strip to check.
+    if (t.sections.length < 2) continue;
     for (const s of t.sections) {
       await goto(page, t.id, s);
       const nav = await page.evaluate((count) => {
@@ -377,14 +388,14 @@ for (const theme of ["light", "dark"]) {
   await ctx.close();
 }
 
-// --- 5c. five tabs, and the Forge reachable from More ----------------------
+// --- 5c. three tabs, and the Forge reachable from Setup ----------------------
 {
   const { ctx, page } = await newPage(FIXTURES.mid, 320);
   const tabs = await page.evaluate(() =>
     [...document.querySelectorAll(".tab-bar button")].map((b) => ({
       label: b.textContent, w: Math.round(b.getBoundingClientRect().width),
     })));
-  ok("five tabs, not six", tabs.length === 5, tabs.map((t) => t.label).join("|"));
+  ok("three tabs: Table, Story, Setup", tabs.length === 3 && /Table/.test(tabs[0].label), tabs.map((t) => t.label).join("|"));
   ok("each tab is at least 60px wide at 320px", Math.min(...tabs.map((t) => t.w)) >= 60,
     `narrowest ${Math.min(...tabs.map((t) => t.w))}px`);
   await ctx.close();
@@ -471,9 +482,9 @@ for (const theme of ["light", "dark"]) {
 
   // Roll a beat and confirm it
   await goto(page, "play", "track");
-  // The pinned bar follows the coach now (here: write the starting point), so
-  // the beat is called from the track card, where the beat calls always are.
-  await page.locator("#screen .beat-call button", { hasText: "Random prompt" }).click();
+  // The floating bar follows the coach (here: write the starting point), so the
+  // beat is called from the Table's Beat button.
+  await callBeat(page, "Random prompt");
   await page.waitForTimeout(80);
   ok("a beat card appears", await page.locator("#screen .result").first().isVisible());
   const dice = await page.locator("#screen .result .die").count();
@@ -527,7 +538,7 @@ for (const theme of ["light", "dark"]) {
 {
   const { ctx, page } = await newPage(FIXTURES.mid);
   await goto(page, "play", "track");
-  await page.locator("#screen .beat-call button", { hasText: "Random prompt" }).first().click();
+  await callBeat(page, "Random prompt");
   await page.waitForTimeout(160);
   const named = async (pg) => pg.evaluate(() => [...document.querySelectorAll("button")]
     .filter((n) => n.offsetParent && !n.classList.contains("term"))

@@ -288,6 +288,14 @@ async function tapText(re, where = "#screen button, #action-bar button, .modal b
   return hit;
 }
 
+// A beat is called from the Table: in its middle when the next move is a beat,
+// otherwise behind the Beat button.
+async function callBeat(re = /random prompt/) {
+  if (await tapText(re, "#screen .beat-call button, #action-bar button")) return true;
+  if (!(await tapText(/^beat/, "#screen .tile"))) return false;
+  return tapText(re, ".modal .beat-call button");
+}
+
 // seed() writes (or clears) storage. Moving between screens inside one journey
 // must do neither — the first version of the files journey re-seeded to get back
 // to the shelf and wiped the file it had just added, then reported the controls
@@ -425,7 +433,7 @@ const journeys = [];
 // brief, so the strip on Oracles is where that button lives.
 {
   await seed(MID, "play", "track");
-  await tapText(/^random prompt$/);
+  await callBeat();
   await goTo("oracles", "yesno");
   const went = await tapText(/^go to the beat$/);
   journeys.push(`beat open → coach "Go to the beat": ${went ? "pressed" : "NOT OFFERED"}`);
@@ -445,14 +453,14 @@ const journeys = [];
     // try is still open the pinned bar is gone, and breaking here ended the walk
     // on try one — which is how this journey reported both surfaces unreachable
     // on one run and reached on the next. Dismiss whatever is open and roll on.
-    if (!(await tapText(/random prompt/))) {
+    if (!(await callBeat())) {
       await page.evaluate(async () => {
         for (const b of document.querySelectorAll(".modal-back")) b.remove();
         (await import("./src/viewstate.js")).clearTransient();
         (await import("./src/router.js")).go("play", "track");
       });
       await page.waitForTimeout(60);
-      if (!(await tapText(/random prompt/))) continue;
+      if (!(await callBeat())) continue;
     }
     await page.waitForTimeout(70);
     const seen = await page.evaluate(() => {

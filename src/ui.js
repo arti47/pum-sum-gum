@@ -393,7 +393,67 @@ export function resultCard({ kind, answer, second, question = "", dice = [], str
       }, a.label));
     }
     add(card, foot);
+    swipeable(card, actions);
   }
   return card;
+}
+
+// Swipe a result: left re-rolls, right dismisses, up adds a note — each the
+// same action as the card's own button, which stays for anyone who cannot or
+// will not swipe. Only actions the card already offers are reachable this way.
+function swipeable(card, actions) {
+  const find = (re) => actions.find((a) => re.test(a.label));
+  const moves = { left: find(/^re-?roll/i), right: find(/^dismiss$/i), up: find(/note/i) };
+  if (!moves.left && !moves.right && !moves.up) return;
+  card.classList.add("swipeable");
+  add(card, el("p", { class: "swipe-hint", "aria-hidden": "true", text: [
+    moves.left ? "← re-roll" : null, moves.up ? "↑ note" : null, moves.right ? "dismiss →" : null,
+  ].filter(Boolean).join("  ·  ") }));
+  let x0 = 0, y0 = 0, id = null;
+  card.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse" || e.target.closest("button, a, input, textarea, select, summary")) return;
+    id = e.pointerId; x0 = e.clientX; y0 = e.clientY;
+    card.classList.add("swiping"); card.classList.remove("swipe-back");
+  });
+  card.addEventListener("pointermove", (e) => {
+    if (e.pointerId !== id) return;
+    const dx = e.clientX - x0, dy = Math.min(0, e.clientY - y0);
+    if (Math.abs(dx) > Math.abs(dy)) card.style.transform = `translateX(${dx * 0.6}px) rotate(${dx / 60}deg)`;
+  });
+  const end = (e) => {
+    if (e.pointerId !== id) return;
+    id = null;
+    const dx = e.clientX - x0, dy = e.clientY - y0;
+    card.classList.remove("swiping"); card.classList.add("swipe-back");
+    card.style.transform = "";
+    let move = null;
+    if (Math.abs(dx) > 90 && Math.abs(dx) > Math.abs(dy)) move = dx < 0 ? moves.left : moves.right;
+    else if (dy < -90 && Math.abs(dy) > Math.abs(dx)) move = moves.up;
+    if (move) move.onClick();
+  };
+  card.addEventListener("pointerup", end);
+  card.addEventListener("pointercancel", (e) => { if (e.pointerId === id) { id = null; card.style.transform = ""; } });
+}
+
+// Press and hold anything that carries a rule id to read that rule. Registered
+// once at boot with the library's opener, so ui.js need not know the library.
+export function registerLongPress(openRule) {
+  let timer = 0, fired = false;
+  document.addEventListener("pointerdown", (e) => {
+    const t = e.target.closest("[data-rule]");
+    if (!t) return;
+    fired = false;
+    clearTimeout(timer);
+    timer = setTimeout(() => { fired = true; openRule(t.dataset.rule); }, 550);
+  });
+  const cancel = () => clearTimeout(timer);
+  document.addEventListener("pointerup", cancel);
+  document.addEventListener("pointercancel", cancel);
+  document.addEventListener("pointermove", (e) => { if (e.movementX * e.movementX + e.movementY * e.movementY > 36) cancel(); });
+  // A hold that opened a rule is not also a tap.
+  document.addEventListener("click", (e) => {
+    if (fired && e.target.closest("[data-rule]")) { e.preventDefault(); e.stopPropagation(); fired = false; }
+  }, true);
+  document.addEventListener("contextmenu", (e) => { if (e.target.closest("[data-rule]")) e.preventDefault(); });
 }
 

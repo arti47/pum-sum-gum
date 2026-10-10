@@ -1,18 +1,19 @@
 // The oracle console: Yes/No, descriptive, story, granular, quantifiers.
 
-import { el, add, announce } from "./core.js";
+import { el, add, announce, clear } from "./core.js";
 import { explain, actionBar, resultCard, toast, promptModal, noGameNotice } from "./ui.js";
 import * as store from "./store.js";
 import { rollYesNo, rollGranular, rollOracle, enrichOracle, journalRoll, diceText, rollProposal, rollPrompt,
   journalDice } from "./roller.js";
 import { yesNoRegisters, granularBands, enrichmentFor } from "./rules.js";
 import { sectionNav, render, go } from "./router.js";
+import { Settings } from "./settings.js";
 import { openRule } from "./screens.js";
 import { DESCRIPTIVE, STORY, QUANTIFIERS } from "../data-pum-oracles.js";
-import { NO_TASK_RESOLUTION } from "../data-guidance.js";
+import { NO_TASK_RESOLUTION, ORACLE_HINTS } from "../data-guidance.js";
 import { setOpenBeat } from "./sheet.js";
 import { registerClearer } from "./viewstate.js";
-import { coachStrip, whichMachine, bookTag } from "./coach.js";
+import { coachStrip, tableBack } from "./coach.js";
 
 // The last result, held so a re-render never re-rolls it.
 let last = null;
@@ -22,16 +23,15 @@ let grBand = "neutral";
 let question = "";
 
 export function renderOracles(host, section) {
+  add(host, tableBack("PUM · one question"));
   add(host, sectionNav("oracles", section));
-  add(host, el("h1", { text: "Oracles" }));
-  add(host, bookTag("oracles"));
+  add(host, el("h1", { text: "Ask the oracle" }));
   add(host, explain([
     "Ask a question, pick the oracle that fits, and read the answer as inspiration rather than instruction.",
     NO_TASK_RESOLUTION,
     "Dislike an answer? Re-roll it, ignore it, or read it against the grain. The journal keeps both rolls either way.",
   ], "no-resolution", openRule));
 
-  add(host, whichMachine("oracles"));
   if (store.activeGame()) add(host, coachStrip());
 
   if (!store.activeGame()) {
@@ -42,11 +42,22 @@ export function renderOracles(host, section) {
     }));
   }
 
-  const q = el("input", { type: "text", placeholder: "What are you asking? (optional)", value: question });
-  q.addEventListener("input", () => { question = q.value; });
-  add(host, el("label", { class: "field" },
+  const q = el("input", { type: "text", class: "ask-q", placeholder: "What do you want to know? (optional)", value: question });
+  const hint = el("p", { class: "ask-hint", "aria-live": "polite" });
+  const showHint = () => {
+    clear(hint);
+    const h = oracleHint(question);
+    if (!h) return;
+    const here = h.section === section && (!h.oracle || section === "yesno");
+    add(hint, el("span", { class: "muted", text: "Sounds like " }), el("strong", { text: h.name }),
+      here ? null : el("button", { class: "btn small ghost", onclick: () => go("oracles", h.section) }, "Go there"));
+  };
+  q.addEventListener("input", () => { question = q.value; showHint(); });
+  add(host, el("label", { class: "field ask-field" },
     el("span", { class: "lbl", text: "Your question" }), q
   ));
+  add(host, hint);
+  showHint();
 
   if (last) add(host, renderLast());
 
@@ -60,22 +71,40 @@ export function renderOracles(host, section) {
     "What your characters can perceive, enriched with a Description word.");
 }
 
+// The oracle a typed question sounds like (ORACLE_HINTS, the app's own).
+function oracleHint(text) {
+  if (!text || !text.trim()) return null;
+  const h = ORACLE_HINTS.find((x) => new RegExp(x.re, "i").test(text));
+  if (!h) return null;
+  if (h.section === "yesno") return { ...h, name: "a Yes or No question" };
+  const all = [...DESCRIPTIVE, ...STORY, ...QUANTIFIERS];
+  const t = all.find((x) => x.id === h.oracle);
+  return { ...h, name: t ? `${t.name}${t.question ? " (" + t.question + ")" : ""}` : h.section };
+}
+
 // --- Yes / No ---------------------------------------------------------------
 function renderYesNo(host) {
   const card = el("div", { class: "card" });
   add(card, el("h2", { text: "Yes or No" }));
   add(card, el("p", { class: "muted", text: "Three registers of the same question — pick the one that matches who is answering." }));
 
-  for (const reg of yesNoRegisters()) {
-    add(card, el("label", { class: "check" },
-      el("input", {
-        type: "radio", name: "ynreg", checked: ynRegister === reg.id || undefined,
-        onchange: () => { ynRegister = reg.id; },
-      }),
-      el("span", { class: "ct" }, el("strong", { text: reg.name }), el("small", { text: reg.blurb }))
-    ));
+  // Who is answering, as three segments; the chosen one says what it means.
+  const regs = yesNoRegisters();
+  const seg = el("div", { class: "btn-grid seg-grid reg-row", role: "group", "aria-label": "Register" });
+  for (const reg of regs) {
+    add(seg, el("button", {
+      class: `btn small ${ynRegister === reg.id ? "primary" : ""}`.trim(),
+      "aria-pressed": ynRegister === reg.id ? "true" : "false",
+      onclick: () => { ynRegister = reg.id; render(); },
+    }, reg.name));
   }
+  add(card, seg);
+  const chosen = regs.find((r) => r.id === ynRegister);
+  if (chosen) add(card, el("p", { class: "muted reg-blurb", text: chosen.blurb }));
 
+  // PUM's bias is a tool for a player who knows the oracles; a first game
+  // does without it until "Show everything".
+  if (Settings.simple()) { add(host, card); return yesNoBar(); }
   add(card, el("label", { class: "check" },
     el("input", {
       type: "checkbox", checked: ynBias || undefined,
@@ -87,13 +116,17 @@ function renderYesNo(host) {
     )
   ));
   add(host, card);
+  yesNoBar();
+}
 
+function yesNoBar() {
+  const bias = ynBias && !Settings.simple();
   actionBar({
     label: "Ask",
-    ariaLabel: `Ask the Yes or No oracle — 1d10, ${ynRegister} register${ynBias ? ", with bias: roll twice and pick" : ""}`,
-    context: `1d10 · ${ynRegister}${ynBias ? " · bias" : ""}`,
+    ariaLabel: `Ask the Yes or No oracle — 1d10, ${ynRegister} register${bias ? ", with bias: roll twice and pick" : ""}`,
+    context: `1d10 · ${ynRegister}${bias ? " · bias" : ""}`,
     onClick: () => {
-      const r = rollYesNo({ register: ynRegister, bias: ynBias, question });
+      const r = rollYesNo({ register: ynRegister, bias: bias, question });
       commit(r, r.needsChoice
         ? { title: `Yes/No (${ynRegister}) — bias, awaiting your pick`, detail: r.options.map((o) => `${o.roll}: ${o.answer}`).join(" | "),
             pick: { register: ynRegister, rolls: r.options.map((o) => o.roll), question } }

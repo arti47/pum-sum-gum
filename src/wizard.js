@@ -9,6 +9,7 @@ import { go, render } from "./router.js";
 import { PLOT_SHEETS, NODE_CATEGORIES } from "../data-pum-plot.js";
 import { GUM_PLOT_SEED, GUM_FOR_FIELDS } from "../data-gum.js";
 import { rollGumSet } from "./roller.js";
+import { PREP_ASKS } from "../data-guidance.js";
 import { registerClearer } from "./viewstate.js";
 import { Settings } from "./settings.js";
 
@@ -126,6 +127,11 @@ export function renderWizard(host) {
   add(host, el("div", { class: "wz-progress" },
     dots,
     el("p", { class: "lede", text: `Step ${s.n} of ${STEPS.length} — ${s.legend}` })
+  ));
+  // The machine asks; you answer underneath.
+  add(host, el("div", { class: "wz-ask" },
+    el("span", { class: "wz-ask-art", "aria-hidden": "true" }),
+    el("p", { class: "wz-ask-q", text: PREP_ASKS[step] })
   ));
   add(host, filledNote());
 

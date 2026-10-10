@@ -16,7 +16,7 @@ The app itself is at <https://arti47.github.io/pum-sum-gum/>.
 
 **Why.** PUM asks for a little preparation so your head is in the right creative context before you start. Four steps: a universe, a plot scope, your protagonists, and a plot sheet.
 
-**Do.** More → Home → Prepare a game. Name the world you want to play in, then say in one line what this thread is about — that is your plot scope.
+**Do.** Setup → Home → Prepare a game. Name the world you want to play in, then say in one line what this thread is about — that is your plot scope.
 
 ### 2 · Choose a plot sheet, and understand what you chose
 
@@ -40,13 +40,13 @@ The app itself is at <https://arti47.github.io/pum-sum-gum/>.
 
 **Why.** SUM's scene opener exists for the moment you know a scene should happen but not how it begins. It is a d20 that tells you what to describe first.
 
-**Do.** Scene → Roll a scene opener. If you already know how it opens, use 'Open it myself' — you never have to roll.
+**Do.** Table → Scene → Roll a scene opener. If you already know how it opens, use 'Open it myself' — you never have to roll.
 
 ### 6 · Roleplay, and ask when you don't know
 
 **Why.** Most of your time is state one: playing your characters. The oracles are for the moments you genuinely don't know, or would rather not decide.
 
-**Do.** Oracles → Yes or No. Pick the register that matches who is answering. Keep it to one or two questions per matter.
+**Do.** Table → Ask → Yes or No. Pick the register that matches who is answering. Keep it to one or two questions per matter.
 
 ### 7 · Bias: two different rules, kept apart
 
@@ -58,7 +58,7 @@ The app itself is at <https://arti47.github.io/pum-sum-gum/>.
 
 **Why.** This is the machine. A modified proposal twists an idea you already have; a random prompt tells you what happens when you don't have one.
 
-**Do.** Play → the pinned button rolls a random prompt; the smaller one rolls a proposal. Then play the answer out for a while before deciding anything.
+**Do.** Table → Beat → Random prompt or Modified proposal — or, when a scene is waiting for its beat, the floating button rolls the random prompt and the smaller one the proposal. Then play the answer out for a while before deciding anything.
 
 ### 9 · Confirm the beat — or don't
 
@@ -70,7 +70,7 @@ The app itself is at <https://arti47.github.io/pum-sum-gum/>.
 
 **Why.** SUM's closure asks how the world responds — fortunately or unfortunately — and hands you the hook into what comes next.
 
-**Do.** Scene → Roll a scene closure. You get a summary of what changed, and a one-step undo if you closed it by mistake.
+**Do.** Table → Scene → Roll a scene closure. You get a summary of what changed, and a one-step undo if you closed it by mistake.
 
 ### 11 · Read it back
 
@@ -90,7 +90,7 @@ The hard part of solo play is not the rules. It is the blank page — the moment
 
 1 · Do not invent a story. Invent a situation and a want, in one sentence: somebody wants something, and something is in the way. “A courier has to reach the far station before the storm closes the pass, and the road is watched.” That sentence is your plot scope. It is enough. A story is what happens when you play it; you cannot write it in advance and you are not supposed to.
 
-`More → Home → Prepare a game`
+`Setup → Home → Prepare a game`
 
 2 · Write three plot nodes, not thirty. One potential problem, one useful finding, one pending question — taken straight out of the sentence you just wrote. For the courier: “the watchers on the road”, “a shelter no one has burned yet”, “who pays the watchers?”. Empty slots are the machine's invitation to invent later, and whatever you invent stays in the list.
 
@@ -100,9 +100,9 @@ The hard part of solo play is not the rules. It is the blank page — the moment
 
 4 · Now say two or three sentences of narration, out loud or in the journal, describing what your protagonist can see and hear. Then have them DO something physical in the first minute — knock, climb, hide, call out. Not think, not remember. Do. Action creates the first question, and a question is what the machine answers.
 
-5 · Only now ask the app anything. Your first roll should be a real uncertainty raised by that action: is there smoke from the shelter? Are the watchers still there? That is Oracles → Yes or No, in the register that matches who is answering.
+5 · Only now ask the app anything. Your first roll should be a real uncertainty raised by that action: is there smoke from the shelter? Are the watchers still there? That is Table → Ask → Yes or No, in the register that matches who is answering.
 
-`Oracles → Yes or No`
+`Table → Ask → Yes or No`
 
 > **Watch out.** If you have opened the app and rolled four things before saying a single sentence of story, you are playing the machine instead of the game. Close the app, narrate a paragraph, and come back with a question.
 
@@ -121,17 +121,17 @@ Two ways a session dies, and the fix for each:
 
 When you are properly stuck, do not ask another oracle — oracles answer questions, and being stuck means you have run out of questions. Roll a random prompt instead. If it lands on an empty node slot, invent the thing on the spot; it becomes a permanent entry in that list.
 
-`Play → Random prompt`
+`Table → Beat → Random prompt`
 
 A scene is about five to fifteen minutes, or three to six exchanges. When a scene stops producing change, that is what the intervention check is for — and if the check does not revive it, close the scene rather than letting it fizzle.
 
-`Scene → Roll an intervention check`
+`Table → Scene → Roll an intervention check`
 
 Cross a box only when something changed for your protagonists: they learned it, lost it, committed to it, or it got worse. A beat that turned out to be scenery is a beat you played and did not confirm. The track is a measure of the story, not of how often you rolled.
 
 Write one line of your own in the journal per scene, in your words, not the app's. The rolls are recorded automatically; what is not recorded is what any of it meant. That line is what makes it possible to pick the game up a week later.
 
-`Journal → Write an entry`
+`Story → Journal → Write an entry`
 
 ### Ending a scene, a session, and a story
 
@@ -139,11 +139,11 @@ Three different endings, three different moves. Most solo games that die do so b
 
 A scene ends on a change, not on a lull. Close it the moment something has shifted — someone decided, something was learned, something got worse — and let the closure roll tell you how the world responds and what it hands you next. That hook is your opening for the following scene, which means you never start from nothing again.
 
-`Scene → Roll a scene closure`
+`Table → Scene → Roll a scene closure`
 
 A session ends best while you still want to keep going. Stop on a hook rather than at a natural pause, mark the break, and write one line about what you expect to happen next — not what will happen, what you expect. Next session begins by finding out whether you were right, which is the easiest possible restart.
 
-`Journal → Session break`
+`Story → Journal → Session break`
 
 A story ends when the plot track fills — and the last third of the track is where you stop introducing and start paying off. Once you are in the final section, no new questions: use the beats to answer the pending ones, and let the useful findings you wrote in prep be what the protagonists actually get.
 
@@ -151,7 +151,7 @@ A story ends when the plot track fills — and the last third of the track is wh
 
 And a scope can end before the track fills. If the real question has been answered and the remaining boxes are just more incident, say so and end it — the app records that you ended it rather than pretending the track resolved. Sandbox and Improvised sheets have no track at all, so this is the only way they ever finish.
 
-`Play → Plot track → Track options → End this scope`
+`Table → Track options → End this scope`
 
 *PUM p.7*
 
@@ -166,7 +166,7 @@ In order. Stop at the first one that unsticks you.
 5. Still nothing? Close the scene, take the closure's hook, and open a new scene somewhere else.
 6. Still nothing? Stop for today and write one line about what you wish would happen. That line is tomorrow's opening.
 
-*PUM p.10 — the advice chapter says the same thing at more length, and is in the app under More → Rules.*
+*PUM p.10 — the advice chapter says the same thing at more length, and is in the app under Setup → Rules.*
 
 ---
 
@@ -182,9 +182,9 @@ Three books, three jobs. Confusing them is the commonest way to get stuck, so it
 - SUM — Scene Unfolding Machine. A supplement. Once PUM says a beat happens, SUM tells you what the scene offers, how the fight goes, and how the people in it behave.
 - GUM — Game Unfolding Machine. Prep. Worlds, factions, objects, a nemesis, characters as concepts. Use it before you play, and when a blank field stops you mid-play.
 
-Every screen ends the same way: the screen's own work first, then a framed Help on this screen panel at its foot holding its What this does note, Which do I need? and, on the plot sheet, How the track and beats fit. The folds inside open for a new player and close everywhere for good the first time you close one.
+Every screen keeps its teaching out of the way: a single folded Help on this screen line at its foot, which the ? in the header also opens, holds its What this does note and, on the Table, How the track and beats fit.
 
-In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its four rows are Call a plot beat (what happens next, stuck, drifting?), See the track (where am I in the story, how long until it ends?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. While GUM is switched on a fifth row joins them — Open the Forge, for a person, a place, a faction or a whole starting situation — and the line adds that GUM invents what you prepare; the Forge's own title line reads GUM · invent and prepare. It folds with the What this does notes. Home's machines card opens on the same three rows.
+In play the question is narrower — PUM or SUM? — and the Table answers it with its three big buttons: Ask (PUM · a question — one question you cannot answer yourself), Beat (PUM · the plot — what happens next, when you are stuck or drifting) and Scene (SUM · this scene — how it starts, what is here, how it plays out and ends). PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Ask and Scene open screens of their own, each with ← Back to the Table and its book named beside it; Beat opens Call a plot beat over the Table. Press and hold any of the three to read its rule. Setup → Home folds the same answer in writing under The machines — which do I need?, with a fifth row, Open the Forge, while GUM is on; the Forge's own title line reads GUM · invent and prepare.
 
 > **Why.** The division that matters: GUM creates a character as a concept — an archetype, an edge, a flaw. SUM decides how that character behaves when you actually meet them. If you find yourself asking 'what is this person like', you want SUM. If you are asking 'who even is this person', you want GUM.
 
@@ -194,7 +194,7 @@ None of the three resolves a task. No book here tells you whether you picked the
 
 ### Preparing a game — the five steps, field by field
 
-`More → Home → Prepare a game`
+`Setup → Home → Prepare a game`
 
 The wizard will not let you past a step whose answer it needs. When the pinned button is greyed out, the line beside it says which answer is missing — 'Name the game to continue', and so on. A row of dots and one line say which step you are on; Back and Next are the only way round, and Back keeps everything you typed.
 
@@ -233,7 +233,7 @@ On a sheet that pairs with the plot-node extension sheet (Journey, Story-focus, 
 
 ### The plot sheet — what you are looking at
 
-`Play → Plot track`
+`Table`
 
 This is the screen you will spend most of your time on. Top to bottom:
 
@@ -246,7 +246,7 @@ The pinned bar at the foot carries your one next move — always the same move t
 
 ### Opening a scene
 
-`Scene → This scene → Roll a scene opener`
+`Table → Scene → This scene → Roll a scene opener`
 
 SUM's opener is for the exact moment you know a scene should happen but not how it starts. It is a d20 that tells you what to describe first.
 
@@ -255,13 +255,13 @@ SUM's opener is for the exact moment you know a scene should happen but not how 
 >
 > So the scene does not open on the door, or the guard, or the plan. It opens on the smell of wet ash in the stairwell. What the opener is doing is stopping you writing the same establishing shot every time.
 
-You never have to roll. 'Open it myself' takes a line of your own and opens the scene with it. Both routes write a journal entry and both put the scene into the open state, which lights a dot on the Scene tab and changes what the plot sheet's 'What now' card suggests.
+You never have to roll. 'Open it myself' takes a line of your own and opens the scene with it. Both routes write a journal entry and both put the scene into the open state, which lights a dot on the Scene button and changes what the Table's 'What now' card suggests.
 
 > **Why.** Why the app makes you open a scene at all, when the books have no such requirement: an open scene is what an intervention check interrupts and what a closure closes. It is a container, not a rule. Nothing forces you to use it — you can play beats and oracles all night without opening one.
 
 ### Asking the oracles
 
-`Oracles`
+`Table → Ask`
 
 Two moments deserve an oracle: when you genuinely do not know, and when you would rather not decide. Avoid rolling if you already have a strong bias toward an answer, or if some outcome would leave you stuck. One or two questions per matter — more than that slows the pace and produces contradictions.
 
@@ -370,7 +370,7 @@ Fill the last box and the scope has resolved. That is the Threshold the whole sh
 
 ### Plot nodes in play
 
-`Play → Plot nodes`
+`Story → Plot nodes`
 
 Each list shows its first four written entries plus one empty slot, with 'Show all N slots' when you want the rest — it says how many written entries are still hidden. Nothing is out of reach either way: the die rolls across every slot, and 'Roll this list' can land on an entry you cannot currently see. The header carries the die the app will roll and how full the list is.
 
@@ -385,7 +385,7 @@ Each list shows its first four written entries plus one empty slot, with 'Show a
 
 ### The cast, and SUM's character emulation
 
-`Play → Cast`
+`Story → Cast`
 
 Three groups: your protagonists, notable characters, and interesting locations. Protagonists are yours entirely and nothing rolls for them. The other two are everyone and everywhere the story has actually met.
 
@@ -399,7 +399,7 @@ Open any character and SUM's twelve character tables are there, in four depths o
 > **Meet reaction** — d20 = 17
 > “Ignore you intentionally, avoiding any interaction” — *SUM p.8*
 >
-> Rolled from the person's own entry, so it is stored with them: next session the app still knows the archivist blanked you. That is the difference between rolling on the Scene tab and rolling from the cast — same table, but one result is attached to somebody.
+> Rolled from the person's own entry, so it is stored with them: next session the app still knows the archivist blanked you. That is the difference between rolling on the Scene screen and rolling from the cast — same table, but one result is attached to somebody.
 
 > **Why.** Every SUM table is ordered so low rolls favour your protagonists and high rolls bring trouble. That ordering is what makes the Rule of Bias work, and it is why 17 above is a cold reception rather than a warm one.
 
@@ -407,7 +407,7 @@ Open any character and SUM's twelve character tables are there, in four depths o
 
 ### Running and closing the scene
 
-`Scene → This scene`
+`Table → Scene → This scene`
 
 Intervention check — roll it when the PCs are taking too long, tension is high, danger is near, or silence lingers. It is a d100, and it is SUM asking whether the world does something while you deliberate.
 
@@ -427,13 +427,13 @@ Scene closure — a d20 asking how the world responds, fortunately or unfortunat
 >
 > High roll, so trouble — the ordering again. Close on this and you know what the next scene opens into, which is exactly what a closure is for.
 
-`Scene → Roll a table`
+`Table → Scene → Roll a table`
 
-The Scene tab's second screen carries SUM's situation tables. Pick what the scene is doing — Exploring (location features, core challenge, challenge conditions), Fighting (terrain, enemy tactics, enemy composition), Discovering (type of clue, revealing finding, opposition activity) or Meeting someone (the twelve character tables, in four depths) — and its tables are listed one to a row, each with its die and a Roll button. The result appears under the row that rolled it; the first table is pinned as the primary action, and every table can be opened in full to read. While a scene is open, This scene links here with Roll a SUM table.
+The Scene screen's second page carries SUM's situation tables. Pick what the scene is doing — Exploring (location features, core challenge, challenge conditions), Fighting (terrain, enemy tactics, enemy composition), Discovering (type of clue, revealing finding, opposition activity) or Meeting someone (the twelve character tables, in four depths) — and its tables are listed one to a row, each with its die and a Roll button. The result appears under the row that rolled it; the first table is pinned as the primary action, and every table can be opened in full to read. While a scene is open, This scene links here with Roll a SUM table.
 
 ### The journal and the dice record
 
-`Journal`
+`Story → Journal`
 
 Every roll the app makes lands here with its dice, so any result can be re-derived later. Thirteen filters cover every kind of entry the app writes. Entries page twenty at a time and cap at five hundred.
 
@@ -447,7 +447,7 @@ The Dice view counts every face the app has rolled in this game, grouped by die 
 
 ### The Forge — GUM's generators
 
-`More → Forge`
+`Setup → Forge`
 
 Forty-three tables in four sections, for prep and for the moment a blank stops you.
 
@@ -486,7 +486,7 @@ Each result says which table it came from, because several results come from sev
 
 ### Settings, your data, and the library
 
-`More → Settings`
+`Setup → Settings`
 
 Your data. Everything lives in this browser's local storage and nothing is sent anywhere.
 
@@ -531,7 +531,7 @@ Scene one. Opener rolled rather than written, because you know a scene starts he
 >
 > Cold to the sternum, and the sound of the water finding a new way in somewhere below you. Not the doorway you would have described.
 
-You explore. On the Scene tab, Roll a table → Exploring gives three tables; declare Trouble first, because you expect this place to be hostile — that is SUM's Rule of Bias, and it keeps the higher of two d20s.
+You explore. On the Scene screen, Roll a table → Exploring gives three tables; declare Trouble first, because you expect this place to be hostile — that is SUM's Rule of Bias, and it keeps the higher of two d20s.
 
 > **Location features · bias high** — 2d20 → 12
 > “Being watched or protected by an unseen entity” — *SUM p.5*
@@ -668,9 +668,9 @@ The cast does the heavy lifting on this sheet. Four depths on the lodger, rolled
 >
 > Rolled only once the relationship had reached Deep. Together: he is not ill, he is training for something, and the discipline looks like symptoms. The tables did not decide that — reading two of them together did.
 
-Session breaks. Journal → Session break marks where you stopped. Neither book defines a session procedure, so nothing is reset, nothing is rolled, and the app does not invent a ritual for it. It is a bookmark, and on a sheet with no track it is the only chronological landmark you get.
+Session breaks. Story → Journal → Session break marks where you stopped. Neither book defines a session procedure, so nothing is reset, nothing is rolled, and the app does not invent a ritual for it. It is a bookmark, and on a sheet with no track it is the only chronological landmark you get.
 
-Ending it. Eleven sessions in, the lodger's story is told. There is no box to fill, so: Play → Plot track → End this scope. The app asks you to confirm, records it in the journal, and offers to start another plot sheet. Reopen is one tap if you were wrong.
+Ending it. Eleven sessions in, the lodger's story is told. There is no box to fill, so: Table → Track options → End this scope. The app asks you to confirm, records it in the journal, and offers to start another plot sheet. Reopen is one tap if you were wrong.
 
 > **Watch out.** On Sandbox and Improvised this control is the only way a scope can ever finish. Without it those two sheets would be the only ones you could never complete — which is why it is a control and not a sentence.
 
@@ -682,7 +682,7 @@ The Customized sheet starts with nothing: no track, and the standard prompt colu
 
 Prep. Universe: “England, 1069, no fantasy.” Scope: “Get the village through the levy without losing the men.” The Customized sheet gives six lists of ten, so both player-named lists are available; you name them “Obligations” and “Rumours from the north”.
 
-Pre-drawing the track. Play → Plot track → Customize → Add a section. You know this story has three movements, so you draw them: “The summons” 2 boxes, “The march” 4, “The reckoning” 3. Nine boxes, built by you rather than chosen from a menu.
+Pre-drawing the track. Table → Track options → Customize → Add a section. You know this story has three movements, so you draw them: “The summons” 2 boxes, “The march” 4, “The reckoning” 3. Nine boxes, built by you rather than chosen from a menu.
 
 - + box adds one to any section, mid-play, when a movement turns out to have more in it than you thought.
 - Remove deletes a section; if you had crossed past it the track steps back to fit.
@@ -715,7 +715,7 @@ The awkward one. A prompt lands on an empty slot in Rumours:
 
 It found “they are burning the Riding”. Two sessions old, written when it seemed like colour. It is now the reason the levy cannot be refused.
 
-Deliberate invocation. Later you want the story to answer something rather than complicate it. Play → Plot nodes → Pending questions → Roll this list. You chose the list on purpose; the die chose the entry; it still counts as a beat and can still cross a box. The alternative, Invoke on a specific written entry, skips the die entirely — also allowed, also a beat.
+Deliberate invocation. Later you want the story to answer something rather than complicate it. Story → Plot nodes → Pending questions → Roll this list. You chose the list on purpose; the die chose the entry; it still counts as a beat and can still cross a box. The alternative, Invoke on a specific written entry, skips the die entirely — also allowed, also a beat.
 
 *PUM p.9*
 
@@ -731,21 +731,26 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 
 ### The frame — header, plot header, tabs
 
-- ◈ Home (top left) — jumps to More → Home from anywhere.
-- ◐ Switch theme (top right) — cycles system → light → dark.
-- The persistent plot header — scope name, current section, crossed/total, and the drawn track. Hidden on More; compacted in landscape, where it drops the drawn track and keeps the count.
-- Tabs: Play · Scene · Oracles · Journal · More. A dot on Scene means a scene is open; a dot on Play means a beat is waiting or the scope has finished.
-- Every screen offers a folded “What this does” note, and many link on to the matching rules-library entry with “Read the rule →”.
+- ◈ Home (top left) — jumps to Setup → Home from anywhere.
+- ? Help on this screen — opens the screen's folded help at its foot; hidden on a screen that has none.
+- ◐ Switch theme (top right) — cycles system → light → dark → candle, a warm black paper with gold ink.
+- The persistent plot header — scope name, current section, crossed/total, and the drawn track. Hidden on Setup; compacted in landscape, where it drops the drawn track and keeps the count.
+- Tabs: Table · Story · Setup. Ask and Scene are rooms off the Table, so the Table stays lit while you are in them. A dot on Table means a scene is open, a beat is waiting, or the scope has finished.
+- The next move floats as an orange pill above the tabs — the same move the Table's card names.
+- Swipe a result card: left re-rolls, right dismisses, up notes it — the same as its buttons, which stay.
+- Press and hold a machine button (Ask · Beat · Scene) or a beat call to read the rule it follows.
+- With no game, the Table, Scene, Ask and the Story each offer Prepare a game and Read the first-session walkthrough.
+- Simple view — on for a first game: the strips show the pages a first game needs and end with Show everything; Yes or No has no bias box. It switches itself off once a first storyline's ending is written, and Settings → Appearance turns it back on.
 
-### Play
+### Table
 
-Plot track
-
-- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene · Open the Forge while GUM is on, or you are here.
-- The pinned bar — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet. The track card always carries Modified proposal and Random prompt.
-- The coach card's button follows the same stages; while a scene is open and has had no beat yet, it reads Call this scene's beat.
-- On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged. While a beat is open the track card moves to the top and the coach keeps only its heading.
-- Under the track: Each box is one beat that mattered — cross all N and this storyline ends; and How the track and beats fit, a fold of five stations.
+- The sheet's name, the scope's name, then the plot track drawn as a road: each act a landmark engraving, each box a milestone, a token standing on the next one.
+- The card in the middle says where you are — a heading, one sentence, Show me the steps. While a scene waits for its beat, the two calls sit right under it; while a beat is waiting to be judged, the beat card takes its place.
+- The floating button — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet.
+- Three machines — Ask (PUM · a question) · Beat (PUM · the plot) · Scene (SUM · this scene). Beat opens Call a plot beat: Modified proposal (I know roughly what happens next) · Random prompt (I don't know what happens next) · When to call which · Not now.
+- Drawers — Plot nodes (N) and Cast (N) open a sheet listing what is written, with Open the page and Close; Files (N) goes to the Story's Files page.
+- On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged.
+- Under the track: Each box is one beat that mattered — cross all N and this storyline ends; and, in the help, How the track and beats fit, a fold of five stations.
 - On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Make up a new one · Pick from your cast (N), on a list this sheet does not print — the count is how many are in the cast.
 - Track: any box opens Box N — Mark a timed beat / Edit the timed beat / Clear the mark / Close.
 - Track options → Advance without a beat · Step back · End this scope; Reopen this scope once it has ended.
@@ -753,8 +758,37 @@ Plot track
 - Add track section dialog: Section name, Boxes, Add.
 - This scope fold → Add game notes / Edit game notes.
 - A blank starting point is the coach's next step: Write the starting point.
-- What now → Open a scene / Back to the scene · Ask an oracle · Write it down · Start another plot sheet when the scope has finished.
 - Dialogs that can fire on confirming: A timed plot beat fires (Play it) · The scope has resolved (Write how it ended / Start another plot sheet / Stay here) · The scope is finished.
+
+### Scene
+
+- ← Back to the Table, with SUM · this scene beside it.
+- This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), and While you play — six numbered moves in the order you reach for them: narrate (no button), then Ask an oracle · Call a plot beat · Roll a SUM table · Roll an intervention check · Roll a scene closure, each beside the moment it is for. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the floating button is Call this scene's beat (with Close) until the scene has had its beat, then Close the scene (with Intervention).
+- Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
+- Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
+- Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.
+- Every result card: Re-roll · Dismiss.
+- Results arrive as objects: an oracle answer pressed in as a seal, a beat as a ruled index card, a SUM roll as a slip torn from the pad, the dice drawn large. The words and dice are the same on all three.
+
+### Ask
+
+- ← Back to the Table, with PUM · one question beside it.
+- Your question — optional, stamped on the result card and into the journal. As you type, a line says which oracle it sounds like — Sounds like a Yes or No question, or Who (Someone), Why (Reason) and so on — with Go there when that oracle is on another page. A hint only: it never rolls.
+- Yes or No — the three registers as one row (the chosen one says who it is for), an “I have a bias” checkbox outside simple view, Ask.
+- Granular — three registers, seven likelihood bands, Ask.
+- Descriptive · Story · Quantifiers — one button per oracle.
+- Result card: Re-roll · Note it · Dismiss; Enrich it when a descriptive or story answer has no d100 word yet; on a bias roll, two answer chips to choose between.
+- Does this call for a beat? — It said yes — random prompt · It said no — modified proposal.
+- Disruption die — the card under an answer when the setting is on: reports the d10 and offers Roll the random prompt / Roll the modified proposal.
+
+### Story
+
+Journal
+
+- Entries — fifteen filters (five in simple view, with Show everything), Write an entry (pinned), Session break, Show N more of M.
+- Entries read as a storybook in chapters: each scene opens a chapter — Scene N and how it opened — with Back to the scene on the one still being played; a beat still waiting to be judged carries Go to the beat. Your own words are set in a hand; the machine's rolls sit small, their dice stamped in the margin.
+- Per entry, behind Edit (the ⋯ at its corner): Add note / Edit note · Delete.
+- A bias Yes/No you have not picked yet shows its two answers as chips on its entry — tap one to settle it. An oracle roll that threw the disruption die records that d10 among its dice.
 
 Plot nodes
 
@@ -780,36 +814,11 @@ Files
 - Record a voice note → Start recording · Stop · Save the recording · Cancel. The microphone is asked for when you press Start, not when the dialog opens, and if the browser will not record it says so and points at Add a file.
 - Images show, audio plays, anything else opens in a new tab. A file the record names but this browser does not have says so where it would have appeared.
 
-### Scene
+Dice
 
-- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene · Open the Forge while GUM is on, or you are here.
-- This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), and While you play — six numbered moves in the order you reach for them: narrate (no button), then Ask an oracle · Call a plot beat · Roll a SUM table · Roll an intervention check · Roll a scene closure, each beside the moment it is for. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action is Call this scene's beat (with Close) until the scene has had its beat, then Close the scene (with Intervention).
-- Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
-- Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
-- Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.
-- Every result card: Re-roll · Dismiss.
-- Results arrive as objects: an oracle answer pressed in as a seal, a beat as a ruled index card, a SUM roll as a slip torn from the pad. The words and dice are the same on all three.
+- Distribution per die size, and Clear the journal.
 
-### Oracles
-
-- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene · Open the Forge while GUM is on, or you are here.
-- Your question — optional, stamped on the result card and into the journal.
-- Yes or No — three registers, an “I have a bias” checkbox, Ask.
-- Granular — three registers, seven likelihood bands, Ask.
-- Descriptive · Story · Quantifiers — one button per oracle.
-- Result card: Re-roll · Note it · Dismiss; Enrich it when a descriptive or story answer has no d100 word yet; on a bias roll, two answer chips to choose between.
-- Does this call for a beat? — It said yes — random prompt · It said no — modified proposal.
-- Disruption die — the card under an answer when the setting is on: reports the d10 and offers Roll the random prompt / Roll the modified proposal.
-
-### Journal
-
-- Entries — thirteen filters, Write an entry (pinned), Session break, Show N more of M.
-- Entries read as a ledger: each scene opens a chapter — Scene N and how it opened — with Back to the scene on the one still being played; a beat still waiting to be judged carries Go to the beat; dice are drawn as the dice that fell.
-- Per entry, behind Edit (the ⋯ at its corner): Add note / Edit note · Delete.
-- A bias Yes/No you have not picked yet shows its two answers as chips on its entry — tap one to settle it. An oracle roll that threw the disruption die records that d10 among its dice.
-- Dice — distribution per die size, and Clear the journal.
-
-### More
+### Setup
 
 Home
 
@@ -817,8 +826,8 @@ Home
 - The current game card: Go to the plot sheet · Open a scene / Continue the scene · Edit → Name this game, Universe or RPG, World, tone and theme, Inspiration.
 - Plot sheets in this game: Switch to this · Edit (scope name, mission, starting point) · Delete · New plot sheet.
 - Your games: Open · Archive / Restore · Prepare another game.
-- The machines — which do I need? (the four rows: Call a plot beat · See the track · Ask an oracle · Go to the scene, and Open the Forge while GUM is on), then what PUM, SUM and GUM each do.
-- With no game: Never played solo before? — three lines saying you narrate, the app answers, and your own RPG resolves · Prepare a game (pinned) · Read the first-session walkthrough.
+- The machines — which do I need? (folded: the four rows Call a plot beat · See the track · Ask an oracle · Go to the scene, and Open the Forge while GUM is on, then what PUM, SUM and GUM each do).
+- With no game: Never played solo before? — three pictures (You tell the story · The machine answers · Your rules resolve) and Tell me more, which unfolds the three lines behind them · Prepare a game (floating, with Walkthrough beside it).
 
 Forge (hidden when GUM is off)
 
@@ -830,7 +839,7 @@ Forge (hidden when GUM is off)
 - Keep this with no game open → Prepare a game with this, or Take it back to prep if you are already mid-way through it. Either way each line is written into the field it belongs to, and the fields it filled are marked.
 - Suggest a starting situation (prep step 2) → rolls GUM's plot seed into Mission, Starting point and Game notes, without leaving prep. Pressed again it reads Suggest another and replaces the last suggestion, as long as you have not edited it; Undo the suggestion puts the fields back as they were; and any prep field with text in it carries Clear beside its label.
 - Name your protagonist — asked after 'Add as a protagonist', so the rolled text becomes the notes and you supply the name.
-- The coach card at the top of the Play tab — a heading saying where you are, a sentence of what is true, Show me the steps, and one Next line. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.
+- The coach card in the middle of the Table — a heading saying where you are, a sentence of what is true, Show me the steps; on the Table its button is the floating one. Its button is whichever of these the moment calls for: Prepare a game · Write the starting point · Open a scene · Open the next scene · Back to the scene · Go to the beat · Call the beat that ends it · Write how it ended · Start the next plot sheet.
 - Beside it, at some stages only: Ask an oracle · Call a plot beat · Write it down · Read the whole story.
 - Where does this open? → Starting point — the dialog the coach opens when the starting point is still blank.
 - How did it end? → The ending — the dialog that closes a storyline. It writes an Endings entry into the journal and marks the scope finished.
@@ -867,7 +876,7 @@ Tutorial — this document. Settings — see Part 2.
 
 Each of these opens over the screen, traps focus, closes on Escape, and returns focus where it was. Primary action first, always.
 
-- Prepare a game (the wizard) — five steps; “Back to preparing it” returns to a half-finished draft from anywhere in More.
+- Prepare a game (the wizard) — five steps; “Back to preparing it” returns to a half-finished draft from anywhere in Setup.
 - Starting point — “Where does this open, and what is introduced?”
 - Game notes — “Notes for this plot sheet”.
 - Timed plot beat — “What is waiting at this box?”; Box N carries Mark / Edit / Clear the mark.

@@ -8,16 +8,30 @@ import { plotSheet } from "./rules.js";
 import { Settings } from "./settings.js";
 import { cue } from "./feel.js";
 
+// Three tabs a player sees: the Table, where play happens; the Story, which is
+// the record of it — the journal and everything the plot reaches for; and Setup.
+// Scene and Oracles are still routes of their own, but they are rooms off the
+// Table rather than tabs beside it: you go to them from its three big buttons
+// and come back, and the tab bar keeps the Table lit while you are there.
 export const TABS = [
-  { id: "play",    icon: "▤", label: "Play",    sections: ["track", "nodes", "cast", "files"] },
-  { id: "scene",   icon: "◗", label: "Scene",   sections: ["arc", "sum"] },
-  { id: "oracles", icon: "◇", label: "Oracles", sections: ["yesno", "descriptive", "story", "granular", "quantifiers"] },
-  { id: "journal", icon: "✎", label: "Journal", sections: ["entries", "dice"] },
-  // The Forge is prep, not play: it lives under More so the tab bar stays five
-  // wide. At 320px six tabs are 53px each; five are 64px, and the tab bar is the
-  // most-used control in the app.
-  { id: "more",    icon: "≡", label: "More",    sections: ["home", "forge", "tables", "library", "tutorial", "settings"], gatedSections: { forge: "gum" } },
+  { id: "play",    icon: "▤", label: "Table",   sections: ["track"] },
+  { id: "scene",   icon: "◗", label: "Scene",   sections: ["arc", "sum"], parent: "play" },
+  { id: "oracles", icon: "◇", label: "Ask",     sections: ["yesno", "descriptive", "story", "granular", "quantifiers"], parent: "play" },
+  { id: "journal", icon: "✎", label: "Story",   sections: ["entries", "nodes", "cast", "files", "dice"] },
+  { id: "more",    icon: "≡", label: "Setup",   sections: ["home", "forge", "tables", "library", "tutorial", "settings"], gatedSections: { forge: "gum" } },
 ];
+
+// Simple view shows these pages in the strips; the rest are one "Show
+// everything" away, and any of them can still be reached directly.
+const SIMPLE = {
+  oracles: ["yesno"],
+  journal: ["entries", "nodes", "cast"],
+  more: ["home", "tutorial", "settings"],
+};
+
+// Plot nodes, the cast and the files used to be sections of Play. They are
+// pages of the Story now; an old route still lands on them.
+const MOVED = { nodes: "journal", cast: "journal", files: "journal" };
 
 const SECTION_LABELS = {
   track: "Plot track", nodes: "Plot nodes", cast: "Cast", files: "Files",
@@ -26,7 +40,7 @@ const SECTION_LABELS = {
   yesno: "Yes or No", descriptive: "Descriptive", story: "Story",
   granular: "Granular", quantifiers: "Quantifiers",
   arc: "This scene", sum: "Roll a table",
-  entries: "Entries", dice: "Dice",
+  entries: "Journal", dice: "Dice",
   home: "Home", library: "Rules", tutorial: "Tutorial", settings: "Settings",
 };
 
@@ -42,6 +56,7 @@ export function liveSections(t) {
 }
 
 export function go(tab, section = null) {
+  if (tab === "play" && MOVED[section]) tab = MOVED[section];
   const t = TABS.find((x) => x.id === tab) || TABS[0];
   // A gated route reached directly explains itself rather than silently
   // redirecting (§8) — the screen renders and offers to switch the toggle on.
@@ -54,6 +69,14 @@ export function go(tab, section = null) {
 }
 
 function goSection(section) { go(current.tab, section); }
+
+// Simple view's way out, wherever it hides something.
+export function showEverything(label = "Show everything") {
+  return el("button", {
+    class: "show-all",
+    onclick: () => { Settings.setSimple(false); render(); },
+  }, label);
+}
 
 // Live state that changes what to do next travels as a badge (§6.3.8).
 function liveState() {
@@ -72,17 +95,18 @@ export function renderTabs() {
   const bar = $("#tab-bar");
   clear(bar);
   const live = liveState();
+  const here = (TABS.find((x) => x.id === current.tab) || {}).parent || current.tab;
   for (const t of TABS) {
+    if (t.parent) continue;
     const btn = el("button", {
       onclick: () => go(t.id),
-      "aria-current": current.tab === t.id ? "page" : null,
+      "aria-current": here === t.id ? "page" : null,
       "aria-label": t.label,
     },
       el("span", { class: "ti", "aria-hidden": "true", "data-tab": t.id, text: t.icon }),
       el("span", { text: t.label })
     );
-    const badge = (t.id === "scene" && live.sceneOpen)
-      || (t.id === "play" && (live.beatOpen || live.resolved));
+    const badge = t.id === "play" && (live.sceneOpen || live.beatOpen || live.resolved);
     if (badge) add(btn, el("span", { class: "badge", "aria-hidden": "true" }));
     add(bar, btn);
   }
@@ -92,7 +116,9 @@ export function sectionNav(tabId, activeSection, badges = {}) {
   const t = TABS.find((x) => x.id === tabId);
   if (!t || t.sections.length < 2) return null;
   const nav = el("nav", { class: "section-nav", "aria-label": t.label + " sections" });
-  for (const s of liveSections(t)) {
+  const simple = Settings.simple() && SIMPLE[tabId];
+  const shown = liveSections(t).filter((s) => !simple || SIMPLE[tabId].includes(s) || s === activeSection);
+  for (const s of shown) {
     const btn = el("button", {
       onclick: () => goSection(s),
       "aria-current": s === activeSection ? "true" : "false",
@@ -100,6 +126,7 @@ export function sectionNav(tabId, activeSection, badges = {}) {
     if (badges[s]) add(btn, el("span", { class: "dot", "aria-hidden": "true" }));
     add(nav, btn);
   }
+  if (simple && shown.length < liveSections(t).length) add(nav, showEverything());
   keepCurrentInView(nav);
   return nav;
 }
@@ -226,14 +253,27 @@ export function render() {
 // open state (closed for good the first time one is closed), and every word
 // in them is unchanged.
 function gatherHelp(screen) {
+  const btn = $("#btn-help");
   const folds = [...screen.querySelectorAll(":scope > details.explain:not(.stay), :scope > details.which, :scope > details.loop-fold")];
+  if (btn) btn.hidden = !folds.length;
   if (!folds.length) return;
-  const drawer = document.createElement("section");
+  // Folded to one line: the screen is for playing, and its teaching is a tap
+  // away — here, or from the ? in the header — rather than a page of prose
+  // under every screen.
+  const drawer = document.createElement("details");
   drawer.className = "help-drawer";
-  drawer.setAttribute("aria-label", "Help on this screen");
-  const head = document.createElement("div");
+  drawer.id = "help-drawer";
+  const head = document.createElement("summary");
   head.className = "help-head";
   head.textContent = "Help on this screen";
   drawer.append(head, ...folds);
   screen.append(drawer);
+}
+
+// The ? in the header opens the screen's help and brings it into view.
+export function openHelp() {
+  const drawer = document.getElementById("help-drawer");
+  if (!drawer) return;
+  drawer.open = true;
+  drawer.scrollIntoView({ block: "start", behavior: "smooth" });
 }
