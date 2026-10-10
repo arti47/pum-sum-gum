@@ -59,9 +59,18 @@ export function renderForge(host) {
   add(host, nav);
   keepCurrentInView(nav);
 
-  if (forgeSection === "seed") return renderSeed(host);
-  if (forgeSection === "grand") return renderGrand(host);
-  return renderSectionTables(host, forgeSection);
+  if (forgeSection === "seed") renderSeed(host);
+  else if (forgeSection === "grand") renderGrand(host);
+  else renderSectionTables(host, forgeSection);
+  // The two generator screens sit side by side under More and named neither.
+  add(host, seeAlso("Your own tables, typed in", "Go to My tables", () => go("more", "tables")));
+}
+
+// A cross-link between two screens that do the same kind of job.
+function seeAlso(text, label, onClick) {
+  return el("div", { class: "see-also" },
+    el("span", { class: "muted", text }),
+    el("button", { class: "btn small ghost", onclick: onClick }, label));
 }
 
 // With no game open every roll here still works and is still discarded, which
@@ -659,6 +668,7 @@ export function renderTables(host) {
 
   const list = store.tables();
   if (lastTable) add(host, tableResult());
+  if (Settings.gum()) add(host, seeAlso("GUM's forty-three tables", "Go to the Forge", () => go("more", "forge")));
 
   if (!list.length) {
     add(host, emptyState(

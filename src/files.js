@@ -252,6 +252,11 @@ export function renderFiles(host) {
     return;
   }
 
+  // The note sends you to Settings for the one export that carries files.
+  add(host, el("div", { class: "see-also" },
+    el("span", { class: "muted", text: "Carry files to another device" }),
+    el("button", { class: "btn small ghost", onclick: () => go("more", "settings") }, "Go to Export everything")));
+
   media.available().then((ok) => {
     if (ok || !host.isConnected) return;
     const warn = el("div", { class: "card" },

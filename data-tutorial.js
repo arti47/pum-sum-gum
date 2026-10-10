@@ -729,6 +729,7 @@ const REFERENCE = [
         "Four drawers — Maps · Character sheets · Portraits · Other files — and a file appears in exactly one.",
         "Add a file is pinned, with Record a voice note beside it; the context line carries the count and the total size.",
         "Per file: Open · Rename · File it under, which is the four drawers again · Remove.",
+        "Go to Export everything — a link to Settings, where the one export that carries files lives.",
         "Record a voice note → Start recording · Stop · Save the recording · Cancel. The microphone is asked for when you press Start, not when the dialog opens, and if the browser will not record it says so and points at Add a file.",
         "Images show, audio plays, anything else opens in a new tab. A file the record names but this browser does not have says so where it would have appeared.",
       ] },
@@ -819,6 +820,7 @@ const REFERENCE = [
       { p: "My tables" },
       { bullets: [
         "New table is pinned. Per table: Roll 1dN · Edit · Delete.",
+        "Go to the Forge, while GUM is on — GUM's forty-three tables, the other generator screen. The Forge links back with Go to My tables.",
         "New table / Edit table — Table name, Rows (one per line; a pasted “1. …” list has its numbering stripped for you), and Die, which defaults to one face per row.",
         "A roll shows its die and offers Re-roll · Keep it → · Dismiss — the same fourteen destinations a GUM roll reaches, journalled as “Kept from my tables — <the table>”.",
         "Not behind the GUM switch: turning GUM off says you do not own that book, and says nothing about a table you typed in yourself.",
