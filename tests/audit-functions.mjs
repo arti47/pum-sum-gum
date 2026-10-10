@@ -481,6 +481,42 @@ const journeys = [];
   await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
 }
 
+// 6c. An empty list's Choose dialog is no dead end: it offers Add a new node,
+// which writes the node into the beat. The list is emptied first, since a
+// rolled beat on the fixture lands on written entries.
+{
+  await seed(MID, "play", "track");
+  await page.evaluate(async () => {
+    const store = await import("./src/store.js");
+    const roller = await import("./src/roller.js");
+    const sheet = await import("./src/sheet.js");
+    const sc = store.currentScope();
+    (sc.nodes.questions || []).forEach((_, i) => store.setNode("questions", i, ""));
+    const node = roller.invokeNode(store.currentScope(), "questions");
+    sheet.setOpenBeat({ kind: "beat", beatType: "prompt", roll: 4, text: "audit", prompt: { label: "audit", node: "questions" },
+      dice: [], repeat: false, key: "audit", node, event: null, journalId: null });
+    (await import("./src/router.js")).go("play", "track");
+  });
+  await page.waitForTimeout(80);
+  const chose = await tapText(/^choose$/);
+  const offered = chose && await tapText(/^add a new node$/, ".modal button");
+  if (offered) await followDialog();
+  journeys.push(`empty list → Choose: Add a new node ${offered ? "taken" : "NOT OFFERED"}`);
+}
+
+// 6d. A biased Yes/No left unpicked waits on its journal entry, and is picked there.
+{
+  await seed(MID, "oracles", "yesno");
+  await page.evaluate(() => {
+    const c = document.querySelector("#screen input[type=checkbox]");
+    if (c && !c.checked) c.click();
+  });
+  await tapText(/^ask$/, "#action-bar button");
+  await goTo("journal", "entries");
+  const picked = await tapText(/./, ".entry-pick button");
+  journeys.push(`bias Yes/No → picked from the journal: ${picked ? "taken" : "NOT OFFERED"}`);
+}
+
 // 6b. The oracle result card's own follow-ups, named rather than hoped for:
 // re-roll writes a LINKED journal entry, and "Enrich it" rolls only the second
 // die into the same entry. Both are controls on a card that exists only after a
