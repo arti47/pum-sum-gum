@@ -177,7 +177,15 @@ export const WHICH_MACHINE = {
       ask: "How does this scene start, what is here, how does the fight, the clue or the person play out, how does it end?",
       use: "SUM · the scene", go: ["scene", "arc"], button: "Go to the scene",
     },
+    {
+      // Shown only while the GUM toggle is on (§1.1): a player without the book
+      // has no Forge to be sent to.
+      ask: "I need a person, a place, a faction or a whole starting situation — before play, or to fill a blank.",
+      use: "GUM · the Forge", go: ["more", "forge"], button: "Open the Forge", gum: true,
+    },
   ],
+  // Appended to the line while GUM is on.
+  gumLine: "GUM invents what you prepare — people, places, a starting situation.",
 };
 
 // --- The beat and the track, in the app's own words -----------------------
@@ -219,6 +227,7 @@ export const BOOK_TAGS = {
   play: "PUM · the story",
   oracles: "PUM · one question",
   scene: "SUM · this scene",
+  forge: "GUM · invent and prepare",
 };
 
 // The app must not pretend to resolve tasks.

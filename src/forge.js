@@ -15,6 +15,7 @@ import { gumTable, gumSection } from "./rules.js";
 import { nodeSlots, categoryName } from "./derived.js";
 import { render, go, keepCurrentInView } from "./router.js";
 import { Settings } from "./settings.js";
+import { bookTag } from "./coach.js";
 import { openRule } from "./screens.js";
 // Prep is where a plot seed belongs, so the Forge has to be able to start it.
 // forge -> wizard -> forge is a cycle the module graph already contains (both
@@ -105,6 +106,7 @@ function seedExampleCard() {
 // --- the plot seed: the book's own combination, in its own order -----------
 function renderSeed(host) {
   add(host, el("h1", { text: "Plot seed" }));
+  add(host, bookTag("forge"));
   // Purpose before mechanism. The old note listed what the six tables ARE — a
   // hook, a motivation, a mission — which describes the machine and never says
   // what you get out of it or when you would want it.
@@ -161,6 +163,7 @@ function worldTruthsCard() {
 // --- the grand oracle: three words -----------------------------------------
 function renderGrand(host) {
   add(host, el("h1", { text: "Grand oracle" }));
+  add(host, bookTag("forge"));
   add(host, explain([
     "Three d100 tables — an action, an adjective and a subject — for the moment no specific oracle fits.",
     "Read the three words together and let them mean something. That interpretation is the answer; the words are only the prompt.",
@@ -191,6 +194,7 @@ function renderSectionTables(host, sectionId) {
   const sec = gumSection(sectionId);
   const tables = GUM_TABLES.filter((t) => t.section === sectionId);
   add(host, el("h1", { text: sec ? sec.name : "Forge" }));
+  add(host, bookTag("forge"));
   add(host, explain([
     sec ? sec.blurb : "",
     "GUM's strength is combination: roll several tables for one subject, or the same table twice, and read the results together.",
@@ -382,7 +386,7 @@ function keepDialog(parts, label, source = "GUM") {
       dest(`Write into ${categoryName(scope, cat.id)}`, () => {
         const at = store.writeNodeToFirstEmpty(cat.id, text, slots);
         if (at < 0) toast(`${categoryName(scope, cat.id)} is full — clear a slot first.`);
-        else { toast(`Written into ${cat.name}.`, { undo: true }); go("play", "nodes"); }
+        else { toast(`Written into ${categoryName(scope, cat.id)}.`, { undo: true }); go("play", "nodes"); }
       });
     }
   }

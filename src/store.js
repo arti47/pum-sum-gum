@@ -419,6 +419,7 @@ export function addJournal(entry) {
     scopeId: entry.scopeId || (currentScope() ? currentScope().id : null),
     sceneId: entry.sceneId || null,
     linkedTo: entry.linkedTo || null,
+    pick: entry.pick || null,
   };
   mutate("Journal entry", () => {
     const g = activeGame();
@@ -434,6 +435,21 @@ export function updateJournal(id, patch) {
     const g = activeGame();
     const e = g && g.journal.find((x) => x.id === id);
     if (e) Object.assign(e, patch);
+  });
+}
+
+// Settle a PUM bias Yes/No (ruling A4): the player picks one of the two
+// answers the entry is holding. `answer` is read by the caller from the data
+// file, so the store restates no table.
+export function resolvePick(id, roll, answer) {
+  mutate("Pick an answer", () => {
+    const g = activeGame();
+    const e = g && g.journal.find((x) => x.id === id);
+    if (!e || !e.pick) return;
+    const { register, rolls, question } = e.pick;
+    e.title = `Yes/No (${register}) — ${answer}`;
+    e.detail = [question, `Chose ${roll} of ${rolls.join(" and ")}`].filter(Boolean).join(" · ");
+    e.pick = null;
   });
 }
 

@@ -262,8 +262,19 @@ export function journalRoll(result, extra = {}) {
     kind: extra.kind || result.kind,
     title: extra.title || "",
     detail: extra.detail || "",
-    dice: result.dice ? result.dice.map((d) => ({ label: d.label, value: d.value, kept: d.kept })) : [],
+    dice: journalDice(result),
     sceneId,
     linkedTo: extra.linkedTo || null,
+    pick: extra.pick || null,
   });
+}
+
+// The dice an entry records: every die the roll threw, the disruption d10
+// included — it is a roll like any other, and the ledger's claim is that every
+// roll is journalled with its dice. It is marked kept whether or not it fired,
+// since "not kept" in the journal means a die the Rule of Bias dropped.
+export function journalDice(result) {
+  const dice = (result.dice || []).map((d) => ({ label: d.label, value: d.value, kept: d.kept }));
+  if (result.disruption) dice.push({ label: result.disruption.die.label, value: result.disruption.roll, kept: true });
+  return dice;
 }

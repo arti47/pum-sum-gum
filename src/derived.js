@@ -313,6 +313,7 @@ export function normalizeGame(input = {}) {
             linkedTo: str(e.linkedTo) || null,
             attachments: Array.isArray(e.attachments)
               ? e.attachments.map((a) => str(a)).filter(Boolean) : [],
+            pick: normalizePick(e),
           };
         })
       : [],
@@ -356,6 +357,26 @@ export function referencedFileIds(state) {
     for (const e of g.journal || []) for (const a of e.attachments || []) ids.push(a);
   }
   return [...new Set(ids)];
+}
+
+// A PUM bias Yes/No waiting for the player's pick: `{ register, rolls[2], question }`.
+// Entries written before the field existed carry only their title — "Yes/No
+// (<register>) — bias, awaiting your pick" — and their two d10s, which is
+// everything the pick needs, so they are recovered rather than left stranded.
+const PENDING_PICK = /^Yes\/No \((\w+)\) — bias, awaiting your pick$/;
+function normalizePick(e) {
+  const okRoll = (n) => Number.isInteger(n) && n >= 1 && n <= 10;
+  const p = e.pick && typeof e.pick === "object" ? e.pick : null;
+  if (p && typeof p.register === "string" && Array.isArray(p.rolls)
+      && p.rolls.length === 2 && p.rolls.every(okRoll)) {
+    return { register: p.register, rolls: p.rolls.slice(), question: typeof p.question === "string" ? p.question : "" };
+  }
+  const m = typeof e.title === "string" ? PENDING_PICK.exec(e.title) : null;
+  if (m && Array.isArray(e.dice)) {
+    const rolls = e.dice.filter((d) => d && /^d10 #[12]$/.test(d.label)).map((d) => Number(d.value));
+    if (rolls.length === 2 && rolls.every(okRoll)) return { register: m[1], rolls, question: "" };
+  }
+  return null;
 }
 
 export function normalize(input = {}) {

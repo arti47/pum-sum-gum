@@ -8,6 +8,7 @@ import { sectionNav, render, go, keepCurrentInView } from "./router.js";
 import { openRule } from "./screens.js";
 import { registerClearer } from "./viewstate.js";
 import { filePreview, chooseFile } from "./files.js";
+import { yesNoAnswer } from "./rules.js";
 
 // 40 entries was 97 controls and the tallest screen in the app under the stress
 // fixture. A log is read from the top; the page is smaller and says how much
@@ -173,6 +174,7 @@ function entryEl(e) {
       text: e.dice.map((d) => `${d.label} ${d.value}${d.kept === false ? "✗" : ""}`).join(" · ") }));
     add(wrap, dice);
   }
+  if (e.pick) add(wrap, pickRow(e));
   if (e.linkedTo) add(wrap, el("div", { class: "cite", text: "↳ follows an earlier roll" }));
   if (e.note) add(wrap, el("div", { class: "entry-note", text: e.note }));
   // Text, image and voice in any combination: an entry can carry all three, and
@@ -220,6 +222,28 @@ function entryEl(e) {
     tools
   ));
   return wrap;
+}
+
+// A PUM bias Yes/No still waiting for its pick (ruling A4). The two chips used
+// to live only on the oracle's result card, so leaving that screen stranded the
+// roll in the record with nothing that could finish it.
+function pickRow(e) {
+  const box = el("div", { class: "entry-pick" });
+  add(box, el("p", { class: "muted", text: "Your pick — PUM's bias rule hands the choice to you. Tap the answer that fits." }));
+  const chips = el("div", { class: "chip-row" });
+  for (const roll of e.pick.rolls) {
+    const answer = yesNoAnswer(e.pick.register, roll);
+    if (!answer) continue;
+    add(chips, el("button", {
+      class: "chip",
+      onclick: () => { store.resolvePick(e.id, roll, answer); toast(`Picked: ${answer}`, { undo: true }); render(); },
+    },
+      el("span", { class: "cd", text: `d10 ${roll}` }),
+      el("span", { class: "cv", text: answer })
+    ));
+  }
+  add(box, chips);
+  return box;
 }
 
 // The fairness record (§5.1): counts per face across the campaign.

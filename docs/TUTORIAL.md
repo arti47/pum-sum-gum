@@ -184,7 +184,7 @@ Three books, three jobs. Confusing them is the commonest way to get stuck, so it
 
 Every screen ends the same way: the screen's own work first, then a framed Help on this screen panel at its foot holding its What this does note, Which do I need? and, on the plot sheet, How the track and beats fit. The folds inside open for a new player and close everywhere for good the first time you close one.
 
-In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its four rows are Call a plot beat (what happens next, stuck, drifting?), See the track (where am I in the story, how long until it ends?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. It folds with the What this does notes. Home's machines card opens on the same three rows.
+In play the question is narrower — PUM or SUM? — and the app answers it on the spot. Play, Scene and Oracles each name their book on the title line (PUM · the story, SUM · this scene, PUM · one question) and carry a Which do I need? fold: PUM moves the story; SUM fills in the scene you are in. A beat decides that a fight breaks out — SUM decides how it goes. Its four rows are Call a plot beat (what happens next, stuck, drifting?), See the track (where am I in the story, how long until it ends?), Ask an oracle (one question you cannot answer yourself) and Go to the scene (how this scene starts, what is here, how it plays out and ends), each a button to that place, or you are here on the tab you are on. While GUM is switched on a fifth row joins them — Open the Forge, for a person, a place, a faction or a whole starting situation — and the line adds that GUM invents what you prepare; the Forge's own title line reads GUM · invent and prepare. It folds with the What this does notes. Home's machines card opens on the same three rows.
 
 > **Why.** The division that matters: GUM creates a character as a concept — an archetype, an edge, a flaw. SUM decides how that character behaves when you actually meet them. If you find yourself asking 'what is this person like', you want SUM. If you are asking 'who even is this person', you want GUM.
 
@@ -280,7 +280,7 @@ Yes or No — 1d10. Three registers, and picking the right one is most of the sk
 >
 > Note what the Conversation register gives you that Deterministic never would: not just assent, but a warning attached to it. The ferryman will take you — and he is telling you something about the crossing. That rider is the answer, not decoration.
 
-Tick 'I have a bias' and the app rolls twice and shows you both answers as chips, committing neither until you tap one. That is PUM's bias rule and it deliberately hands the choice to you.
+Tick 'I have a bias' and the app rolls twice and shows you both answers as chips, committing neither until you tap one. That is PUM's bias rule and it deliberately hands the choice to you. Leave the screen before you pick and nothing is lost: the journal entry keeps both answers as the same two chips, waiting for your pick.
 
 Descriptive oracles — Someone, Place, Object, Hazard, Mood, Notice. 1d10 for the answer, plus a d100 Description word to colour it.
 
@@ -333,7 +333,7 @@ When a prompt invokes a node list, the die size depends on how full the list is:
 Land on a written entry and it comes into play. Land on an empty slot and you get four controls, which are four permissions the book grants:
 
 - Add new — invent something. It becomes a permanent entry in that list.
-- Choose — pick an entry that fits better than the one the die found.
+- Choose — pick an entry that fits better than the one the die found. If nothing is written in the list yet there is nothing to choose, and the dialog offers Add a new node instead.
 - Reroll — try the die again.
 - Leave it to destiny — reroll until a written entry comes up. This is the 'still stuck' rule, and it can never hand you an empty slot back.
 
@@ -741,7 +741,7 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 
 Plot track
 
-- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.
+- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene · Open the Forge while GUM is on, or you are here.
 - The pinned bar — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet. The track card always carries Modified proposal and Random prompt.
 - The coach card's button follows the same stages; while a scene is open and has had no beat yet, it reads Call this scene's beat.
 - On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged. While a beat is open the track card moves to the top and the coach keeps only its heading.
@@ -781,7 +781,7 @@ Files
 
 ### Scene
 
-- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.
+- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene · Open the Forge while GUM is on, or you are here.
 - This scene — a stepper (Open · Intervene · Close) above one card that is the scene: No scene open, with Roll a scene opener · Open it myself; or The scene, with what opened it, its Interventions (N), and While you play — six numbered moves in the order you reach for them: narrate (no button), then Ask an oracle · Call a plot beat · Roll a SUM table · Roll an intervention check · Roll a scene closure, each beside the moment it is for. On the card, the Rule of Bias as one row: Neutral / Favourable / Trouble. While a scene runs the pinned action is Call this scene's beat (with Close) until the scene has had its beat, then Close the scene (with Intervention).
 - Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
 - Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
@@ -791,7 +791,7 @@ Files
 
 ### Oracles
 
-- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene, or you are here.
+- Under the title, the book this tab belongs to; under the note, Which do I need? — Call a plot beat · See the track · Ask an oracle · Go to the scene · Open the Forge while GUM is on, or you are here.
 - Your question — optional, stamped on the result card and into the journal.
 - Yes or No — three registers, an “I have a bias” checkbox, Ask.
 - Granular — three registers, seven likelihood bands, Ask.
@@ -805,6 +805,7 @@ Files
 - Entries — thirteen filters, Write an entry (pinned), Session break, Show N more of M.
 - Entries read as a ledger: each scene opens a chapter — Scene N and how it opened — with Back to the scene on the one still being played; a beat still waiting to be judged carries Go to the beat; dice are drawn as the dice that fell.
 - Per entry, behind Edit (the ⋯ at its corner): Add note / Edit note · Delete.
+- A bias Yes/No you have not picked yet shows its two answers as chips on its entry — tap one to settle it. An oracle roll that threw the disruption die records that d10 among its dice.
 - Dice — distribution per die size, and Clear the journal.
 
 ### More
@@ -815,12 +816,12 @@ Home
 - The current game card: Go to the plot sheet · Open a scene / Continue the scene · Edit → Name this game, Universe or RPG, World, tone and theme, Inspiration.
 - Plot sheets in this game: Switch to this · Edit (scope name, mission, starting point) · Delete · New plot sheet.
 - Your games: Open · Archive / Restore · Prepare another game.
-- The machines — which do I need? (the four rows: Call a plot beat · See the track · Ask an oracle · Go to the scene), then what PUM, SUM and GUM each do.
+- The machines — which do I need? (the four rows: Call a plot beat · See the track · Ask an oracle · Go to the scene, and Open the Forge while GUM is on), then what PUM, SUM and GUM each do.
 - With no game: Never played solo before? — three lines saying you narrate, the app answers, and your own RPG resolves · Prepare a game (pinned) · Read the first-session walkthrough.
 
 Forge (hidden when GUM is off)
 
-- Plot seed · World · Characters · Grand oracle.
+- Plot seed · World · Characters · Grand oracle — each under the title line GUM · invent and prepare.
 - Roll a whole plot seed (pinned) · World truths · Roll all three · per-table dN buttons · Roll all of <group>.
 - Result card: Re-roll · Keep it → · Dismiss · Re-roll this one — on a set, it re-rolls just that table.
 - Keep this → Write into <list> · Add as a protagonist · Add to the cast as a character · Add to the cast as a location · Just keep it in the journal.
