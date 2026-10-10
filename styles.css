@@ -2230,3 +2230,4 @@ details.machines > summary { font-family: var(--serif); font-weight: 700; }
 .jentry .entry-dice { float: right; margin: -.2rem 0 .2rem .6rem; transform: rotate(-4deg); opacity: .9; }
 .jentry .entry-dice .die { min-width: 30px; height: 30px; font-size: .7rem; }
 #screen:has(.solo-card) > h1::before { display: none; }
+.jentry .entry-dice { float: none; display: flex; margin: .25rem 0 0; transform: rotate(-3deg); transform-origin: left center; }
