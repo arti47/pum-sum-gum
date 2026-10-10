@@ -611,6 +611,16 @@ Three consequences the runner forces, all of them corrections to how the passes 
   see the finding, restore, see it green. `docs/AUDIT.md` names which guards were verified that
   way in each cycle.
 
+### 7.4 Owner's standing instructions (2026-10-10)
+
+Recorded at the owner's request, to hold for every session on this project:
+
+- **Report progress as percentages only** — 5%, 10% … up to 100%. Do not narrate each step;
+  a short summary of what changed comes once, at 100%.
+- **Always keep the app faithful to the rules.** Every change, however cosmetic, leaves the
+  books' tables, rolls, odds and procedures exactly as written; anything the app adds in its own
+  words is labelled as the app's own, never presented as the books'.
+
 ## 8. Changelog
 
 | Date | Change | Verification | Cache |
