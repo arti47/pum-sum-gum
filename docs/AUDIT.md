@@ -2157,3 +2157,13 @@ hold. Table 127 words, cold open 50. *Found on the way:* the Yes or No bar read 
 the screen was drawn, not when Ask was pressed — ticking it rolled once. Fixed; the function
 audit's bias journey caught it.
 
+---
+
+## Reported from play — "no way to make edits to game nodes and stuff once committed"
+
+**F-104 · The editors were two screens from what they edit.** *Rule:* none changed. *Target:* the
+Table's node and cast drawers were read-only; a written slot looked like text and could only be
+removed by emptying it; the mission, starting point and game details were editable only from
+Setup → Home. *Fix:* editable drawer rows with ✎ and + Add; one slot editor with Remove this node;
+the This scope fold always present with the scope and game editors.
+

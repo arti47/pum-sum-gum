@@ -148,7 +148,7 @@ function sheetRow(p) {
   return row;
 }
 
-function editProtagonist(p) {
+export function editProtagonist(p) {
   const name = el("input", { type: "text", value: p.name });
   const notes = el("textarea", null);
   notes.value = p.notes || "";
@@ -186,7 +186,7 @@ function editProtagonist(p) {
   });
 }
 
-function openCast(c) {
+export function openCast(c) {
   const body = el("div");
   add(body, el("p", { class: "muted", text: c.kind === "character"
     ? "Everything this game knows about them. Ask SUM below and the answer is stored here, so next time you know how they talk and what they want."

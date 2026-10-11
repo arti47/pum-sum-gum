@@ -209,7 +209,7 @@ function renderHome(host) {
   });
 }
 
-function editGame(game) {
+export function editGame(game) {
   const title = el("input", { type: "text", value: game.title });
   const universe = el("input", { type: "text", value: game.universe });
   const tone = el("input", { type: "text", value: game.tone });
@@ -245,7 +245,7 @@ function editGame(game) {
   });
 }
 
-function editScope(s) {
+export function editScope(s) {
   const name = el("input", { type: "text", value: s.name });
   const mission = el("textarea", null);
   mission.value = s.mission || "";

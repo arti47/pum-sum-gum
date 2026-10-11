@@ -139,7 +139,7 @@ export function inspireBlock(fieldId, input, { addItem = null } = {}) {
 // `notes` adds a second field below the first. It exists because GUM builds a
 // character as a concept and the concept does not belong in a Name box: the
 // dialog asks for the name, and the rolled words land beside it.
-export function promptModal({ title, label, value = "", multiline = false, placeholder = "", hint = "", inspire = null, notes = null, className = "", onSubmit }) {
+export function promptModal({ title, label, value = "", multiline = false, placeholder = "", hint = "", inspire = null, notes = null, className = "", remove = null, onSubmit }) {
   const input = multiline
     ? el("textarea", { placeholder })
     : el("input", { type: "text", placeholder });
@@ -175,8 +175,10 @@ export function promptModal({ title, label, value = "", multiline = false, place
     className,
     actions: [
       { label: "Save", primary: true, onClick: submit },
+      // Something already written can be taken out from the same dialog that edits it.
+      remove ? { label: remove.label, onClick: remove.onClick } : null,
       { label: "Cancel" },
-    ],
+    ].filter(Boolean),
   });
 }
 
