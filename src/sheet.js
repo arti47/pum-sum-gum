@@ -14,7 +14,8 @@ import {
 import { plotSheet, nodeCategory, sectionOfBox, proposalNote, abcd } from "./rules.js";
 import { rollProposal, rollPrompt, invokeNode, journalRoll, diceText } from "./roller.js";
 import { sectionNav, go, render } from "./router.js";
-import { openRule } from "./screens.js";
+import { openRule, editScope, editGame } from "./screens.js";
+import { openCast, editProtagonist } from "./cast.js";
 import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-plot.js";
 import { BEAT_TRIGGERS, FIRST_BEAT_COACH, BEAT_STEPS, TRACK_CAPTION, TRACK_LOOP } from "../data-guidance.js";
 import { coachCard, nextMove, endingDialog } from "./coach.js";
@@ -110,9 +111,10 @@ function renderTrack(host, scope) {
   add(host, drawerChips(scope));
 
   // Context the player re-reads occasionally, not every beat — folded (§6.5).
-  if (scope.mission || scope.startingPoint || scope.notes) {
+  {
     // The scope's own words — content, not teaching — so it is not a note and
-    // stays on the table rather than going to the help.
+    // stays on the table rather than going to the help. Everything prep wrote
+    // can be changed from here.
     const d = el("details", { class: "scope-fold" }, el("summary", null, "This scope"));
     const body = el("div", { class: "body" });
     if (scope.mission) add(body, el("p", null, el("strong", { text: "Mission. " }), scope.mission));
@@ -130,6 +132,9 @@ function renderTrack(host, scope) {
         onSubmit: (v) => { store.setScopeNotes(v); render(); },
       }),
     }, scope.notes ? "Edit game notes" : "Add game notes"));
+    add(body, el("div", { class: "btn-row" },
+      el("button", { class: "btn small", onclick: () => editScope(scope) }, "Edit name, mission and starting point"),
+      el("button", { class: "btn small", onclick: () => editGame(game) }, "Edit the game")));
     add(d, body);
     add(host, d);
   }
@@ -209,23 +214,33 @@ function drawerChips(scope) {
 
 function nodesDrawer(scope) {
   const body = el("div", { class: "drawer" });
-  let any = false;
+  add(body, el("p", { class: "muted", text: "Tap a node to change or remove it." }));
   for (const cat of NODE_CATEGORIES) {
-    if (!nodeSlots(scope, cat.id)) continue;
-    const list = nodeList(scope, cat.id).filter((t) => t && t.trim());
-    add(body, el("h3", { class: "drawer-h", text: `${categoryName(scope, cat.id)} · ${list.length}` }));
-    if (list.length) {
-      any = true;
-      const ul = el("ul", { class: "drawer-list" });
-      for (const t of list) add(ul, el("li", { text: t }));
-      add(body, ul);
+    const slots = nodeSlots(scope, cat.id);
+    if (!slots) continue;
+    const list = nodeList(scope, cat.id);
+    const written = list.map((t, i) => ({ t, i })).filter((x) => x.t && x.t.trim());
+    add(body, el("h3", { class: "drawer-h", text: `${categoryName(scope, cat.id)} · ${written.length}/${slots}` }));
+    const ul = el("div", { class: "drawer-list editable" });
+    for (const { t, i } of written) {
+      add(ul, el("button", {
+        class: "drawer-item", "aria-label": `Edit ${t}`,
+        onclick: () => { closeModal(); editSlotDialog(scope, cat, i, t); },
+      }, el("span", { text: t }), el("span", { class: "drawer-pen", "aria-hidden": "true", text: "✎" })));
     }
+    const free = list.length < slots ? list.length : list.findIndex((x) => !x || !x.trim());
+    if (written.length < slots) {
+      add(ul, el("button", {
+        class: "drawer-item add",
+        onclick: () => { closeModal(); editSlotDialog(scope, cat, free < 0 ? written.length : free, ""); },
+      }, `+ Add to ${categoryName(scope, cat.id)}`));
+    }
+    add(body, ul);
   }
-  if (!any) add(body, el("p", { class: "muted", text: "Nothing written yet. The plot reaches into these lists when a random prompt names one." }));
   modal({
     title: "Plot nodes", className: "drawer-sheet", body,
     actions: [
-      { label: "Open the page", primary: true, onClick: () => go("journal", "nodes") },
+      { label: "Open the page", onClick: () => go("journal", "nodes") },
       { label: "Close" },
     ],
   });
@@ -235,14 +250,27 @@ function castDrawer() {
   const game = store.activeGame();
   const body = el("div", { class: "drawer" });
   const cast = game ? game.cast : [];
-  if (!cast.length) add(body, el("p", { class: "muted", text: "No one yet. Characters and places you meet in play gather here." }));
-  const ul = el("ul", { class: "drawer-list" });
-  for (const c of cast) add(ul, el("li", null, el("strong", { text: c.name }), c.notes ? ` — ${c.notes}` : ""));
-  if (cast.length) add(body, ul);
+  const pcs = game ? game.protagonists : [];
+  add(body, el("p", { class: "muted", text: cast.length || pcs.length
+    ? "Everyone in this story. Tap anyone to change their name, notes or traits."
+    : "No one yet. Characters and places you meet in play gather here." }));
+  const list = (items, onPick) => {
+    const ul = el("div", { class: "drawer-list editable" });
+    for (const c of items) {
+      add(ul, el("button", {
+        class: "drawer-item", "aria-label": `Edit ${c.name}`,
+        onclick: () => { closeModal(); onPick(c); },
+      }, el("span", null, el("strong", { text: c.name }), c.notes ? ` — ${c.notes}` : ""),
+        el("span", { class: "drawer-pen", "aria-hidden": "true", text: "✎" })));
+    }
+    return ul;
+  };
+  if (pcs.length) { add(body, el("h3", { class: "drawer-h", text: "Protagonists" })); add(body, list(pcs, editProtagonist)); }
+  if (cast.length) { add(body, el("h3", { class: "drawer-h", text: "Cast" })); add(body, list(cast, openCast)); }
   modal({
     title: "Cast", className: "drawer-sheet", body,
     actions: [
-      { label: "Open the page", primary: true, onClick: () => go("journal", "cast") },
+      { label: "Open the page", onClick: () => go("journal", "cast") },
       { label: "Close" },
     ],
   });
@@ -1127,17 +1155,7 @@ function nodeCard(scope, cat, slots) {
       el("button", {
         class: `node-txt ${text ? "" : "empty"} btn ghost`.trim(),
         style: "text-align:left;justify-content:flex-start;flex:1;min-height:40px;padding:.2rem .3rem",
-        onclick: () => promptModal({
-          title: categoryName(scope, cat.id),
-          label: `Slot ${lo}-${hi}`,
-          value: text,
-          inspire: cat.id,
-          // A dialog titled "Pending questions" with an empty box tells a
-          // newcomer nothing. The book defines every category and gives
-          // examples; both live in the data, so both are shown here.
-          hint: `${cat.definition} e.g. ${cat.examples}`,
-          onSubmit: (v) => { store.setNode(cat.id, i, v); render(); },
-        }),
+        onclick: () => editSlotDialog(scope, cat, i, text),
       }, text || "Add new, choose, or reroll"),
       text ? el("button", {
         class: "btn small",
@@ -1157,6 +1175,28 @@ function nodeCard(scope, cat, slots) {
       : `Show all ${slots} slots`));
   }
   return card;
+}
+
+// One slot of a plot-node list, written, rewritten or taken out. The same
+// dialog serves the Plot nodes page and the Table's drawer, so a node can be
+// changed wherever it is seen — written in prep is not written in stone.
+function editSlotDialog(scope, cat, i, text) {
+  const [lo, hi] = slotRange(i);
+  promptModal({
+    title: categoryName(scope, cat.id),
+    label: `Slot ${lo}-${hi}`,
+    value: text,
+    inspire: cat.id,
+    // A dialog titled "Pending questions" with an empty box tells a
+    // newcomer nothing. The book defines every category and gives
+    // examples; both live in the data, so both are shown here.
+    hint: `${cat.definition} e.g. ${cat.examples}`,
+    remove: text ? {
+      label: "Remove this node",
+      onClick: () => { store.setNode(cat.id, i, ""); toast("Node removed.", { undo: true }); render(); },
+    } : null,
+    onSubmit: (v) => { store.setNode(cat.id, i, v); render(); },
+  });
 }
 
 // Permission: invoke a node deliberately, counting as a beat (PUM p.9).

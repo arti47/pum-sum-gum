@@ -2231,3 +2231,15 @@ details.machines > summary { font-family: var(--serif); font-weight: 700; }
 .jentry .entry-dice .die { min-width: 30px; height: 30px; font-size: .7rem; }
 #screen:has(.solo-card) > h1::before { display: none; }
 .jentry .entry-dice { float: none; display: flex; margin: .25rem 0 0; transform: rotate(-3deg); transform-origin: left center; }
+
+/* Written things look editable: a pen on every node and every drawer row. */
+.node-row .node-txt:not(.empty)::after { content: "✎"; margin-left: auto; padding-left: .5rem; color: var(--ink-3); font-family: var(--sans); }
+.drawer-list.editable { display: flex; flex-direction: column; gap: .3rem; padding: 0; }
+.drawer-item {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%;
+  min-height: 44px; padding: .45rem .7rem; text-align: left; cursor: pointer; font: inherit; font-family: var(--serif);
+  border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper-2); color: var(--ink);
+}
+.drawer-item:hover { border-color: var(--accent); }
+.drawer-item.add { font-family: var(--sans); font-size: .85rem; font-weight: 600; color: var(--accent-text); border-style: dashed; }
+.drawer-pen { color: var(--ink-3); flex: none; }
