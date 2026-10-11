@@ -212,36 +212,56 @@ function drawerChips(scope) {
   return row;
 }
 
+// Every list on one page, every slot a box (reported from play: "edit all the
+// slots at one time… instead of one at a time"). Nothing is written until
+// Save, and Save is one undo however many boxes changed.
 function nodesDrawer(scope) {
-  const body = el("div", { class: "drawer" });
-  add(body, el("p", { class: "muted", text: "Tap a node to change or remove it." }));
+  const body = el("div", { class: "drawer nodes-edit" });
+  add(body, el("p", { class: "muted", text: "Write, change or clear any slot, then Save. Empty a box to remove that node." }));
+  const boxes = [];
   for (const cat of NODE_CATEGORIES) {
     const slots = nodeSlots(scope, cat.id);
     if (!slots) continue;
     const list = nodeList(scope, cat.id);
-    const written = list.map((t, i) => ({ t, i })).filter((x) => x.t && x.t.trim());
-    add(body, el("h3", { class: "drawer-h", text: `${categoryName(scope, cat.id)} · ${written.length}/${slots}` }));
-    const ul = el("div", { class: "drawer-list editable" });
-    for (const { t, i } of written) {
-      add(ul, el("button", {
-        class: "drawer-item", "aria-label": `Edit ${t}`,
-        onclick: () => { closeModal(); editSlotDialog(scope, cat, i, t); },
-      }, el("span", { text: t }), el("span", { class: "drawer-pen", "aria-hidden": "true", text: "✎" })));
+    const name = categoryName(scope, cat.id);
+    const lastWritten = list.reduce((n, t, i) => (t && t.trim() ? i + 1 : n), 0);
+    add(body, el("h3", { class: "drawer-h", text: `${name} · ${nodeFill(scope, cat.id)}/${slots}` }));
+    add(body, el("p", { class: "cite", text: `${cat.definition} e.g. ${cat.examples}` }));
+    const rows = el("div", { class: "slot-edit" });
+    const addRow = (i) => {
+      const [lo, hi] = slotRange(i);
+      const input = el("input", { type: "text", "aria-label": `${name}, slot ${lo}-${hi}`, placeholder: "Empty" });
+      input.value = list[i] || "";
+      boxes.push({ cat, i, input, was: list[i] || "" });
+      add(rows, el("label", { class: "slot-row" }, el("span", { class: "node-idx", text: fmtRange(lo, hi) }), input));
+    };
+    // What is written, and one empty box to write in; more on request.
+    let shown = Math.min(slots, lastWritten + 1);
+    for (let i = 0; i < shown; i++) addRow(i);
+    add(body, rows);
+    if (shown < slots) {
+      const more = el("button", {
+        class: "btn small ghost", type: "button",
+        onclick: () => { addRow(shown); shown += 1; boxes[boxes.length - 1].input.focus(); if (shown >= slots) more.remove(); },
+      }, `+ Another slot in ${name}`);
+      add(body, more);
     }
-    const free = list.length < slots ? list.length : list.findIndex((x) => !x || !x.trim());
-    if (written.length < slots) {
-      add(ul, el("button", {
-        class: "drawer-item add",
-        onclick: () => { closeModal(); editSlotDialog(scope, cat, free < 0 ? written.length : free, ""); },
-      }, `+ Add to ${categoryName(scope, cat.id)}`));
-    }
-    add(body, ul);
   }
+  const save = () => {
+    const changed = boxes.filter((b) => b.input.value.trim() !== b.was.trim());
+    if (!changed.length) return;
+    store.transact("Edit plot nodes", () => {
+      for (const b of changed) store.setNode(b.cat.id, b.i, b.input.value.trim());
+    });
+    toast(`${changed.length} slot${changed.length === 1 ? "" : "s"} saved.`, { undo: true });
+  };
   modal({
     title: "Plot nodes", className: "drawer-sheet", body,
     actions: [
-      { label: "Open the page", onClick: () => go("journal", "nodes") },
-      { label: "Close" },
+      { label: "Save", primary: true, onClick: () => { save(); render(); } },
+      // Leaving for the page keeps what was typed rather than dropping it.
+      { label: "Open the page", onClick: () => { save(); go("journal", "nodes"); } },
+      { label: "Cancel" },
     ],
   });
 }
@@ -1046,6 +1066,7 @@ export function renderNodes(host, scope) {
     return;
   }
 
+  add(host, el("button", { class: "btn wide", onclick: () => nodesDrawer(scope) }, "Edit all nodes"));
   for (const cat of NODE_CATEGORIES) {
     const slots = nodeSlots(scope, cat.id);
     if (slots === 0) continue;

@@ -2177,3 +2177,9 @@ the class `empty`, so the empty-state card's padding and frame turned it into a 
 faint italic text. *Fix:* class `blank`, label **+ Write a node**, and no *Show all* on a list with
 nothing written.
 
+
+**F-107 · Plot nodes could only be edited one slot at a time.** Reported from play with a
+screenshot of the Table's drawer. Every slot opened its own dialog. *Fix:* the drawer is a form,
+every printed list with a box per slot (+ Another slot up to capacity); Save writes every changed
+box in one transaction, so one Undo reverts it. Story → Plot nodes → **Edit all nodes** opens the
+same form.

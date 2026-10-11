@@ -702,7 +702,7 @@ const REFERENCE = [
         "The card in the middle says where you are — a heading, one sentence, Show me the steps. While a scene waits for its beat, the two calls sit right under it; while a beat is waiting to be judged, the beat card takes its place.",
         "The floating button — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet.",
         "Three machines — Ask (PUM · a question) · Beat (PUM · the plot) · Scene (SUM · this scene). Beat opens Call a plot beat: Modified proposal (I know roughly what happens next) · Random prompt (I don't know what happens next) · When to call which · Not now.",
-        "Drawers — Plot nodes (N) opens every list with each node a row to tap and change, and + Add to <list> where a list has room; Cast (N) lists your protagonists and cast, each a row that opens its own editor. Both offer Open the page and Close. Files (N) goes to the Story's Files page.",
+        "Drawers — Plot nodes (N) opens every list at once, each slot a box to write, change or empty (+ Another slot in <list> opens one more), then Save — one Undo takes the whole edit back — or Open the page or Cancel; Cast (N) lists your protagonists and cast, each a row that opens its own editor. Both offer Open the page and Close. Files (N) goes to the Story's Files page.",
         "On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged.",
         "Under the track: Each box is one beat that mattered — cross all N and this storyline ends; and, in the help, How the track and beats fit, a fold of five stations.",
         "On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Make up a new one · Pick from your cast (N), on a list this sheet does not print — the count is how many are in the cast.",
@@ -761,7 +761,7 @@ const REFERENCE = [
       { p: "Plot nodes" },
       { bullets: [
         "Per list: the fill count in its heading; then one line with the 1d10 or 1d20 pill, a “What goes in here” fold and Roll this list; the first four written slots plus one empty as buttons, Invoke on written entries, Show all N slots.",
-        "Tap any written node (it carries a ✎) to rewrite it — Save, Remove this node, or Cancel. An empty slot reads + Write a node; tap it to write one. A list with nothing in it shows just that one slot.",
+        "Edit all nodes opens every list at once, the same form as the Table's Plot nodes drawer. Or tap any written node (it carries a ✎) to rewrite it — Save, Remove this node, or Cancel. An empty slot reads + Write a node; tap it to write one. A list with nothing in it shows just that one slot.",
         "Player-named lists add Rename and Remove.",
         "Add a plot node list — names one of the two blank lists from the extension sheet.",
         "Invoke this node → Invoke as a beat / Cancel.",

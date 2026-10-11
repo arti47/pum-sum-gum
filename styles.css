@@ -2259,3 +2259,10 @@ details.machines > summary { font-family: var(--serif); font-weight: 700; }
   border: 1.5px dashed var(--rule-2) !important; border-radius: var(--radius-sm);
 }
 .node-txt.blank:hover { border-color: var(--accent) !important; }
+
+/* Every node slot as a box, edited at once (F-107). */
+.nodes-edit .slot-edit{display:grid;gap:.35rem;margin:.3rem 0 .4rem}
+.nodes-edit .slot-row{display:flex;align-items:center;gap:.5rem}
+.nodes-edit .slot-row .node-idx{flex:0 0 2.6rem}
+.nodes-edit .slot-row input{flex:1;min-width:0;min-height:40px}
+.nodes-edit .cite{margin:0 0 .2rem}
