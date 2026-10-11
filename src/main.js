@@ -1,17 +1,17 @@
 // Boot.
 
 import { $ } from "./core.js";
-import { toast, registerUndo, registerExplainState, registerCue } from "./ui.js";
+import { toast, registerUndo, registerExplainState, registerCue, registerLongPress } from "./ui.js";
 import { cue } from "./feel.js";
 import * as store from "./store.js";
 import { applyTheme, cycleTheme, Settings } from "./settings.js";
-import { registerScreen, go, renderTabs, render } from "./router.js";
+import { registerScreen, go, renderTabs, render, openHelp } from "./router.js";
 import { renderPlay } from "./sheet.js";
 import { renderOracles } from "./oracles.js";
 import { renderScene } from "./scene.js";
 import { renderJournal } from "./journal.js";
 import { installGlossary } from "./glossary.js";
-import { renderMore, openTerm } from "./screens.js";
+import { renderMore, openTerm, openRule } from "./screens.js";
 import { clearTransient } from "./viewstate.js";
 
 store.load();
@@ -33,6 +33,7 @@ registerExplainState({
 // Every "what this does" note in the app grows chips for the jargon its own text
 // uses, from here on, without any screen opting in (§6.6 layer 0).
 installGlossary({ openTerm });
+registerLongPress(openRule);
 
 registerCue(cue);
 registerScreen("play", renderPlay);
@@ -47,6 +48,7 @@ $("#btn-theme").addEventListener("click", () => {
 });
 
 $("#btn-home").addEventListener("click", () => go("more", "home"));
+$("#btn-help").addEventListener("click", openHelp);
 
 // Follow the system theme live while the app is set to "system".
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);

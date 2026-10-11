@@ -336,8 +336,10 @@ ok("every node-invoking prompt has a play note",
       const src = readFileSync(join(root, "src", f), "utf8");
       for (const m of src.matchAll(/["`]([^"`\n]{3,70})["`]/g)) remember(m[1]);
     }
-    const TABS = ["Play", "Scene", "Oracles", "Journal", "More"];
+    // The three tabs; Ask and Scene are rooms reached from the Table's buttons.
+    const TABS = ["Table", "Story", "Setup"];
     const SECTIONS = [
+      "Ask", "Scene", "Journal", "Files",
       "Plot track", "Plot nodes", "Cast", "Forge", "Plot seed", "World", "Characters",
       "Grand oracle", "Yes or No", "Descriptive", "Story", "Granular", "Quantifiers",
       "This scene", "Roll a table", "Entries", "Dice",

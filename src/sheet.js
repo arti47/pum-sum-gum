@@ -17,9 +17,7 @@ import { sectionNav, go, render } from "./router.js";
 import { openRule } from "./screens.js";
 import { NODE_CATEGORIES, PROMPT_NOTES, TRACK_SECTION_NOTES } from "../data-pum-plot.js";
 import { BEAT_TRIGGERS, FIRST_BEAT_COACH, BEAT_STEPS, TRACK_CAPTION, TRACK_LOOP } from "../data-guidance.js";
-import { renderCast } from "./cast.js";
-import { renderFiles } from "./files.js";
-import { coachCard, whichMachine, bookTag, nextMove, endingDialog } from "./coach.js";
+import { coachCard, nextMove, endingDialog } from "./coach.js";
 import { registerClearer } from "./viewstate.js";
 import { cue } from "./feel.js";
 
@@ -77,9 +75,6 @@ export function renderPlay(host, section) {
     track: !!openBeat || isEnded(scope),
   }));
 
-  if (section === "nodes") return renderNodes(host, scope);
-  if (section === "cast") return renderCast(host);
-  if (section === "files") return renderFiles(host);
   return renderTrack(host, scope);
 }
 
@@ -88,38 +83,36 @@ export function renderPlay(host, section) {
 // ---------------------------------------------------------------------------
 function renderTrack(host, scope) {
   const sheet = plotSheet(scope.sheetId);
-  add(host, el("h1", { text: scope.name }));
-  add(host, bookTag("play"));
-  add(host, el("p", { class: "lede", text: sheet ? `${sheet.name} · ${sheet.tagline}` : "" }));
-  // The coach leads, short: where you are, and the one next thing. Its literal
-  // steps fold beneath it — open until the first beat of this game is
-  // confirmed, when the newcomer line that used to sit apart joins them.
+  // The Table: the track along the top, the one thing happening now in the
+  // middle, and the three machines underneath — everything a turn of play
+  // needs on one screen, and nothing a turn of play does not.
+  add(host, el("p", { class: "table-kicker", text: sheet ? sheet.name : "" }));
+  add(host, el("h1", { class: "table-title", text: scope.name }));
   const game = store.activeGame();
   const newcomer = !!game && !game.journal.some((e) => e.kind === "track");
-  // On the plot sheet the next move leads and the teaching sits one tap below
-  // the sheet, folded: the note and Which do I need? above the track stood
-  // between a new player and the one thing to do next.
-  const note = explain([
-    "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
-    "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
-  ], "confirm", openRule);
+  const move = nextMove();
+  const beatStage = !!move && (move.stage === "scene-beat" || move.stage === "endgame");
+
+  add(host, trackCard(scope));
+
+  // The middle of the table: a beat waiting to be judged, or where you are.
+  const now = el("section", { class: "table-now", "aria-label": "Now" });
   if (openBeat) {
-    // A beat on the table is the one thing to deal with, and its card carries
-    // its own steps: the sheet leads, and the coach shrinks to its heading.
-    add(host, trackCard(scope));
-    add(host, coachCard({ compact: true, brief: true }));
+    add(now, beatArea(scope));
   } else {
-    add(host, coachCard({ compact: true, newcomer, newcomerLine: newcomer ? FIRST_BEAT_COACH : null }));
-    // The sheet itself: the track, and the beat called on it, in one card.
-    add(host, trackCard(scope));
+    add(now, coachCard({ compact: true, bare: !!move, newcomer, newcomerLine: newcomer ? FIRST_BEAT_COACH : null }));
+    // When the next move IS a beat, its two calls are right here.
+    if (beatStage && !isEnded(scope)) add(now, beatArea(scope));
   }
+  add(host, now);
+
+  add(host, tableTiles(scope));
+  add(host, drawerChips(scope));
 
   // Context the player re-reads occasionally, not every beat — folded (§6.5).
-  // A missing starting point is the coach's next step, so it is not repeated
-  // here as a card of its own.
   if (scope.mission || scope.startingPoint || scope.notes) {
     // The scope's own words — content, not teaching — so it is not a note and
-    // stays on the sheet rather than going to the help drawer.
+    // stays on the table rather than going to the help.
     const d = el("details", { class: "scope-fold" }, el("summary", null, "This scope"));
     const body = el("div", { class: "body" });
     if (scope.mission) add(body, el("p", null, el("strong", { text: "Mission. " }), scope.mission));
@@ -141,23 +134,16 @@ function renderTrack(host, scope) {
     add(host, d);
   }
 
-  // The teaching — the note, the loop of track and beats, Which do I need? —
-  // is gathered by the router into the help drawer at the screen's foot. The
-  // loop is left out while a beat is open: its card carries the steps.
-  add(host, note);
+  // The teaching is gathered by the router into the screen's help.
+  add(host, explain([
+    "This is your plot sheet. Call a beat when a moment might matter: a modified proposal if you know roughly what happens next, a random prompt if you don't.",
+    "Play the answer out first. Only cross a box once the outcome turned out to be relevant — the app never crosses one for you.",
+  ], "confirm", openRule));
   if (!openBeat && hasTrack(scope)) add(host, trackLoopFold());
-  add(host, whichMachine("play"));
 
-  // The pinned bar carries the coach's next move — the same one the card
-  // names — not a beat. A beat pinned on every visit told a player who had
-  // just finished prep to roll before a scene had opened (PUM p.5 opens with
-  // roleplay), while the coach above said "open a scene": two next steps.
-  // The beat calls stay in the track card, where the track they cross is.
-  const move = nextMove();
+  // The floating button is the coach's next move — the same one the card names.
   if (!openBeat && move) {
-    if (move.stage === "scene-beat" || move.stage === "endgame") {
-      // The next move IS a beat, and this is the sheet it is called on: the
-      // bar rolls it rather than scrolling to the buttons that would.
+    if (beatStage) {
       actionBar({
         label: "Random prompt", context: move.context,
         secondary: { label: "Proposal", onClick: () => doProposal(scope) },
@@ -167,6 +153,99 @@ function renderTrack(host, scope) {
       actionBar({ label: move.label, context: move.context, onClick: move.run });
     }
   }
+}
+
+// The three machines, as three big buttons: one question, the plot, the scene.
+// Each says which book it is; together they are the "which do I need?" answer.
+function tableTiles(scope) {
+  const nav = el("nav", { class: "table-tiles", "aria-label": "The machines" });
+  const RULE = { ask: "yes-no", beat: "beat-kinds", scene: "scene-arc" };
+  // Press and hold a machine to read its rule.
+  const tile = (key, label, book, onclick, badge = false) => el("button", {
+    class: `tile tile-${key}`, onclick, "aria-label": `${label} — ${book}`, "data-rule": RULE[key],
+  },
+    el("span", { class: "tile-art", "aria-hidden": "true" }),
+    el("span", { class: "tile-label", text: label }),
+    el("span", { class: "tile-book", text: book }),
+    badge ? el("span", { class: "badge", "aria-hidden": "true" }) : null
+  );
+  add(nav, tile("ask", "Ask", "PUM · a question", () => go("oracles", "yesno")));
+  add(nav, tile("beat", "Beat", "PUM · the plot", () => openBeatSheet(scope), !!openBeat));
+  add(nav, tile("scene", "Scene", "SUM · this scene", () => go("scene", "arc"), !!scope.openScene));
+  return nav;
+}
+
+// The beat's two calls, in a sheet of their own — or, with a beat already on the
+// table, the way back to it.
+export function openBeatSheet(scope = store.currentScope()) {
+  if (!scope) return;
+  if (openBeat || isEnded(scope)) {
+    const anchor = document.getElementById("beat-controls");
+    if (anchor) anchor.scrollIntoView({ block: "start", behavior: "smooth" });
+    else go("play", "track");
+    return;
+  }
+  modal({
+    title: "Call a plot beat",
+    className: "sheet-beat",
+    body: beatChooser(scope, { inSheet: true }),
+    actions: [{ label: "Not now" }],
+  });
+}
+
+// What the plot reaches for, one tap away without leaving the table.
+function drawerChips(scope) {
+  const game = store.activeGame();
+  const fill = NODE_CATEGORIES.reduce((n, c) => n + (nodeSlots(scope, c.id) ? nodeFill(scope, c.id) : 0), 0);
+  const row = el("nav", { class: "drawer-chips", "aria-label": "Drawers" });
+  add(row, el("button", { class: "chip drawer-chip", "data-d": "nodes", onclick: () => nodesDrawer(scope) },
+    `Plot nodes (${fill})`));
+  add(row, el("button", { class: "chip drawer-chip", "data-d": "cast", onclick: () => castDrawer() },
+    `Cast (${game ? game.cast.length : 0})`));
+  add(row, el("button", { class: "chip drawer-chip", "data-d": "files", onclick: () => go("journal", "files") },
+    `Files (${game ? game.files.length : 0})`));
+  return row;
+}
+
+function nodesDrawer(scope) {
+  const body = el("div", { class: "drawer" });
+  let any = false;
+  for (const cat of NODE_CATEGORIES) {
+    if (!nodeSlots(scope, cat.id)) continue;
+    const list = nodeList(scope, cat.id).filter((t) => t && t.trim());
+    add(body, el("h3", { class: "drawer-h", text: `${categoryName(scope, cat.id)} · ${list.length}` }));
+    if (list.length) {
+      any = true;
+      const ul = el("ul", { class: "drawer-list" });
+      for (const t of list) add(ul, el("li", { text: t }));
+      add(body, ul);
+    }
+  }
+  if (!any) add(body, el("p", { class: "muted", text: "Nothing written yet. The plot reaches into these lists when a random prompt names one." }));
+  modal({
+    title: "Plot nodes", className: "drawer-sheet", body,
+    actions: [
+      { label: "Open the page", primary: true, onClick: () => go("journal", "nodes") },
+      { label: "Close" },
+    ],
+  });
+}
+
+function castDrawer() {
+  const game = store.activeGame();
+  const body = el("div", { class: "drawer" });
+  const cast = game ? game.cast : [];
+  if (!cast.length) add(body, el("p", { class: "muted", text: "No one yet. Characters and places you meet in play gather here." }));
+  const ul = el("ul", { class: "drawer-list" });
+  for (const c of cast) add(ul, el("li", null, el("strong", { text: c.name }), c.notes ? ` — ${c.notes}` : ""));
+  if (cast.length) add(body, ul);
+  modal({
+    title: "Cast", className: "drawer-sheet", body,
+    actions: [
+      { label: "Open the page", primary: true, onClick: () => go("journal", "cast") },
+      { label: "Close" },
+    ],
+  });
 }
 
 // PUM p.5's flowchart is a loop, and the loop crosses tabs: a scene opens, you
@@ -212,7 +291,6 @@ function trackCard(scope) {
     if (sheet && sheet.customizable) {
       add(card, el("button", { class: "btn wide", onclick: () => addSectionDialog() }, "Add a track section"));
     }
-    add(card, beatArea(scope));
     // Without a track there is no Threshold, so the only thing that can finish
     // this scope is you saying so. That makes the control mandatory here.
     add(card, endScopeRow(scope));
@@ -270,8 +348,6 @@ function trackCard(scope) {
     ));
     add(card, el("button", { class: "btn wide", onclick: () => go("more", "home") }, "Start another plot sheet"));
   }
-
-  if (!isEnded(scope) || openBeat) add(card, beatArea(scope));
 
   // The track's own permissions are used now and then, not every beat, so they
   // fold under one line rather than standing level with the track. Still
@@ -575,8 +651,10 @@ function reportAdvance(out, title) {
 }
 
 // --- beats -----------------------------------------------------------------
-function beatChooser(scope) {
+function beatChooser(scope, { inSheet = false } = {}) {
   const wrap = el("div", { class: "beat-call" });
+  // From the sheet, a call closes it before the beat card is drawn.
+  const call = (fn) => () => { if (inSheet) closeModal(); fn(scope); };
   add(wrap, el("div", { class: "beat-call-head" },
     el("span", { class: "label", text: "Call a plot beat" }),
     el("span", { class: "muted", text: "A proposal twists an idea you already have. A prompt tells you what happens when you don't." })
@@ -584,9 +662,11 @@ function beatChooser(scope) {
   // The pinned bar already carries the primary, and carried the same label:
   // "Random prompt" appeared twice on one screen, both in accent. These are the
   // same two actions spelled out, so they read as the explanation, not the call.
-  add(wrap, el("div", { class: "btn-row" },
-    el("button", { class: "btn", onclick: () => doProposal(scope) }, "Modified proposal"),
-    el("button", { class: "btn", onclick: () => doPrompt(scope) }, "Random prompt")
+  add(wrap, el("div", { class: "beat-calls" },
+    el("button", { class: "btn beat-pick pick-proposal", "aria-label": "Modified proposal", "data-rule": "beat-triggers", onclick: call(doProposal) },
+      el("strong", { text: "Modified proposal" }), el("small", { text: "I know roughly what happens next" })),
+    el("button", { class: "btn beat-pick pick-prompt", "aria-label": "Random prompt", "data-rule": "beat-triggers", onclick: call(doPrompt) },
+      el("strong", { text: "Random prompt" }), el("small", { text: "I don't know what happens next" }))
   ));
   add(wrap, triggersFold());
   if (scope.lastBeat) {
@@ -920,10 +1000,10 @@ function triggersFold() {
 // ---------------------------------------------------------------------------
 // Plot nodes
 // ---------------------------------------------------------------------------
-function renderNodes(host, scope) {
+export function renderNodes(host, scope) {
   const sheet = plotSheet(scope.sheetId);
   add(host, el("h1", { text: "Plot nodes" }));
-  add(host, bookTag("play"));
+  add(host, el("p", { class: "lede", text: "What a random prompt can reach into." }));
   add(host, explain([
     "Plot nodes are your game's own content — the things a random prompt can reach into. Write them at the start and keep them alive as you play.",
     "The die above each list is the one the app will roll: 1d10 while a list is less than half full, 1d20 from the halfway entry on.",

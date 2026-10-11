@@ -4,11 +4,14 @@
 import { el, add, fmtTime, fmtDay } from "./core.js";
 import { explain, promptModal, confirmModal, toast, emptyState, actionBar, diceRow } from "./ui.js";
 import * as store from "./store.js";
-import { sectionNav, render, go, keepCurrentInView } from "./router.js";
+import { sectionNav, render, go, keepCurrentInView, showEverything } from "./router.js";
+import { Settings } from "./settings.js";
 import { openRule } from "./screens.js";
 import { registerClearer } from "./viewstate.js";
-import { filePreview, chooseFile } from "./files.js";
+import { filePreview, chooseFile, renderFiles } from "./files.js";
 import { yesNoAnswer } from "./rules.js";
+import { renderNodes } from "./sheet.js";
+import { renderCast } from "./cast.js";
 
 // 40 entries was 97 controls and the tallest screen in the app under the stress
 // fixture. A log is read from the top; the page is smaller and says how much
@@ -26,6 +29,8 @@ const FILTERS = [
   ["session", "Sessions"], ["ending", "Endings"], ["table", "My tables"],
 ];
 
+const SIMPLE_FILTERS = ["all", "beat", "yesno", "scene", "note"];
+
 export function renderJournal(host, section) {
   add(host, sectionNav("journal", section));
   const game = store.activeGame();
@@ -37,6 +42,9 @@ export function renderJournal(host, section) {
     return;
   }
   if (section === "dice") return renderDice(host, game);
+  if (section === "nodes") return renderNodes(host, store.currentScope());
+  if (section === "cast") return renderCast(host);
+  if (section === "files") return renderFiles(host);
   return renderEntries(host, game);
 }
 
@@ -49,12 +57,16 @@ function renderEntries(host, game) {
   ], "beat-kinds", openRule));
 
   const row = el("div", { class: "section-nav" });
+  // Simple view keeps the filters a first story needs.
+  const simple = Settings.simple();
   for (const [id, label] of FILTERS) {
+    if (simple && !SIMPLE_FILTERS.includes(id) && id !== filter) continue;
     add(row, el("button", {
       "aria-current": filter === id ? "true" : "false",
       onclick: () => { filter = id; shown = PAGE; render(); },
     }, label));
   }
+  if (simple) add(row, showEverything());
   add(host, row);
   keepCurrentInView(row);
 

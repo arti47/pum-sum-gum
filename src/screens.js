@@ -77,14 +77,6 @@ function renderHome(host) {
     // had to talk. This is the app's shortest possible answer to "what is a
     // solo RPG", and it is only ever shown before the first game exists.
     add(host, newToSoloCard());
-    add(host, emptyState(
-      "No game yet",
-      "PUM starts with a little preparation: a universe, a plot scope, your protagonists, and a plot sheet.",
-      { label: "Prepare a game", onClick: () => startWizard() }
-    ));
-    add(host, el("button", {
-      class: "btn wide", onclick: () => go("more", "tutorial"),
-    }, "Read the first-session walkthrough"));
     add(host, machinesCard());
     // Every other screen pins its primary action; the very first screen a new
     // player sees was the one that did not.
@@ -325,33 +317,42 @@ function gamesCard(current) {
 }
 
 function newToSoloCard() {
-  const card = el("div", { class: "card" });
+  const card = el("div", { class: "card solo-card" });
   // The unfolding machine itself — decoration, so it says nothing to a reader.
   add(card, el("div", { class: "hero", "aria-hidden": "true" }));
-  add(card, el("div", { class: "card-head" },
-    el("h2", { text: NEW_TO_SOLO.title }),
-    el("span", { class: "cite", text: "the app's own words" })
-  ));
+  add(card, el("h2", { text: NEW_TO_SOLO.title }));
+  const row = el("ol", { class: "solo-steps" });
+  for (const st of NEW_TO_SOLO.steps) {
+    add(row, el("li", { "data-art": st.art },
+      el("span", { class: "solo-art", "aria-hidden": "true" }),
+      el("span", { text: st.k })));
+  }
+  add(card, row);
+  const more = el("details", { class: "rows-fold" }, el("summary", null, "Tell me more"));
   const ul = el("ul", { class: "plain" });
   for (const p of NEW_TO_SOLO.points) add(ul, el("li", { text: p }));
-  add(card, ul);
-  add(card, el("p", { class: "loop", text: NEW_TO_SOLO.loop }));
+  add(more, el("div", { class: "body" }, ul, el("p", { class: "cite", text: "The app's own words, not the books'." })));
+  add(card, more);
   return card;
 }
 
+// The three books, folded: reference for the curious, not a step of play. On
+// the Table the same answer is the three big buttons.
 function machinesCard() {
-  const card = el("div", { class: "card machines" });
-  add(card, el("h3", { text: "The machines — which do I need?" }));
-  add(card, whichBody());
-  add(card, el("p", { class: "cite", text: "What each book is for:" }));
+  const card = el("details", { class: "card machines rows-fold" },
+    el("summary", null, "The machines — which do I need?"));
+  const body = el("div", { class: "body" });
+  add(body, whichBody());
+  add(body, el("p", { class: "cite", text: "What each book is for:" }));
   for (const m of MACHINES) {
     const d = el("details", { class: "acc" }, el("summary", null, m.name));
     add(d, el("div", { class: "acc-body" },
       el("p", { text: m.text }),
       el("p", { class: "cite", text: m.version })
     ));
-    add(card, d);
+    add(body, d);
   }
+  add(card, body);
   return card;
 }
 
@@ -713,6 +714,11 @@ function renderSettings(host) {
     "Sound and vibration",
     "A rattle of dice on a roll, a pen stroke when a box is crossed, a press when a track is sealed, a soft page between screens — and a buzz where the phone allows it. Off by default.",
     Settings.feel(), (v) => { Settings.setFeel(v); render(); }
+  ));
+  add(look, toggle(
+    "Simple view",
+    "Shows the tools a first game needs and keeps the rest one tap away. It switches itself off once your first storyline's ending is written.",
+    Settings.simple(), (v) => { Settings.setSimple(v); render(); }
   ));
   add(host, look);
 

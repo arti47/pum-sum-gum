@@ -130,6 +130,12 @@ export const NEW_TO_SOLO = {
     "It does not resolve actions. Whether the lock opens or the sword lands is your own RPG's job, or yours.",
   ],
   loop: "Say what your characters do → ask when you are unsure → take the answer and keep telling the story.",
+  // The same three points, as three pictures with a caption each.
+  steps: [
+    { art: "quill", k: "You tell the story" },
+    { art: "oracles", k: "The machine answers" },
+    { art: "scales", k: "Your rules resolve" },
+  ],
 };
 
 // The one-line coach on the plot sheet, shown until the first beat is confirmed.
@@ -379,3 +385,35 @@ export const ENDING_PROMPTS = [
   "What is different in the world now?",
   "What is still unfinished — a thread you might pick up in the next storyline?",
 ];
+
+// --- Which oracle fits the question you typed (the app's own hint) --------
+// Read top to bottom; the first pattern the question matches names an oracle.
+// A hint only: it never rolls, and the player still picks the oracle.
+export const ORACLE_HINTS = [
+  { re: "^\\s*how (many|much)\\b", section: "quantifiers", oracle: "many" },
+  { re: "^\\s*how (good|well)\\b", section: "quantifiers", oracle: "good" },
+  { re: "^\\s*how (hard|tough|difficult)\\b", section: "quantifiers", oracle: "hard" },
+  { re: "^\\s*(is|are|am|does|do|did|can|could|will|would|has|have|had|was|were|should|shall|may|might|must)\\b", section: "yesno" },
+  { re: "\\bwho\\b", section: "descriptive", oracle: "someone" },
+  { re: "\\bwhere\\b", section: "descriptive", oracle: "place" },
+  { re: "\\bwhy\\b", section: "story", oracle: "reason" },
+  { re: "\\bhow\\b", section: "story", oracle: "explain" },
+  { re: "\\b(want|wants|after|goal)\\b", section: "story", oracle: "intent" },
+  { re: "\\b(doing|happening)\\b", section: "story", oracle: "activity" },
+  { re: "\\b(find|found|discover)\\b", section: "story", oracle: "discovery" },
+  { re: "\\b(danger|hazard|trap)\\b", section: "descriptive", oracle: "hazard" },
+  { re: "\\b(feel|mood|atmosphere)\\b", section: "descriptive", oracle: "mood" },
+  { re: "\\b(see|hear|notice|smell)\\b", section: "descriptive", oracle: "notice" },
+  { re: "\\bwhat\\b", section: "descriptive", oracle: "object" },
+];
+
+// --- Game prep as a conversation (the app's own words) ---------------------
+// What the machine asks at each of PUM p.3's steps, in order.
+export const PREP_ASKS = [
+  "What shall we call this game?",
+  "What story do you want to tell?",
+  "Who are your heroes?",
+  "How long a story? Pick a plot sheet.",
+  "What might this story reach for? Jot a few things down.",
+];
+

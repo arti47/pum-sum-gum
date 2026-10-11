@@ -153,7 +153,10 @@ for (const seed of seeds) {
   // read the coach's label and take that move instead.
   async function nudge() {
     const label = await page.evaluate(() => {
-      const b = document.querySelector("#screen .btn.primary.wide");
+      // The coach's move: a primary on its card, or — on the Table, where the
+      // card keeps only where you are — the floating button that carries it.
+      const b = document.querySelector("#screen .btn.primary.wide")
+        || document.querySelector("#action-bar .btn.primary");
       return b && b.offsetParent !== null ? (b.textContent || "").trim() : null;
     });
     if (!label) return null;
@@ -169,7 +172,8 @@ for (const seed of seeds) {
   }
 
   const screenText = () => page.evaluate(() =>
-    (document.querySelector("#screen")?.innerText || "").replace(/\s+/g, " "));
+    [document.querySelector("#screen")?.innerText || "", document.querySelector("#action-bar")?.innerText || ""]
+      .join(" ").replace(/\s+/g, " "));
 
   // --- prep ---------------------------------------------------------------
   await page.evaluate(async () => (await import("./src/router.js")).go("more", "home"));
@@ -220,6 +224,9 @@ for (const seed of seeds) {
     await page.waitForTimeout(70);
     const open = (await screenText()).includes("cross a box");
     if (!open) {
+      // On the Table a beat is called from its Beat button, unless the next
+      // move is a beat and its two calls are already on the table.
+      if (!/Random prompt/.test(await screenText())) await step("open the Beat sheet", "^Beat");
       await step(`call a beat (${i + 1})`, pick() < 0.5 ? "Random prompt" : "Modified proposal");
     }
 
@@ -232,6 +239,11 @@ for (const seed of seeds) {
         await step("choose an entry", "^Choose$");
         const took = await step("take a written entry", "^(?!Cancel$).+", { optional: true });
         if (!took) await escapeDialog("choosing from a plot node list");
+        // An empty list offers Add a new node, which asks for the node.
+        else if (await page.evaluate(() => !!document.querySelector(".modal"))) {
+          await fill(`Something chosen ${i}`);
+          if (!(await step("save the new node", "^Save$", { optional: true }))) await escapeDialog("adding a node from Choose");
+        }
       }
       else await step("leave it to destiny", "Leave it to destiny");
     }

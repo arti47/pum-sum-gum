@@ -12,11 +12,12 @@
 // correct, because it is derived, never remembered.
 
 import { el, add } from "./core.js";
-import { promptModal, toast, noteFold } from "./ui.js";
+import { promptModal, toast } from "./ui.js";
 import * as store from "./store.js";
 import { isResolved, isEnded, hasTrack, crossed, trackLength } from "./derived.js";
 import { go, render } from "./router.js";
 import { Settings } from "./settings.js";
+import { openBeatSheet } from "./sheet.js";
 
 // The beat controls are further down THIS screen, so "go to the beat" is a
 // scroll, not a navigation. Three coach actions used go("play","track") from
@@ -28,7 +29,10 @@ import { Settings } from "./settings.js";
 function scrollToBeat() {
   const el = document.getElementById("beat-controls");
   if (el) { el.scrollIntoView({ block: "start", behavior: "smooth" }); return; }
-  go("play", "track");
+  // No beat on the table and no call in view: the Table's Beat sheet is where
+  // a beat is called, so go there and open it.
+  if (document.body.dataset.tab !== "play") go("play", "track");
+  if (!document.getElementById("beat-controls")) openBeatSheet();
 }
 // The same defect as scrollToBeat, in the place coachStrip() created: the strip
 // now renders ON scene/arc, and these three actions ran go("scene","arc") — a
@@ -192,6 +196,8 @@ export function endingDialog(game, scope) {
         });
         if (!isEnded(scope)) store.setScopeClosed(true);
       });
+      // A first storyline finished and written: simple view has done its job.
+      if (Settings.simple()) Settings.setSimple(false);
       toast("Ending written. It is in the journal with the rest of the story.", { undo: true });
       render();
     },
@@ -230,7 +236,7 @@ export function coachStrip({ onScene = false } = {}) {
 // furniture above the track for someone who has.
 // `brief` is the form shown while a beat is on the table: the beat card below
 // carries its own steps, so the coach keeps only where you are.
-export function coachCard({ compact = false, brief = false, newcomer = false, newcomerLine = null } = {}) {
+export function coachCard({ compact = false, brief = false, newcomer = false, newcomerLine = null, bare = false } = {}) {
   const game = store.activeGame();
   const scope = store.currentScope();
   const stage = stageOf(game, scope);
@@ -266,10 +272,20 @@ export function coachCard({ compact = false, brief = false, newcomer = false, ne
     return card;
   }
   if (compact && steps.length) {
-    add(card, el("details", { class: "rows-fold coach-fold", open: newcomer || undefined },
+    add(card, el("details", { class: "rows-fold coach-fold", open: (newcomer && !bare) || undefined },
       el("summary", null, "Show me the steps"), el("div", { class: "body" }, ...steps)));
   } else {
     add(card, ...steps);
+  }
+  // On the Table the floating button is this move and the three machines are
+  // the oracle and the beat: the card keeps only the extras they do not cover.
+  if (bare) {
+    const rest = extrasFor(stage).filter((e) => e.run !== scrollToBeat && !/oracle/i.test(e.label));
+    if (rest.length) {
+      add(card, el("div", { class: "btn-row", style: "margin-top:.4rem" },
+        ...rest.map((e) => el("button", { class: "btn small", onclick: e.run }, e.label))));
+    }
+    return card;
   }
 
   const act = actionFor(stage, game, scope);
@@ -291,13 +307,8 @@ export function coachCard({ compact = false, brief = false, newcomer = false, ne
   return card;
 }
 
-// "Which do I need?" — PUM or SUM, beat or oracle — on each tab where the
-// question comes up, folded with the notes. The row for the tab you are on
-// says so instead of offering a button that would navigate to this screen
-// (the F-67 defect).
-export function whichMachine(here, { closed = false } = {}) {
-  return noteFold(WHICH_MACHINE.title, whichBody(here), "which", { closed });
-}
+// "Which do I need?" — on the Table it is the three big buttons themselves; the
+// written rows stay on Setup's Home, where the books are introduced.
 
 // The rows themselves; Home shows them open, above the three books.
 export function whichBody(here = null) {
@@ -319,6 +330,13 @@ export function whichBody(here = null) {
     ));
   }
   return body;
+}
+
+// Ask and Scene are rooms off the Table: a way back, and the book you are in.
+export function tableBack(book) {
+  return el("div", { class: "table-back" },
+    el("button", { class: "btn small ghost", onclick: () => go("play", "track") }, "← Back to the Table"),
+    el("span", { class: "book-tag", text: book }));
 }
 
 // The book a tab belongs to, as a kicker on its title line.

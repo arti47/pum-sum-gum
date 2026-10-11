@@ -2143,3 +2143,17 @@ journal line, the slot editor, a deliberate invocation, and the Forge's "Written
 had no on-screen answer in play. *Which do I need?* gains a fifth row while GUM is on, and the
 Forge carries a book tag. Off, both go with the Forge.
 
+---
+
+## Reported from play — "cluttered and messy, too wordy, not enough graphics, intimidating"
+
+**F-103 · The play surface was a document.** *Rule:* none — no table, roll, odds or procedure
+changed. *Target:* measured at 390×844 — Play 3,119px, 593 words, 40 buttons; the cold open
+2,256px and 404 words; *Which do I need?* twice on one screen; five tabs of which three were the
+same act of playing. *Fix:* the Table (three tabs, three drawn machine buttons, the track as a
+road, one floating next move), teaching behind one Help line and a header ?, simple view for a
+first game, prep as a conversation, large dice, a storybook journal, a candle theme, swipe and
+hold. Table 127 words, cold open 50. *Found on the way:* the Yes or No bar read the bias box when
+the screen was drawn, not when Ask was pressed — ticking it rolled once. Fixed; the function
+audit's bias journey caught it.
+
