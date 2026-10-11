@@ -761,7 +761,7 @@ const REFERENCE = [
       { p: "Plot nodes" },
       { bullets: [
         "Per list: the fill count in its heading; then one line with the 1d10 or 1d20 pill, a “What goes in here” fold and Roll this list; the first four written slots plus one empty as buttons, Invoke on written entries, Show all N slots.",
-        "Tap any written node (it carries a ✎) to rewrite it — Save, Remove this node, or Cancel.",
+        "Tap any written node (it carries a ✎) to rewrite it — Save, Remove this node, or Cancel. An empty slot reads + Write a node; tap it to write one. A list with nothing in it shows just that one slot.",
         "Player-named lists add Rename and Remove.",
         "Add a plot node list — names one of the two blank lists from the extension sheet.",
         "Invoke this node → Invoke as a beat / Cancel.",

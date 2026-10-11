@@ -2252,3 +2252,10 @@ details.machines > summary { font-family: var(--serif); font-weight: 700; }
 .track-sec-name { margin-bottom: 0; line-height: 1.2; }
 .track-boxes { padding-top: 18px; }
 .track-boxes::before { top: calc(50% + 9px); }
+
+/* An empty node slot is an obvious place to write: a dashed line and a +. */
+.node-txt.blank {
+  color: var(--accent-text); font-family: var(--sans) !important; font-weight: 600 !important; font-size: .88rem !important;
+  border: 1.5px dashed var(--rule-2) !important; border-radius: var(--radius-sm);
+}
+.node-txt.blank:hover { border-color: var(--accent) !important; }

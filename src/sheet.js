@@ -1152,11 +1152,16 @@ function nodeCard(scope, cat, slots) {
     const text = list[i] || "";
     add(listEl, el("div", { class: "node-row" },
       el("span", { class: "node-idx", text: fmtRange(lo, hi) }),
+      // An empty slot is a button that says what it does. It used to carry the
+      // beat card's "Add new, choose, or reroll" in faint italics and the
+      // empty-state class, which padded it into a blank box that read as
+      // nothing to press (reported from play: "can't change these").
       el("button", {
-        class: `node-txt ${text ? "" : "empty"} btn ghost`.trim(),
+        class: `node-txt ${text ? "" : "blank"} btn ghost`.trim(),
         style: "text-align:left;justify-content:flex-start;flex:1;min-height:40px;padding:.2rem .3rem",
+        "aria-label": text ? null : `Write a node in slot ${lo}-${hi}`,
         onclick: () => editSlotDialog(scope, cat, i, text),
-      }, text || "Add new, choose, or reroll"),
+      }, text || "+ Write a node"),
       text ? el("button", {
         class: "btn small",
         "aria-label": `Invoke ${text}`,
@@ -1165,7 +1170,8 @@ function nodeCard(scope, cat, slots) {
     ));
   }
   add(card, listEl);
-  if (shown < slots) {
+  // Nothing written yet: more empty slots would only repeat the one above.
+  if (shown < slots && lastWritten > 0) {
     const hiddenWritten = Math.max(0, lastWritten - shown);
     add(card, el("button", {
       class: "btn small ghost",

@@ -2172,3 +2172,8 @@ screenshot. *Fix:* 18px of headroom above each row for the token and the laurel,
 re-centred, the acts spaced apart. Checked by measuring that no act name intersects a box or
 its headroom.
 
+**F-106 · An empty node slot did not look editable.** Reported from play. The slot button carried
+the class `empty`, so the empty-state card's padding and frame turned it into a blank box with
+faint italic text. *Fix:* class `blank`, label **+ Write a node**, and no *Show all* on a list with
+nothing written.
+
