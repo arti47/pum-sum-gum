@@ -2167,3 +2167,8 @@ removed by emptying it; the mission, starting point and game details were editab
 Setup → Home. *Fix:* editable drawer rows with ✎ and + Add; one slot editor with Remove this node;
 the This scope fold always present with the scope and game editors.
 
+**F-105 · The road's act names were overlapped by the row above.** Reported from play with a
+screenshot. *Fix:* 18px of headroom above each row for the token and the laurel, the road
+re-centred, the acts spaced apart. Checked by measuring that no act name intersects a box or
+its headroom.
+

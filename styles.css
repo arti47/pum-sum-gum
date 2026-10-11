@@ -2243,3 +2243,12 @@ details.machines > summary { font-family: var(--serif); font-weight: 700; }
 .drawer-item:hover { border-color: var(--accent); }
 .drawer-item.add { font-family: var(--sans); font-size: .85rem; font-weight: 600; color: var(--accent-text); border-style: dashed; }
 .drawer-pen { color: var(--ink-3); flex: none; }
+
+/* Room on the road: the token on the next box and the laurel over the last
+   stand above their row, so each act's name gets its own line clear of them,
+   and the acts are spaced apart (reported from play: names overlapped). */
+.track-sec { margin-bottom: .9rem; row-gap: .2rem; }
+.track-sec:last-child { margin-bottom: .3rem; margin-top: 0; }
+.track-sec-name { margin-bottom: 0; line-height: 1.2; }
+.track-boxes { padding-top: 18px; }
+.track-boxes::before { top: calc(50% + 9px); }
