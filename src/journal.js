@@ -62,6 +62,7 @@ function renderEntries(host, game) {
   for (const [id, label] of FILTERS) {
     if (simple && !SIMPLE_FILTERS.includes(id) && id !== filter) continue;
     add(row, el("button", {
+      "data-k": id,
       "aria-current": filter === id ? "true" : "false",
       onclick: () => { filter = id; shown = PAGE; render(); },
     }, label));
@@ -257,6 +258,19 @@ function entryEl(e, withTime = true) {
       onConfirm: () => { store.removeJournal(e.id); render(); },
     }),
   }, "Delete"));
+  // Swipe an entry left to open its tools; the ⋯ stays for everyone else.
+  let sx = null, sy = 0;
+  wrap.addEventListener("touchstart", (ev) => {
+    sx = ev.target.closest("button, a, input, textarea, summary") ? null : ev.touches[0].clientX;
+    sy = ev.touches[0].clientY;
+  }, { passive: true });
+  wrap.addEventListener("touchend", (ev) => {
+    if (sx === null) return;
+    const dx = ev.changedTouches[0].clientX - sx, dy = ev.changedTouches[0].clientY - sy;
+    sx = null;
+    const tools = wrap.querySelector(":scope > details.entry-tools");
+    if (tools && dx < -60 && Math.abs(dy) < Math.abs(dx) * 0.6) tools.open = true;
+  }, { passive: true });
   add(wrap, el("details", { class: "entry-tools" },
     el("summary", { "aria-label": "Edit" }, el("span", { class: "sr-only", text: "Edit" }),
       el("span", { "aria-hidden": "true", class: "dots", text: "⋯" })),
@@ -324,7 +338,10 @@ function renderDice(host, game) {
       el("span", { class: "cite", text: `${n} roll${n === 1 ? "" : "s"} · expected ${(n / size).toFixed(1)} per face` })
     ));
     const max = Math.max(...counts, 1);
-    const bars = el("div", { class: "dist" });
+    // A ruled line where every face would stand if the dice were perfectly even.
+    const groupsFor = size > 20 ? 10 : size;
+    const expH = Math.min(100, Math.round(((n / groupsFor) / (size > 20 ? max * (size / groupsFor) || 1 : max)) * 100));
+    const bars = el("div", { class: "dist", style: `--exp:${expH}%` });
     const labels = el("div", { class: "dist-labels" });
     // d100 is grouped into tens so the chart stays legible on a phone.
     const groups = size > 20 ? 10 : size;
@@ -342,15 +359,6 @@ function renderDice(host, game) {
   }
 
   add(host, el("p", { class: "muted", text: `${total} dice rolled in this game.` }));
-  add(host, el("button", {
-    class: "btn danger wide",
-    onclick: () => confirmModal({
-      title: "Clear the journal?",
-      message: `All ${game.journal.length} entries in this game are deleted — every roll, note and scene record. Export first if you want to keep them. This can be undone once from Settings.`,
-      confirmLabel: "Clear the journal", danger: true,
-      onConfirm: () => { store.clearJournal(); shown = PAGE; toast("Journal cleared.", { undo: true }); render(); },
-    }),
-  }, "Clear the journal"));
 }
 
 function resetJournalView() { shown = PAGE; filter = "all"; }

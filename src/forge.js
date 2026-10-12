@@ -49,7 +49,7 @@ export function renderForge(host) {
     return;
   }
 
-  const nav = el("nav", { class: "section-nav", "aria-label": "Forge sections" });
+  const nav = el("nav", { class: "section-nav forge-nav", "aria-label": "Forge sections" });
   for (const [id, label] of FORGE_SECTIONS) {
     add(nav, el("button", {
       "aria-current": forgeSection === id ? "true" : "false",
@@ -139,7 +139,7 @@ function renderSeed(host) {
       el("button", {
         // "d20" is a die size, not a name. The row beside it says which table
         // this is; the button's own accessible name has to say it too.
-        class: "btn small", "aria-label": `Roll ${t.name} — d${t.die}`,
+        class: "btn small die-btn", "data-d": String(t.die), "aria-label": `Roll ${t.name} — d${t.die}`,
         onclick: () => fireOne(id),
       }, `d${t.die}`)
     ));
@@ -233,7 +233,7 @@ function renderSectionTables(host, sectionId) {
           el("strong", { text: t.name }), el("br"),
           el("span", { class: "muted", text: t.blurb })),
         el("button", {
-          class: "btn small", "aria-label": `Roll ${t.name} — d${t.die}`,
+          class: "btn small die-btn", "data-d": String(t.die), "aria-label": `Roll ${t.name} — d${t.die}`,
           onclick: () => fireOne(t.id),
         }, `d${t.die}`)
       ));

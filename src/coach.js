@@ -319,7 +319,7 @@ export function whichBody(here = null) {
   for (const row of WHICH_MACHINE.rows) {
     if (row.gum && !gum) continue;
     const isHere = row.go[0] === here;
-    add(body, el("div", { class: `which-row${isHere ? " here" : ""}` },
+    add(body, el("div", { class: `which-row${isHere ? " here" : ""}`, "data-book": row.use.split(" ")[0].toLowerCase() },
       el("div", { class: "which-text" },
         el("strong", { text: row.use }),
         el("span", { text: row.ask })

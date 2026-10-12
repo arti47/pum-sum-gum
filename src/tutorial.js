@@ -65,6 +65,16 @@ function block(b) {
 }
 
 export function renderTutorial(host) {
+  // How far down the guide you are, as a thin line under the header.
+  const bar = el("div", { class: "read-progress", "aria-hidden": "true" });
+  add(host, bar);
+  const track = () => {
+    if (!bar.isConnected) { window.removeEventListener("scroll", track); return; }
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.setProperty("--read", max > 0 ? `${Math.min(100, (scrollY / max) * 100)}%` : "0%");
+  };
+  window.addEventListener("scroll", track, { passive: true });
+  requestAnimationFrame(track);
   add(host, el("h1", { text: TUTORIAL_META.title }));
   add(host, el("p", { class: "lede", text: TUTORIAL_META.blurb }));
   add(host, explain([

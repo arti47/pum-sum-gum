@@ -2191,3 +2191,9 @@ cards three deep; Home's primary printed twice; Settings one 2,500px column. *Fi
 sheets, the next move docked, help as a sheet, one title per screen, run-folding in the journal,
 one-tap node rows, flat scene moves, a shelf of games, a settings index, a display face and an ink
 per book. Presentation only; every rule, roll and table unchanged.
+
+**F-109 · Second UX/UI audit, on the Phase 26 build.** Six defects: the Help sheet rose under the
+tab bar (stacking context); Ask's thread repeated the answer on its card; the Forge strip
+overflowed; *Show everything* read as a tab; the cold open's machines card was an empty closed
+line; the read-only Dice page ended on *Clear the journal*. All fixed, the last by moving the
+control to Settings → Danger zone. Twenty-eight presentation changes alongside; no rule touched.

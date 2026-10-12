@@ -48,8 +48,10 @@ export function renderOracles(host, section) {
   const scope = store.currentScope();
   const game = store.activeGame();
   if (game && scope && scope.openScene) {
+    // The newest answer is already on the result card below, so the thread
+    // starts with the one before it.
     const asked = game.journal.filter((e) => e.sceneId === scope.openScene.id
-      && ["yesno", "oracle", "granular"].includes(e.kind)).slice(0, 3).reverse();
+      && ["yesno", "oracle", "granular"].includes(e.kind)).slice(last ? 1 : 0, (last ? 1 : 0) + 3).reverse();
     if (asked.length) {
       const thread = el("ol", { class: "ask-thread", "aria-label": "Asked in this scene" });
       for (const e of asked) {
@@ -308,19 +310,20 @@ function beatTriggerCard(result) {
   const scope = store.currentScope();
   if (!scope) return null;
 
-  const card = el("div", { class: "card" });
+  // Under the answer, as a slip tucked beneath the seal rather than a card of its own.
+  const card = el("div", { class: "card beat-call" });
   add(card, el("div", { class: "card-head" },
     el("h3", { text: "Does this call for a beat?" }),
     el("span", { class: "cite", text: "PUM p.28" })
   ));
   add(card, el("p", { class: "muted", text: `You were answered "${answered}". The cheat sheet turns two kinds of answer straight into a plot beat — if that is the question you asked.` }));
-  const row = el("div", { class: "btn-row" });
+  const row = el("div", { class: "chip-row" });
   add(row, el("button", {
-    class: "btn",
+    class: "chip",
     onclick: () => fireBeatFromOracle("prompt", "asked if something happens, and PUM said yes"),
   }, "It said yes — random prompt"));
   add(row, el("button", {
-    class: "btn",
+    class: "chip",
     onclick: () => fireBeatFromOracle("proposal", "asked if things go as expected, and PUM said no"),
   }, "It said no — modified proposal"));
   add(card, row);

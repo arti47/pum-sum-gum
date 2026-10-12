@@ -63,6 +63,9 @@ const SOUNDS = {
   // Dice: four clicks, close together and falling off, like a die settling.
   roll: (t) => [0, 0.055, 0.12, 0.2].forEach((d, i) =>
     burst(t + d, { freq: 2600 - i * 300, q: 3, gain: 0.3 - i * 0.06, length: 0.035 })),
+  // A SUM roll: the same dice, a touch lower, so the two books sound apart.
+  "roll-sum": (t) => [0, 0.06, 0.13, 0.21].forEach((d, i) =>
+    burst(t + d, { freq: 1900 - i * 220, q: 3, gain: 0.3 - i * 0.06, length: 0.04 })),
   // A pen crossing a box: two short strokes.
   cross: (t) => {
     burst(t, { freq: 1800, q: 0.8, gain: 0.18, length: 0.09 });
@@ -74,7 +77,8 @@ const SOUNDS = {
   seal: (t) => { knock(t); burst(t, { freq: 3000, q: 2, gain: 0.12, length: 0.03 }); },
 };
 
-const BUZZ = { roll: [12, 40, 12], cross: [18], seal: [30, 50, 70], page: null };
+// PUM a tick, SUM a double tick: a roll can be told by hand which book made it.
+const BUZZ = { roll: [12, 40, 12], "roll-sum": [8, 40, 8, 40, 8], cross: [18], seal: [30, 50, 70], page: null };
 
 export function cue(kind) {
   if (!Settings.feel()) return;

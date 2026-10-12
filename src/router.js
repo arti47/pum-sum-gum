@@ -1,7 +1,7 @@
 // Tab routing + section nav (two-level navigation, §6.3.1) + live-state badges.
 
 import { el, add, clear, $ } from "./core.js";
-import { clearActionBar } from "./ui.js";
+import { clearActionBar, modal, closeModal } from "./ui.js";
 import * as store from "./store.js";
 import { crossed, trackLength, hasTrack, isResolved, isEnded, currentSection, sectionsOf } from "./derived.js";
 import { plotSheet } from "./rules.js";
@@ -121,6 +121,7 @@ export function sectionNav(tabId, activeSection, badges = {}) {
   for (const s of shown) {
     const btn = el("button", {
       onclick: () => goSection(s),
+      "data-s": s,
       "aria-current": s === activeSection ? "true" : "false",
     }, SECTION_LABELS[s] || s);
     if (badges[s]) add(btn, el("span", { class: "dot", "aria-hidden": "true" }));
@@ -151,6 +152,77 @@ function fadeEdges(nav) {
   nav.classList.toggle("more-right", nav.scrollLeft < max - 2);
 }
 
+// The header's drawn track opens the whole track, from any screen. The Table
+// owns the track card, so it registers what a tap does.
+let headerTap = null;
+export function registerHeaderTap(fn) { headerTap = fn; }
+
+// Inside a room, a sideways swipe turns to the next page of it — the next
+// oracle, or the other half of the scene. Fields, result cards (which have
+// swipes of their own) and the strips are left alone.
+export function installRoomSwipe() {
+  const screen = $("#screen");
+  if (!screen) return;
+  let x0 = null, y0 = 0, t0 = 0;
+  screen.addEventListener("touchstart", (e) => {
+    x0 = null;
+    if (!document.body.classList.contains("in-room") || e.touches.length !== 1) return;
+    if (e.target.closest("input, textarea, select, .result, .section-nav, .room-grip, .seg-grid")) return;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+  }, { passive: true });
+  screen.addEventListener("touchend", (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - t0 > 700) return;
+    const t = TABS.find((x) => x.id === current.tab);
+    const live = t ? liveSections(t) : [];
+    const next = live[live.indexOf(current.section) + (dx < 0 ? 1 : -1)];
+    if (next) go(current.tab, next);
+  }, { passive: true });
+}
+
+// Quick find, on a keyboard: Ctrl or ⌘ + K lists every page of the app by the
+// name it already has, and typing narrows it.
+function openQuickFind() {
+  const input = el("input", { type: "text", placeholder: "Type a page's name" });
+  const list = el("div", { class: "qf-list" });
+  const pages = [];
+  for (const t of TABS) {
+    for (const sec of liveSections(t)) {
+      pages.push({ tab: t.id, section: sec, name: SECTION_LABELS[sec] || sec,
+        where: t.parent ? (TABS.find((x) => x.id === t.parent) || t).label + " · " + t.label : t.label });
+    }
+  }
+  const draw = () => {
+    clear(list);
+    const q = input.value.trim().toLowerCase();
+    for (const p of pages.filter((p) => !q || `${p.name} ${p.where}`.toLowerCase().includes(q))) {
+      add(list, el("button", { class: "qf-item", onclick: () => { closeModal(); go(p.tab, p.section); } },
+        el("strong", { text: p.name }), el("span", { class: "cite", text: p.where })));
+    }
+  };
+  input.addEventListener("input", draw);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { const first = list.querySelector("button"); if (first) { e.preventDefault(); first.click(); } }
+  });
+  draw();
+  modal({
+    title: "Find a page", className: "quick-find",
+    body: el("div", null,
+      el("p", { class: "muted", text: "Every page of the app by name. Enter opens the first." }),
+      el("label", { class: "field" }, el("span", { class: "lbl", text: "Page" }), input),
+      list),
+    actions: [{ label: "Close" }],
+  });
+}
+
+export function installQuickFind() {
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) { e.preventDefault(); openQuickFind(); }
+  });
+}
+
 // The persistent plot header: the game's Threshold, on every in-play screen (§6.2).
 function renderPlotHeader() {
   const host = $("#plot-header");
@@ -161,6 +233,10 @@ function renderPlotHeader() {
   document.body.classList.toggle("in-play", inPlay);
   if (!inPlay) { host.hidden = true; return; }
   host.hidden = false;
+  host.setAttribute("role", "button");
+  host.tabIndex = 0;
+  host.onclick = () => { if (headerTap) headerTap(); };
+  host.onkeydown = (e) => { if ((e.key === "Enter" || e.key === " ") && headerTap) { e.preventDefault(); headerTap(); } };
 
   const sheet = plotSheet(scope.sheetId);
   const sec = currentSection(scope);
@@ -239,6 +315,10 @@ export function render() {
   // Ask and Scene are rooms off the Table, drawn as a sheet risen over it.
   const room = !!(TABS.find((x) => x.id === current.tab) || {}).parent;
   document.body.classList.toggle("in-room", room);
+  document.body.classList.remove("in-prep");
+  // A help sheet raised over the last screen goes with it.
+  document.querySelectorAll("body > #help-drawer").forEach((d) => d.remove());
+  document.body.classList.remove("help-up");
   document.body.dataset.section = current.section || "";
   if (fn) fn(screen, current.section);
   gatherHelp(screen);
@@ -282,8 +362,19 @@ export function openHelp() {
   drawer.open = true;
   drawer.classList.add("as-sheet");
   document.body.classList.add("help-up");
-  const settle = () => { if (!drawer.open) { drawer.classList.remove("as-sheet"); document.body.classList.remove("help-up"); } };
-  drawer.addEventListener("toggle", settle, { once: true });
+  // Lifted out of the screen while it is up, so nothing on the page — the tab
+  // bar included — can sit over it; put back where it was when it closes.
+  const home = drawer.parentNode, before = drawer.nextSibling;
+  document.body.append(drawer);
+  const settle = () => {
+    if (drawer.open) return;
+    drawer.removeEventListener("toggle", settle);
+    drawer.classList.remove("as-sheet");
+    document.body.classList.remove("help-up");
+    if (home && home.isConnected) home.insertBefore(drawer, before && before.parentNode === home ? before : null);
+    else drawer.remove();
+  };
+  drawer.addEventListener("toggle", settle);
   setTimeout(() => {
     const away = (e) => {
       if (drawer.contains(e.target)) return;

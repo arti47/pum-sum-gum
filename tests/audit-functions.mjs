@@ -532,6 +532,32 @@ const journeys = [];
   journeys.push(`header ? → help: ${opened ? "opened" : "NOT OFFERED"}`);
 }
 
+// 6f. Phase 27's ways round: the header's track opens the whole track, a crossed
+// box says which beat crossed it, a written node opens Invoke · Edit, Ctrl+K
+// finds a page, and a glossary search marks what it matched.
+{
+  await seed(MID, "play", "track");
+  await page.click("#plot-header");
+  await page.waitForTimeout(80);
+  const sheet = await page.evaluate(() => !!document.querySelector(".modal.track-sheet-modal"));
+  await page.evaluate(() => { const b = document.querySelector(".modal .track-box.crossed"); if (b) b.click(); });
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+  await goTo("journal", "nodes");
+  const menu = await tapText(/./, "#screen .node-txt:not(.blank)");
+  await page.evaluate(() => { for (const b of document.querySelectorAll(".modal-back")) b.remove(); });
+  await page.keyboard.press("Control+k");
+  await page.waitForTimeout(60);
+  await page.keyboard.type("dice");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(80);
+  const found = await page.evaluate(() => document.body.dataset.section === "dice");
+  await goTo("more", "library");
+  await page.fill("#screen input[type=text]", "beat");
+  await page.waitForTimeout(80);
+  journeys.push(`header track → sheet: ${sheet ? "opened" : "NOT OFFERED"}; written node → menu: ${menu ? "opened" : "NOT OFFERED"}; `
+    + `Ctrl+K → page: ${found ? "found" : "NOT FOUND"}`);
+}
+
 // 6b. The oracle result card's own follow-ups, named rather than hoped for:
 // re-roll writes a LINKED journal entry, and "Enrich it" rolls only the second
 // die into the same entry. Both are controls on a card that exists only after a
