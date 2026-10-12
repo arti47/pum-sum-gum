@@ -356,7 +356,10 @@ let lastCardSig = "";
 
 // `variant` gives the result its object: a seal pressed into an oracle answer,
 // an index card for a beat, a torn slip for a SUM roll. Only the frame changes.
-export function resultCard({ kind, answer, second, question = "", dice = [], strip = null, actions = [], extra = null, variant = null }) {
+export function resultCard({ kind, answer, second, question = "", dice = [], strip = null, actions = [], extra = null, variant = null, onKeep = null }) {
+  // A card on the table can be kept in the hand: its first action, and the
+  // upward swipe.
+  if (onKeep) actions = [{ label: "Keep in hand", onClick: onKeep }, ...actions];
   const sig = [kind, answer, ...dice.map((d) => `${d.label}:${d.value}`)].join("|");
   // A hidden document pauses animations, so a card drawn while hidden arrives still.
   const fresh = sig !== lastCardSig && document.visibilityState === "visible";
@@ -391,7 +394,7 @@ export function resultCard({ kind, answer, second, question = "", dice = [], str
     for (const a of actions) {
       // Each action carries its mark — ↻ re-roll, ✎ note, ✕ put away — drawn
       // beside its words, so the foot reads at a glance.
-      const act = /^re-?roll/i.test(a.label) ? "reroll" : /note/i.test(a.label) ? "note"
+      const act = /^re-?roll/i.test(a.label) ? "reroll" : /^keep in hand$/i.test(a.label) ? "keep" : /note/i.test(a.label) ? "note"
         : /^dismiss$/i.test(a.label) ? "dismiss" : /enrich/i.test(a.label) ? "enrich" : null;
       add(foot, el("button", {
         class: `btn small ${a.primary ? "primary" : ""}`.trim(),
@@ -410,11 +413,11 @@ export function resultCard({ kind, answer, second, question = "", dice = [], str
 // will not swipe. Only actions the card already offers are reachable this way.
 function swipeable(card, actions) {
   const find = (re) => actions.find((a) => re.test(a.label));
-  const moves = { left: find(/^re-?roll/i), right: find(/^dismiss$/i), up: find(/note/i) };
+  const moves = { left: find(/^re-?roll/i), right: find(/^dismiss$/i), up: find(/^keep in hand$/i) || find(/note/i) };
   if (!moves.left && !moves.right && !moves.up) return;
   card.classList.add("swipeable");
   add(card, el("p", { class: "swipe-hint", "aria-hidden": "true", text: [
-    moves.left ? "← re-roll" : null, moves.up ? "↑ note" : null, moves.right ? "dismiss →" : null,
+    moves.left ? "← re-roll" : null, moves.up ? (/keep/i.test(moves.up.label) ? "↑ keep" : "↑ note") : null, moves.right ? "dismiss →" : null,
   ].filter(Boolean).join("  ·  ") }));
   let x0 = 0, y0 = 0, id = null;
   card.addEventListener("pointerdown", (e) => {

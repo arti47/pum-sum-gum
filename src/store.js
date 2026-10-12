@@ -430,6 +430,16 @@ export function addJournal(entry) {
   return rec;
 }
 
+// The hand: cards the player kept off the table. A flag on the journal entry —
+// the card is the roll's own record, so keeping it copies nothing.
+export function setInHand(id, on) {
+  mutate(on ? "Keep a card" : "Put a card back", () => {
+    const g = activeGame();
+    const e = g && g.journal.find((x) => x.id === id);
+    if (e) e.hand = !!on;
+  });
+}
+
 export function updateJournal(id, patch) {
   mutate("Edit journal entry", () => {
     const g = activeGame();

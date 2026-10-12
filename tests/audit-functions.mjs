@@ -558,6 +558,18 @@ const journeys = [];
     + `Ctrl+K → page: ${found ? "found" : "NOT FOUND"}`);
 }
 
+// 6g. The card table's hand: keep a dealt card, read it from the Table, put it back.
+{
+  await seed(MID, "oracles", "yesno");
+  await tapText(/^ask$/, "#action-bar button");
+  await page.waitForTimeout(80);
+  const kept = await tapText(/^keep in hand$/);
+  await goTo("play", "track");
+  const opened = await tapText(/./, "#screen .hand-card");
+  const back = await tapText(/^put it back$/);
+  journeys.push(`hand: kept ${kept ? "yes" : "NOT OFFERED"}, read ${opened ? "yes" : "NOT SHOWN"}, put back ${back ? "yes" : "NOT OFFERED"}`);
+}
+
 // 6b. The oracle result card's own follow-ups, named rather than hoped for:
 // re-roll writes a LINKED journal entry, and "Enrich it" rolls only the second
 // die into the same entry. Both are controls on a card that exists only after a

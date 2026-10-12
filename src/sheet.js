@@ -105,6 +105,7 @@ function renderTrack(host, scope) {
   add(host, now);
 
   add(host, tableTiles(scope));
+  add(host, handFan(game));
   add(host, drawerChips(scope));
 
   // On a wide screen the record sits beside the table: the last few entries,
@@ -185,6 +186,42 @@ export function openTrackSheet() {
       trackCard(scope)),
     actions: [{ label: "Close" }],
   });
+}
+
+// Keep a dealt card in the hand: the journal entry it already is, flagged.
+export function keepCard(id) {
+  if (!id) return null;
+  return () => { store.setInHand(id, true); toast("Kept in your hand.", { undo: true }); render(); };
+}
+
+// The hand: the cards kept off the table, fanned along its foot. Tap one to
+// read it again or put it back.
+function handFan(game) {
+  const held = game.journal.filter((e) => e.hand).slice(0, 7);
+  if (!held.length) return null;
+  const fan = el("div", { class: "hand", "aria-label": "Your hand" });
+  add(fan, el("p", { class: "hand-label", text: `Your hand · ${held.length}` }));
+  const row = el("div", { class: "hand-cards", style: `--n:${held.length}` });
+  held.slice().reverse().forEach((e, i) => {
+    add(row, el("button", {
+      class: "hand-card", "data-kind": e.kind, style: `--i:${i}`,
+      "aria-label": `Kept card: ${e.title || e.detail}`,
+      onclick: () => modal({
+        title: e.title || e.kind, className: "card-read",
+        body: el("div", null,
+          el("p", { class: "muted", text: "A card you kept in your hand. It stays in the journal either way." }),
+          e.detail ? el("p", { text: e.detail }) : null,
+          e.note ? el("p", { class: "entry-note", text: e.note }) : null,
+          (e.dice || []).length ? el("p", { class: "cite", text: e.dice.map((d) => `${d.label} ${d.value}`).join(" · ") }) : null),
+        actions: [
+          { label: "Put it back", onClick: () => { store.setInHand(e.id, false); render(); } },
+          { label: "Close", primary: true },
+        ],
+      }),
+    }, el("span", { class: "hc-kind", text: e.kind }), el("span", { class: "hc-title", text: e.title || e.detail })));
+  });
+  add(fan, row);
+  return fan;
 }
 
 // The three machines, as three big buttons: one question, the plot, the scene.
@@ -874,6 +911,7 @@ function beatCard(scope) {
 
   return resultCard({
     variant: "card",
+    onKeep: keepCard(b.journalId),
     kind: isProposal ? "Modified proposal" : "Random prompt",
     answer: b.text,
     second: isProposal

@@ -314,6 +314,9 @@ export function normalizeGame(input = {}) {
             attachments: Array.isArray(e.attachments)
               ? e.attachments.map((a) => str(a)).filter(Boolean) : [],
             pick: normalizePick(e),
+            // Kept in the player's hand on the card table: a view of the
+            // record, so it is a flag on the entry, not a second copy of it.
+            hand: e.hand === true,
           };
         })
       : [],
