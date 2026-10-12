@@ -25,12 +25,7 @@ import { cue } from "./feel.js";
 // The beat currently on the table, if any. Held in module state so a re-render
 // never re-rolls it (§5.1: roll once, store it, render from the stored value).
 let openBeat = null;
-// Which node lists have been expanded to their full slot count. The Nodes screen
-// was the densest in the app — 6.1 screens and 104 controls on a ten-slot sheet —
-// almost all of it empty slots nobody had asked to see yet.
-let expandedLists = {};
-
-function clearOpenBeat() { openBeat = null; expandedLists = {}; }
+function clearOpenBeat() { openBeat = null; }
 registerClearer(clearOpenBeat);
 
 // The disruption cascade hands a beat over from the Oracles tab (PUM p.9).
@@ -87,8 +82,9 @@ function renderTrack(host, scope) {
   // The Table: the track along the top, the one thing happening now in the
   // middle, and the three machines underneath — everything a turn of play
   // needs on one screen, and nothing a turn of play does not.
-  add(host, el("p", { class: "table-kicker", text: sheet ? sheet.name : "" }));
-  add(host, el("h1", { class: "table-title", text: scope.name }));
+  // The header already carries the scope's name and track, so the page's own
+  // title is for assistive tech only; the sheet's name rides on the track card.
+  add(host, el("h1", { class: "table-title sr-only", text: scope.name }));
   const game = store.activeGame();
   const newcomer = !!game && !game.journal.some((e) => e.kind === "track");
   const move = nextMove();
@@ -109,6 +105,22 @@ function renderTrack(host, scope) {
 
   add(host, tableTiles(scope));
   add(host, drawerChips(scope));
+
+  // On a wide screen the record sits beside the table: the last few entries,
+  // read from the journal, with the way to the whole of it.
+  if (game && game.journal.length) {
+    const aside = el("aside", { class: "table-ledger", "aria-label": "Latest in the journal" });
+    add(aside, el("h2", { text: "Journal" }));
+    const ol = el("ol");
+    for (const e of game.journal.slice(0, 8)) {
+      add(ol, el("li", { "data-kind": e.kind },
+        el("span", { class: "tl-kind", text: e.kind }),
+        el("span", { class: "tl-title", text: e.title || e.detail || "" })));
+    }
+    add(aside, ol);
+    add(aside, el("button", { class: "btn small", onclick: () => go("journal", "entries") }, "Open the journal"));
+    add(host, aside);
+  }
 
   // Context the player re-reads occasionally, not every beat — folded (§6.5).
   {
@@ -171,7 +183,8 @@ function tableTiles(scope) {
   },
     el("span", { class: "tile-art", "aria-hidden": "true" }),
     el("span", { class: "tile-label", text: label }),
-    el("span", { class: "tile-book", text: book }),
+    el("span", { class: "tile-book", "data-book": book.split(" · ")[0].toLowerCase() },
+      el("b", { text: book.split(" · ")[0] }), el("span", { text: book.split(" · ")[1] || "" })),
     badge ? el("span", { class: "badge", "aria-hidden": "true" }) : null
   );
   add(nav, tile("ask", "Ask", "PUM · a question", () => go("oracles", "yesno")));
@@ -329,7 +342,8 @@ function trackCard(scope) {
   const here = currentSection(scope);
   add(card, el("div", { class: "card-head" },
     el("h2", { text: total ? "Plot track" : "No plot track" }),
-    el("span", { class: "cite", text: total ? `${done}/${total}` : "no track" })
+    el("span", { class: "cite" }, sheet ? el("span", { class: "track-sheet", text: sheet.name }) : null,
+      total ? `${done}/${total}` : "no track")
   ));
 
   if (!total) {
@@ -382,9 +396,9 @@ function trackCard(scope) {
 
   // What the boxes are for, and how a beat reaches them — said under the track
   // itself, where "2/11" otherwise stood with nothing to say what it counts.
-  if (!isEnded(scope)) {
+  // Said until the first box is crossed; after that the track has taught it.
+  if (!isEnded(scope) && done === 0) {
     add(card, el("p", { class: "track-caption", text: TRACK_CAPTION.replace("{n}", String(total)) }));
-
   }
 
   if (isEnded(scope)) {
@@ -593,12 +607,27 @@ function abcdLabel(letter) {
   return t ? `${t.name} (${letter})` : letter;
 }
 
+// The journal already records what crossed each box ("Track 3/11"), so a
+// crossed box can say which beat it was — a view of the record, not a new one.
+function crossedBy(scope, index) {
+  const game = store.activeGame();
+  if (!game) return null;
+  const tag = `Track ${index + 1}/`;
+  for (let i = game.journal.length - 1; i >= 0; i--) {
+    const e = game.journal[i];
+    if (e.kind === "track" && e.scopeId === scope.id && String(e.detail || "").startsWith(tag)) return e;
+  }
+  return null;
+}
+
 function boxDialog(index, isDone, mark) {
   const scope = store.currentScope();
+  const by = isDone && scope ? crossedBy(scope, index) : null;
   modal({
     title: `Box ${index + 1}`,
     body: el("div", null,
       el("p", { class: "muted", text: isDone ? "This box is crossed." : "This box is still empty." }),
+      by ? el("p", { class: "box-by" }, el("strong", { text: by.title })) : null,
       mark ? el("p", null, el("strong", { text: "Timed beat: " }), mark) : null,
       el("p", { class: "muted", text: "Mark a box with an event you know is coming. When play reaches it, the event unfolds and counts as a random prompt." })
     ),
@@ -1115,13 +1144,14 @@ function nodeCard(scope, cat, slots) {
   // written entry carries its own Invoke — 89 controls over five screens, the
   // second-tallest screen in the app. Four is what fits in a glance and what
   // prep already shows while a list is being written.
+  // Everything written, and one empty slot to write in. The card grows as the
+  // list does, so nothing sits behind a "show all".
   const lastWritten = list.reduce((n, t, i) => (t && t.trim() ? i + 1 : n), 0);
-  const shown = expandedLists[cat.id]
-    ? slots
-    : Math.min(slots, Math.min(lastWritten, 4) + 1);
+  const shown = Math.min(slots, lastWritten + 1);
 
   add(card, el("div", { class: "card-head" },
     el("h3", { text: categoryName(scope, cat.id) }),
+    el("span", { class: "pill on", text: `1d${dieSize}` }),
     el("span", { class: "cite", text: `${fill}/${slots}` })
   ));
   // PUM p.9 lets you reach for a whole list on purpose — world elements while
@@ -1130,7 +1160,6 @@ function nodeCard(scope, cat, slots) {
   // this is the rolled half. It shares one line with the die it rolls and the
   // fold saying what the list is for.
   add(card, el("div", { class: "node-tools" },
-    el("span", { class: "pill on", text: `1d${dieSize}` }),
     el("details", { class: "rows-fold" },
       el("summary", null, "What goes in here"),
       el("div", { class: "body" },
@@ -1177,31 +1206,31 @@ function nodeCard(scope, cat, slots) {
       // beat card's "Add new, choose, or reroll" in faint italics and the
       // empty-state class, which padded it into a blank box that read as
       // nothing to press (reported from play: "can't change these").
+      // A written one opens its two moves — invoke it, or change it — rather
+      // than standing beside two buttons of its own on every row.
       el("button", {
         class: `node-txt ${text ? "" : "blank"} btn ghost`.trim(),
-        style: "text-align:left;justify-content:flex-start;flex:1;min-height:40px;padding:.2rem .3rem",
-        "aria-label": text ? null : `Write a node in slot ${lo}-${hi}`,
-        onclick: () => editSlotDialog(scope, cat, i, text),
-      }, text || "+ Write a node"),
-      text ? el("button", {
-        class: "btn small",
-        "aria-label": `Invoke ${text}`,
-        onclick: () => invokeDeliberately(scope, cat, i, text),
-      }, "Invoke") : null
+        "aria-label": text ? `${text} — invoke or edit` : `Write a node in slot ${lo}-${hi}`,
+        onclick: () => text ? nodeMenu(scope, cat, i, text) : editSlotDialog(scope, cat, i, text),
+      }, text || "+ Write a node")
     ));
   }
   add(card, listEl);
-  // Nothing written yet: more empty slots would only repeat the one above.
-  if (shown < slots && lastWritten > 0) {
-    const hiddenWritten = Math.max(0, lastWritten - shown);
-    add(card, el("button", {
-      class: "btn small ghost",
-      onclick: () => { expandedLists[cat.id] = true; render(); },
-    }, hiddenWritten
-      ? `Show all ${slots} slots — ${hiddenWritten} more written`
-      : `Show all ${slots} slots`));
-  }
   return card;
+}
+
+// A written node's two moves: invoke it on purpose (PUM p.9), or change it.
+function nodeMenu(scope, cat, i, text) {
+  modal({
+    title: text,
+    className: "node-menu",
+    body: el("p", { class: "muted", text: `${categoryName(scope, cat.id)} · slot ${fmtRange(...slotRange(i))}` }),
+    actions: [
+      { label: "Invoke", primary: true, onClick: () => { closeModal(); invokeDeliberately(scope, cat, i, text); return true; } },
+      { label: "Edit", onClick: () => { closeModal(); editSlotDialog(scope, cat, i, text); return true; } },
+      { label: "Cancel" },
+    ],
+  });
 }
 
 // One slot of a plot-node list, written, rewritten or taken out. The same

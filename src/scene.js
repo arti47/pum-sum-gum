@@ -106,6 +106,9 @@ function renderArc(host, scope) {
       }
     }
     if (last && last.result.table.section === "controller") add(card, renderLast());
+    // The bias is chosen before the rolls it governs, so it sits above them.
+    add(card, biasRow());
+    add(card, el("p", { class: "cite", text: "The Rule of Bias applies to the intervention and the closure." }));
     // While the scene runs: the moves in the order a player reaches for them,
     // each saying when, with its button beside it. Before this the card
     // offered two rolls and a row of links, and nothing said that most of a
@@ -131,8 +134,6 @@ function renderArc(host, scope) {
           el("strong", { text: m[0] }))));
     }
     add(card, ol);
-    add(card, biasRow());
-    add(card, el("p", { class: "cite", text: "The Rule of Bias applies to the intervention and the closure." }));
   } else {
     add(card, el("div", { class: "card-head" }, el("h2", { text: "No scene open" })));
     if (last && last.result.table.section === "controller") add(card, renderLast());

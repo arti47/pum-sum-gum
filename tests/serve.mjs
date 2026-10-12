@@ -11,7 +11,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const TYPES = {
   ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript",
   ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml",
-  ".pdf": "application/pdf",
+  ".pdf": "application/pdf", ".woff2": "font/woff2",
 };
 
 export function serve(port = 0) {

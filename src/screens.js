@@ -136,9 +136,12 @@ function renderHome(host) {
   }
   add(cur, inlineRow("Scene", scope.openScene ? "open" : "none open"));
   add(cur, inlineRow("Journal", `${game.journal.length} entries`));
-  add(cur, el("div", { class: "btn-row", style: "margin-top:.5rem" },
-    el("button", { class: "btn primary", onclick: () => go("play", "track") }, "Go to the plot sheet"),
-    el("button", { class: "btn", onclick: () => go("scene", "arc") }, scope.openScene ? "Continue the scene" : "Open a scene"),
+  // The bar pinned below already carries the plot sheet and the scene, so the
+  // cover offers only what the bar does not — save when the bar has moved on to
+  // the next storyline, and the plot sheet would otherwise be a tab away.
+  const finished = isEnded(scope) && game.journal.some((e) => e.kind === "ending" && e.scopeId === scope.id);
+  add(cur, el("div", { class: "btn-row cover-actions" },
+    finished ? el("button", { class: "btn", onclick: () => go("play", "track") }, "Go to the plot sheet") : null,
     el("button", { class: "btn small ghost", onclick: () => editGame(game) }, "Edit")
   ));
   add(host, cur);
@@ -292,9 +295,11 @@ function gamesCard(current) {
     el("h3", { text: "Your games" }),
     el("span", { class: "cite", text: String(all.length) })
   ));
+  // A shelf: each game a cover, side by side, the open one standing forward.
+  const shelf = el("div", { class: "shelf" });
   for (const g of all) {
     const active = current && g.id === current.id;
-    add(card, el("div", { class: "entry" },
+    add(shelf, el("div", { class: `entry book${active ? " open" : ""}${g.archivedAt ? " archived" : ""}` },
       el("div", { class: "entry-head" },
         el("span", { class: "entry-title", text: g.title }),
         g.archivedAt ? el("span", { class: "pill", text: "archived" }) : null,
@@ -312,6 +317,7 @@ function gamesCard(current) {
       )
     ));
   }
+  add(card, shelf);
   add(card, el("button", { class: "btn wide primary", onclick: () => startWizard() }, "Prepare another game"));
   return card;
 }
@@ -605,8 +611,17 @@ function renderSettings(host) {
     "Optional rules are off unless the books present them as the default. Everything here is stored on this device only.",
   ], null, null, { stay: true }));
 
+  // An index of the page's own sections: nothing folds away, the long column
+  // just gets a way to jump.
+  const jump = el("nav", { class: "set-jump", "aria-label": "Settings sections" });
+  for (const [id, name] of [["set-data", "Your data"], ["set-rules", "Optional rules"], ["set-look", "Appearance"], ["set-about", "About the books"], ["set-danger", "Danger zone"]]) {
+    add(jump, el("button", { class: "chip", "data-ico": id.slice(4),
+      onclick: () => { const t = document.getElementById(id); if (t) t.scrollIntoView({ block: "start" }); } }, name));
+  }
+  add(host, jump);
+
   // Data
-  const data = el("div", { class: "card" });
+  const data = el("div", { class: "card set-card", id: "set-data", "data-ico": "data" });
   add(data, el("h2", { text: "Your data" }));
   add(data, el("p", { class: "muted", text: "Everything lives in this browser's local storage. Nothing is sent anywhere. Export regularly — a game you cannot take with you is a rental." }));
   // Files are the one thing a plain export leaves behind, so the size of what
@@ -659,7 +674,7 @@ function renderSettings(host) {
   add(host, data);
 
   // Optional rules
-  const rules = el("div", { class: "card" });
+  const rules = el("div", { class: "card set-card", id: "set-rules", "data-ico": "rules" });
   add(rules, el("h2", { text: "Optional rules" }));
   add(rules, toggle(
     "Disruption die",
@@ -691,7 +706,7 @@ function renderSettings(host) {
   add(host, rules);
 
   // Appearance
-  const look = el("div", { class: "card" });
+  const look = el("div", { class: "card set-card", id: "set-look", "data-ico": "look" });
   add(look, el("h2", { text: "Appearance" }));
   add(look, inlineRow("Theme", el("button", {
     class: "btn small", onclick: () => { cycleTheme(); render(); },
@@ -723,7 +738,7 @@ function renderSettings(host) {
   add(host, look);
 
   // About the books — including what they do not contain (ruling A8)
-  const about = el("div", { class: "card" });
+  const about = el("div", { class: "card set-card", id: "set-about", "data-ico": "about" });
   add(about, el("h2", { text: "About the books" }));
   add(about, el("p", { class: "muted", text: "Plot Unfolding Machine v9.0, Scene Unfolding Machine v8.0 Rev2 and Game Unfolding Machine v2.2 by JeansenVaars, CC BY-NC-SA 4.0. This app is a personal play aid built from those books; it reproduces no rules prose and carries no setting content." }));
   add(about, el("h3", { text: "Safety tools" }));
@@ -734,7 +749,7 @@ function renderSettings(host) {
   add(host, about);
 
   // Danger zone at the end of the scroll, out of the thumb's resting arc (§6.3.11)
-  const danger = el("div", { class: "card" });
+  const danger = el("div", { class: "card set-card", id: "set-danger", "data-ico": "danger" });
   add(danger, el("h2", { text: "Danger zone" }));
   const game = store.activeGame();
   if (game) {

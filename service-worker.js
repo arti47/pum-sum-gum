@@ -1,7 +1,7 @@
 // Mixed strategy per template §5: the app shell and data files are cache-first against a
 // versioned cache; navigation requests are network-first so a stale shell never outlives a
 // deploy. Bump CACHE_VERSION on ANY shipped-file change.
-const CACHE_VERSION = "um-v63";
+const CACHE_VERSION = "um-v64";
 
 const APP_SHELL = [
   "./",
@@ -11,6 +11,7 @@ const APP_SHELL = [
   "./styles.css",
   "./manifest.json",
   "./icon.svg",
+  "./fonts/im-fell-english.woff2",
   "./data-pum-oracles.js",
   "./data-pum-plot.js",
   "./data-sum.js",

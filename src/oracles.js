@@ -43,6 +43,24 @@ export function renderOracles(host, section) {
     }));
   }
 
+  // The questions already put in this scene, as a short thread above the next
+  // one — what the oracle has said so far, read from the journal.
+  const scope = store.currentScope();
+  const game = store.activeGame();
+  if (game && scope && scope.openScene) {
+    const asked = game.journal.filter((e) => e.sceneId === scope.openScene.id
+      && ["yesno", "oracle", "granular"].includes(e.kind)).slice(0, 3).reverse();
+    if (asked.length) {
+      const thread = el("ol", { class: "ask-thread", "aria-label": "Asked in this scene" });
+      for (const e of asked) {
+        add(thread, el("li", null,
+          e.detail && e.kind === "yesno" ? el("span", { class: "at-q", text: e.detail }) : null,
+          el("span", { class: "at-a", text: e.title })));
+      }
+      add(host, thread);
+    }
+  }
+
   const q = el("input", { type: "text", class: "ask-q", placeholder: "What do you want to know? (optional)", value: question });
   const hint = el("p", { class: "ask-hint", "aria-live": "polite" });
   const showHint = () => {

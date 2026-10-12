@@ -392,10 +392,10 @@ WALKTHROUGH.push(
     title: "Plot nodes in play",
     blocks: [
       { tap: "Story → Plot nodes" },
-      { p: "Each list shows its first four written entries plus one empty slot, with 'Show all N slots' when you want the rest — it says how many written entries are still hidden. Nothing is out of reach either way: the die rolls across every slot, and 'Roll this list' can land on an entry you cannot currently see. The header carries the die the app will roll and how full the list is." },
+      { p: "Each list shows every written entry plus one empty slot, and grows as you write. The header carries the die the app will roll and how full the list is. Tap a written entry for its two moves: Invoke or Edit." },
       { bullets: [
         "Tap a slot to write, rewrite or clear it. Every text field here can roll three context-matched GUM words for inspiration.",
-        "Invoke — on a written entry, brings it in deliberately as a beat, no die rolled. PUM p.9 allows this and says it counts as a beat for advancing the track.",
+        "Invoke — tap a written entry, then Invoke: it is brought in deliberately as a beat, no die rolled. PUM p.9 allows this and says it counts as a beat for advancing the track.",
         "Roll this list — the other half of the same permission: you pick the list on purpose, the die picks the entry.",
         "Rename / Remove — on a list of your own. Removing it deletes its entries and any prompt face pointing at it falls back to the printed column.",
       ] },
@@ -681,8 +681,8 @@ const REFERENCE = [
     blocks: [
       { bullets: [
         "◈ Home (top left) — jumps to Setup → Home from anywhere.",
-        "? Help on this screen — opens the screen's folded help at its foot; hidden on a screen that has none.",
-        "◐ Switch theme (top right) — cycles system → light → dark → candle, a warm black paper with gold ink.",
+        "? Help on this screen — raises the screen's folded help as a sheet over it; hidden on a screen that has none.",
+        "Theme lives in Setup → Settings → Appearance — it cycles system → light → dark → candle, a warm black paper with gold ink.",
         "The persistent plot header — scope name, current section, crossed/total, and the drawn track. Hidden on Setup; compacted in landscape, where it drops the drawn track and keeps the count.",
         "Tabs: Table · Story · Setup. Ask and Scene are rooms off the Table, so the Table stays lit while you are in them. A dot on Table means a scene is open, a beat is waiting, or the scope has finished.",
         "The next move floats as an orange pill above the tabs — the same move the Table's card names.",
@@ -698,13 +698,14 @@ const REFERENCE = [
     title: "Table",
     blocks: [
       { bullets: [
-        "The sheet's name, the scope's name, then the plot track drawn as a road: each act a landmark engraving, each box a milestone, a token standing on the next one.",
+        "The scope's name rides in the header; the Table opens on the plot track drawn as a road, the sheet's name in its corner: each act a landmark engraving, each box a milestone, a token standing on the next one. A crossed box opens to say which beat crossed it.",
         "The card in the middle says where you are — a heading, one sentence, Show me the steps. While a scene waits for its beat, the two calls sit right under it; while a beat is waiting to be judged, the beat card takes its place.",
         "The floating button — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet.",
+        "On a wide screen (1200px and up), the latest eight journal entries sit beside the Table, with Open the journal beneath them.",
         "Three machines — Ask (PUM · a question) · Beat (PUM · the plot) · Scene (SUM · this scene). Beat opens Call a plot beat: Modified proposal (I know roughly what happens next) · Random prompt (I don't know what happens next) · When to call which · Not now.",
         "Drawers — Plot nodes (N) opens every list at once, each slot a box to write, change or empty (+ Another slot in <list> opens one more), then Save — one Undo takes the whole edit back — or Open the page or Cancel; Cast (N) lists your protagonists and cast, each a row that opens its own editor. Both offer Open the page and Close. Files (N) goes to the Story's Files page.",
         "On a beat card, after its three numbered steps: It mattered — cross a box · It didn't matter (or Played it, on a trackless sheet) · Re-roll · Add a note · Re-roll the beat when a repeat is flagged.",
-        "Under the track: Each box is one beat that mattered — cross all N and this storyline ends; and, in the help, How the track and beats fit, a fold of five stations.",
+        "Under the track, until the first box is crossed: Each box is one beat that mattered — cross all N and this storyline ends; and, in the help, How the track and beats fit, a fold of five stations.",
         "On a node result: Add new · Choose · Reroll · Leave it to destiny · Name it and roll, on an unnamed list · Make up a new one · Pick from your cast (N), on a list this sheet does not print — the count is how many are in the cast.",
         "Track: any box opens Box N — Mark a timed beat / Edit the timed beat / Clear the mark / Close.",
         "Track options → Advance without a beat · Step back · End this scope; Reopen this scope once it has ended.",
@@ -760,8 +761,8 @@ const REFERENCE = [
       ] },
       { p: "Plot nodes" },
       { bullets: [
-        "Per list: the fill count in its heading; then one line with the 1d10 or 1d20 pill, a “What goes in here” fold and Roll this list; the first four written slots plus one empty as buttons, Invoke on written entries, Show all N slots.",
-        "Edit all nodes opens every list at once, the same form as the Table's Plot nodes drawer. Or tap any written node (it carries a ✎) to rewrite it — Save, Remove this node, or Cancel. An empty slot reads + Write a node; tap it to write one. A list with nothing in it shows just that one slot.",
+        "Per list: the 1d10 or 1d20 pill and the fill count in its heading; then a “What goes in here” fold and Roll this list; every written slot plus one empty, each a button — a written one opens Invoke · Edit · Cancel, the empty one reads + Write a node.",
+        "Edit all nodes opens every list at once, the same form as the Table's Plot nodes drawer. Or tap any written node, then Edit, to rewrite it — Save, Remove this node, or Cancel. An empty slot reads + Write a node; tap it to write one. A list with nothing in it shows just that one slot.",
         "Player-named lists add Rename and Remove.",
         "Add a plot node list — names one of the two blank lists from the extension sheet.",
         "Invoke this node → Invoke as a beat / Cancel.",
@@ -796,7 +797,7 @@ const REFERENCE = [
       { p: "Home" },
       { bullets: [
         "Before you play — the outstanding prep steps, each a link.",
-        "The current game card: Go to the plot sheet · Open a scene / Continue the scene · Edit → Name this game, Universe or RPG, World, tone and theme, Inspiration.",
+        "The current game card, drawn as a cover with the track as a dial: Edit → Name this game, Universe or RPG, World, tone and theme, Inspiration; once its storyline is finished and written, Go to the plot sheet too. The floating bar carries Go to the plot sheet with Open scene or Scene beside it.",
         "Plot sheets in this game: Switch to this · Edit (scope name, mission, starting point) · Delete · New plot sheet.",
         "Your games: Open · Archive / Restore · Prepare another game.",
         "The machines — which do I need? (folded: the four rows Call a plot beat · See the track · Ask an oracle · Go to the scene, and Open the Forge while GUM is on, then what PUM, SUM and GUM each do).",
@@ -837,6 +838,7 @@ const REFERENCE = [
       ] },
       { p: "Tutorial — this document. Settings — see Part 2." },
       { bullets: [
+        "At the top, a row of the page's sections — Your data · Optional rules · Appearance · About the books · Danger zone — each jumping to its card.",
         "Your data: Export JSON (also pinned, with Import beside it) · Import JSON · Export everything · Export readable · Check my data · Undo. A line under them says how many files are stored and roughly how much room this browser allows.",
         "Export JSON carries the record and not the files; Export everything carries both, as one much larger paste, and says how large before it builds one. Import takes either.",
         "Export and import dialogs: Copy · Download · Close · Import · Cancel.",

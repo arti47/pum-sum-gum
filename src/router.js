@@ -236,6 +236,9 @@ export function render() {
   renderPlotHeader();
   // The route, as a hook for the per-tab engraving beside each screen's title.
   document.body.dataset.tab = current.tab;
+  // Ask and Scene are rooms off the Table, drawn as a sheet risen over it.
+  const room = !!(TABS.find((x) => x.id === current.tab) || {}).parent;
+  document.body.classList.toggle("in-room", room);
   document.body.dataset.section = current.section || "";
   if (fn) fn(screen, current.section);
   gatherHelp(screen);
@@ -271,9 +274,23 @@ function gatherHelp(screen) {
 }
 
 // The ? in the header opens the screen's help and brings it into view.
+// It rises as a sheet over the screen rather than sending you to its foot; its
+// own line, or a tap outside it, puts it back.
 export function openHelp() {
   const drawer = document.getElementById("help-drawer");
   if (!drawer) return;
   drawer.open = true;
-  drawer.scrollIntoView({ block: "start", behavior: "smooth" });
+  drawer.classList.add("as-sheet");
+  document.body.classList.add("help-up");
+  const settle = () => { if (!drawer.open) { drawer.classList.remove("as-sheet"); document.body.classList.remove("help-up"); } };
+  drawer.addEventListener("toggle", settle, { once: true });
+  setTimeout(() => {
+    const away = (e) => {
+      if (drawer.contains(e.target)) return;
+      drawer.open = false;
+      settle();
+      document.removeEventListener("pointerdown", away, true);
+    };
+    document.addEventListener("pointerdown", away, true);
+  }, 0);
 }
