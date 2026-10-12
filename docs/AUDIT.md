@@ -2197,3 +2197,9 @@ tab bar (stacking context); Ask's thread repeated the answer on its card; the Fo
 overflowed; *Show everything* read as a tab; the cold open's machines card was an empty closed
 line; the read-only Dice page ended on *Clear the journal*. All fixed, the last by moving the
 control to Settings → Danger zone. Twenty-eight presentation changes alongside; no rule touched.
+
+**F-110 · Deploys never reached an open or installed app.** Reported: "the interface still looks
+the same" after two successful deploys. Cache-first fetches served the old files; the new worker
+waited behind a toast whose reload ran before it took control. *Fix:* network-first with
+`no-cache` revalidation and the cache as offline fallback; `skipWaiting` on install; reload only
+after `controllerchange`. Offline boot verified in a browser.

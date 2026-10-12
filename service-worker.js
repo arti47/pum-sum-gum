@@ -1,7 +1,6 @@
-// Mixed strategy per template §5: the app shell and data files are cache-first against a
-// versioned cache; navigation requests are network-first so a stale shell never outlives a
-// deploy. Bump CACHE_VERSION on ANY shipped-file change.
-const CACHE_VERSION = "um-v65";
+// Network-first for everything, with the versioned cache as the offline fallback, so a
+// deploy reaches an open or installed app on its next load. Bump CACHE_VERSION on ANY shipped-file change.
+const CACHE_VERSION = "um-v66";
 
 const APP_SHELL = [
   "./",
@@ -45,8 +44,12 @@ const APP_SHELL = [
   "./src/files.js",
 ];
 
+// A new version takes over as soon as it has cached the shell. Before, it waited
+// behind an "Update available" toast, and the toast reloaded before the new
+// worker was active — so the old cache answered the reload and the app looked
+// unchanged after every deploy (reported: "the interface still looks the same").
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE_VERSION).then((c) => c.addAll(APP_SHELL)));
+  e.waitUntil(caches.open(CACHE_VERSION).then((c) => c.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (e) => {
@@ -76,7 +79,7 @@ self.addEventListener("fetch", (e) => {
   // the guide's markup in the shell's slot and serve the wrong page offline.
   if (req.mode === "navigate") {
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-cache" })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE_VERSION).then((c) => c.put(req, copy));
@@ -89,17 +92,20 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // Everything else: cache-first against the versioned cache.
+  // Everything else: network-first, the cache only when offline. Cache-first
+  // kept serving the last version's files until the worker itself changed, so a
+  // deploy reached nobody who already had the app open or installed.
   e.respondWith(
-    caches.match(req).then((hit) =>
-      hit ||
-      fetch(req).then((res) => {
+    // no-cache: revalidate with the server (a cheap 304 when nothing changed)
+    // rather than taking the browser's own ten-minute HTTP cache.
+    fetch(req, { cache: "no-cache" })
+      .then((res) => {
         if (res.ok) {
           const copy = res.clone();
           caches.open(CACHE_VERSION).then((c) => c.put(req, copy));
         }
         return res;
       })
-    )
+      .catch(() => caches.match(req))
   );
 });

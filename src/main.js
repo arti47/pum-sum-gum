@@ -70,9 +70,12 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
             el.className = "toast";
             el.style.pointerEvents = "auto";
             el.textContent = "Update available — tap to reload";
+            // Reload only once the new worker is in charge, or the old one
+            // answers the reload with the old files.
             el.addEventListener("click", () => {
+              navigator.serviceWorker.addEventListener("controllerchange", () => location.reload(), { once: true });
               sw.postMessage("skip-waiting");
-              location.reload();
+              if (sw.state === "activated") location.reload();
             });
             $("#toast-mount").append(el);
           }
