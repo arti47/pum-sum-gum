@@ -173,6 +173,20 @@ function renderTrack(host, scope) {
   }
 }
 
+// The whole track, from the header on any screen: the same card the Table
+// draws, risen as a sheet over wherever you are.
+export function openTrackSheet() {
+  const scope = store.currentScope();
+  if (!scope) return;
+  modal({
+    title: scope.name, className: "track-sheet-modal",
+    body: el("div", null,
+      el("p", { class: "muted", text: "The plot track of this storyline. Each crossed box is a beat that mattered." }),
+      trackCard(scope)),
+    actions: [{ label: "Close" }],
+  });
+}
+
 // The three machines, as three big buttons: one question, the plot, the scene.
 // Each says which book it is; together they are the "which do I need?" answer.
 function tableTiles(scope) {
@@ -363,8 +377,11 @@ function trackCard(scope) {
   let index = 0;
   for (const sec of sections) {
     const isCurrent = done < total && sectionOfBox(sections, done).section === sec;
+    // Each act counts its own boxes, so "where am I in this act" is read off the road.
+    const inSec = Math.max(0, Math.min(sec.boxes, done - index));
     const secEl = el("div", { class: `track-sec ${isCurrent ? "current" : ""}`.trim(), "data-sec": sec.name },
-      el("div", { class: "track-sec-name", text: sec.name })
+      el("div", { class: "track-sec-name" }, sec.name,
+        sec.boxes > 1 ? el("span", { class: "sec-count", text: `${inSec}/${sec.boxes}` }) : null)
     );
     const boxes = el("div", { class: "track-boxes" });
     for (let i = 0; i < sec.boxes; i++) {

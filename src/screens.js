@@ -28,7 +28,9 @@ let pendingTermId = null;
 export function renderMore(host, section) {
   // The wizard lives on Home. It must not hijack the other More routes, or the
   // section nav reads as broken while a game is being prepared (§6.3.9).
-  if (inWizard() && section === "home") return renderWizard(host);
+  // Prep takes the whole screen: the tabs step aside while a game is made, and
+  // Back, Next and Cancel are the way round.
+  if (inWizard() && section === "home") { document.body.classList.add("in-prep"); return renderWizard(host); }
   add(host, sectionNav("more", section));
   if (inWizard()) {
     add(host, el("div", { class: "card" },
@@ -77,7 +79,8 @@ function renderHome(host) {
     // had to talk. This is the app's shortest possible answer to "what is a
     // solo RPG", and it is only ever shown before the first game exists.
     add(host, newToSoloCard());
-    add(host, machinesCard());
+    // On the cold open the machines are three drawn plates, not a closed line.
+    add(host, machinesCard({ open: true }));
     // Every other screen pins its primary action; the very first screen a new
     // player sees was the one that did not.
     actionBar({
@@ -344,8 +347,8 @@ function newToSoloCard() {
 
 // The three books, folded: reference for the curious, not a step of play. On
 // the Table the same answer is the three big buttons.
-function machinesCard() {
-  const card = el("details", { class: "card machines rows-fold" },
+function machinesCard({ open = false } = {}) {
+  const card = el("details", { class: "card machines rows-fold", open: open || undefined },
     el("summary", null, "The machines — which do I need?"));
   const body = el("div", { class: "body" });
   add(body, whichBody());
@@ -447,6 +450,14 @@ function renderLibrary(host) {
 // "What is a plot scope?" has no answer in a library organised rule by rule.
 // The glossary answers it, in two layers: a first group that assumes the reader
 // has never played a solo RPG at all, then the machinery.
+// A search's words, marked where they fall in a term or its definition.
+function marked(text, q) {
+  if (!q || !text) return text;
+  const at = text.toLowerCase().indexOf(q);
+  if (at < 0) return text;
+  return el("span", null, text.slice(0, at), el("mark", { text: text.slice(at, at + q.length) }), marked(text.slice(at + q.length), q));
+}
+
 function glossaryCard(q) {
   const terms = GLOSSARY.filter((g) => !q
     || g.term.toLowerCase().includes(q)
@@ -487,9 +498,9 @@ function glossaryCard(q) {
     add(body, el("h4", { class: "term-group", text: group }));
     for (const g of terms.filter((x) => (x.group || "Terms") === group)) {
       const row = el("div", { class: "defrow", id: "term-" + g.id },
-        el("span", { class: "k", text: g.term }),
+        el("span", { class: "k" }, marked(g.term, q)),
         el("span", { class: "v" },
-          g.body,
+          marked(g.body, q),
           g.more ? el("span", { class: "muted", text: " " + g.more }) : null,
           el("span", { class: "cite", text: " " + g.page })
         )
@@ -762,6 +773,19 @@ function renderSettings(host) {
         onConfirm: () => { store.deleteGame(game.id); toast("Game deleted.", { undo: true }); go("more", "home"); },
       }),
     }, "Delete the current game"));
+    // Moved here from the Dice page, which only reads the record: a page you
+    // read should not end on a red button that erases what it shows.
+    if (game.journal.length) {
+      add(danger, el("button", {
+        class: "btn danger wide", style: "margin-top:.4rem",
+        onclick: () => confirmModal({
+          title: "Clear the journal?",
+          message: `All ${game.journal.length} entries in this game are deleted — every roll, note and scene record. Export first if you want to keep them. This can be undone once from Settings.`,
+          confirmLabel: "Clear the journal", danger: true,
+          onConfirm: () => { store.clearJournal(); toast("Journal cleared.", { undo: true }); render(); },
+        }),
+      }, "Clear the journal"));
+    }
   }
   add(danger, el("button", {
     class: "btn danger wide", style: "margin-top:.4rem",

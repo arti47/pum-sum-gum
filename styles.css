@@ -2570,3 +2570,189 @@ h3.jday, .jchapter { background: var(--paper); -webkit-backdrop-filter: none; ba
 .tile-book[data-book="sum"] b { background: transparent; }
 .table-kicker { margin: .2rem 0 .5rem; font-family: var(--sans); font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); text-align: center; }
 details.entry-tools > summary { min-width: 40px; min-height: 40px; }
+
+/* =====================================================================
+   Phase 27 — every screen, finished. Presentation only.
+   ===================================================================== */
+
+/* --- type: fluid titles, small capitals for every kicker ---------------- */
+#screen h1 { font-size: clamp(1.8rem, 1.4rem + 2vw, 2.4rem); }
+.table-kicker, .book-tag, .entry-kind, .jchapter-n, .track-sec-name, .drawer-h, .lbl, .help-head {
+  font-variant-caps: all-small-caps; letter-spacing: .1em;
+}
+
+/* --- the header's track is a button to the whole track ------------------ */
+#plot-header[role="button"] { cursor: pointer; border-radius: 10px; padding: 2px 6px; margin: -2px -6px; }
+#plot-header[role="button"]:hover { background: var(--paper-sunk); }
+#plot-header[role="button"]:focus-visible { outline: 2px solid var(--accent); }
+.modal.track-sheet-modal .track-card { border: 0; box-shadow: none; padding: 0; background: none; }
+
+/* --- quick find --------------------------------------------------------- */
+.qf-list { display: grid; gap: 2px; max-height: 50vh; overflow: auto; margin-top: .4rem; }
+.qf-item { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; min-height: 44px;
+  padding: .45rem .6rem; border: 0; border-radius: 8px; background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit; font-family: var(--serif); }
+.qf-item:hover, .qf-item:focus-visible { background: var(--accent-soft); }
+
+/* --- rooms tinted by their book; on a desktop, a panel from the right ---- */
+body.in-room[data-tab="scene"] #screen { background: color-mix(in srgb, var(--paper-2) 88%, var(--sum-soft)); }
+body.in-room[data-tab="oracles"] #screen { background: color-mix(in srgb, var(--paper-2) 90%, var(--accent-soft)); }
+@media (min-width: 900px) {
+  body.in-room .screen {
+    grid-template-columns: 1fr; max-width: 760px;
+    margin-left: auto; margin-right: 0; margin-top: 0;
+    border-radius: 24px 0 0 0; border-right: 0;
+    box-shadow: -18px 0 40px -24px rgba(27, 33, 48, .5);
+    min-height: calc(100vh - var(--hdr-h));
+  }
+  body.in-room #screen.turn { animation: slide-in .28s cubic-bezier(.2, .8, .3, 1) both; }
+  body.in-room .room-grip { display: none; }
+}
+@keyframes slide-in { from { transform: translateX(48px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* --- a deckled edge on the top of every risen sheet ---------------------- */
+body.in-room #screen::before, details.help-drawer.as-sheet::after {
+  content: ""; position: absolute; left: 22px; right: 22px; top: -1px; height: 6px; pointer-events: none;
+  background: radial-gradient(circle at 4px -2px, transparent 4px, var(--rule) 4.5px, transparent 5.5px) 0 0 / 9px 6px repeat-x;
+  opacity: .7;
+}
+body.in-room #screen { position: relative; }
+
+/* --- phone on its side: the Table in two columns ------------------------- */
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) {
+  body[data-tab="play"] .screen { display: grid; grid-template-columns: 1.1fr 1fr; gap: 0 1rem; max-width: none; align-items: start; }
+  body[data-tab="play"] .screen > * { grid-column: 2; }
+  body[data-tab="play"] .screen > .track-card { grid-column: 1; grid-row: 1 / span 12; }
+  body[data-tab="play"] .screen > .table-kicker { grid-column: 1; }
+}
+
+/* --- the Table: act counts, slim card for now, tiles that press -------- */
+.sec-count { margin-left: .5rem; font-family: var(--mono); font-size: .66rem; letter-spacing: 0; color: var(--ink-3); font-variant-caps: normal; }
+.track-sec.current .sec-count { color: var(--accent-text); }
+.table-now .coach-card > p:not(:first-of-type) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.table-tiles .tile { transition: transform .12s ease, box-shadow .12s ease; }
+.table-tiles .tile:active { transform: translateY(2px) scale(.98); box-shadow: inset 0 0 0 2px var(--accent-soft); }
+.table-tiles .tile:active .tile-art { transform: translateY(-3px); }
+.tile-art { transition: transform .15s ease; }
+
+/* --- every button leaves an ink ring when pressed ------------------------ */
+.btn:active:not(:disabled) { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 22%, transparent); transition: box-shadow 0s; }
+.btn { transition: box-shadow .35s ease, background-color .15s ease, border-color .15s ease; }
+
+/* --- results: each action with its mark; the beat question as chips ---- */
+.result-foot .btn[data-act]::before { margin-right: .35rem; font-family: var(--sans); font-weight: 700; }
+.result-foot .btn[data-act="reroll"]::before { content: "↻"; }
+.result-foot .btn[data-act="note"]::before { content: "✎"; }
+.result-foot .btn[data-act="dismiss"]::before { content: "✕"; }
+.result-foot .btn[data-act="enrich"]::before { content: "✦"; }
+.card.beat-call { margin-top: -.6rem; padding-top: .8rem; border-top: 1px dashed var(--rule-2); border-radius: 0 0 var(--radius) var(--radius); background: var(--paper); box-shadow: none; }
+.card.beat-call .card-head { border: 0; padding-bottom: 0; }
+.card.beat-call .chip-row { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.card.beat-call .chip { min-height: 40px; font-family: var(--sans); font-weight: 600; font-size: .84rem; }
+
+/* --- strips: icons over the Story's pages; the Forge strip wraps --------- */
+body[data-tab="journal"] > .screen > .section-nav button,
+body[data-tab="journal"] #screen > .section-nav button { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding-top: .45rem; }
+#screen > .section-nav button[data-s]::before {
+  content: none; width: 20px; height: 20px; background: currentColor;
+  -webkit-mask: var(--s-art) center / contain no-repeat; mask: var(--s-art) center / contain no-repeat;
+}
+body[data-tab="journal"] #screen > .section-nav button[data-s]::before { content: ""; }
+[data-s="entries"] { --s-art: var(--art-journal); }
+[data-s="nodes"]   { --s-art: var(--art-list); }
+[data-s="cast"]    { --s-art: var(--art-busts); }
+[data-s="files"]   { --s-art: var(--art-folder); }
+[data-s="dice"]    { --s-art: var(--art-dice); }
+.forge-nav { flex-wrap: wrap; overflow: visible; row-gap: var(--s2); }
+.forge-nav::before, .forge-nav::after { display: none; }
+.section-nav .show-all {
+  border: 1px dashed var(--rule-2) !important; border-radius: 999px !important; margin-left: .3rem;
+  font-size: .76rem; padding: .25rem .7rem !important; align-self: center; min-height: 36px;
+}
+.section-nav .show-all::after { display: none !important; }
+
+/* --- journal filters inked by book ------------------------------------- */
+.section-nav button[data-k="sum"], .section-nav button[data-k="scene"] { color: var(--sum); }
+.section-nav button[data-k="gum"] { color: var(--gum); }
+.section-nav button[data-k][aria-current="true"] { color: var(--accent-ink); }
+
+/* --- cast and files: a wall of cards, two to a row ---------------------- */
+.card:has(> .entry.person), .card.drawer:has(> .entry) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s2) var(--s3); }
+.card:has(> .entry.person) > :not(.entry), .card.drawer:has(> .entry) > :not(.entry) { grid-column: 1 / -1; }
+.card > .entry.person, .card.drawer > .entry {
+  margin: 0; border: 1px solid var(--rule); border-radius: 12px; padding: .7rem .65rem; background: var(--paper);
+  display: flex; flex-direction: column; gap: .3rem; min-width: 0;
+}
+.card > .entry.person[data-kind="protagonist"] { grid-column: 1 / -1; background: var(--paper-2); border-width: 1.5px; }
+.card > .entry.person .entry-head { flex-wrap: wrap; }
+.card > .entry.person .entry-title { font-family: var(--display); font-size: 1.15rem; }
+.card > .entry.person .btn-row { margin-top: auto !important; flex-wrap: wrap; }
+.card.drawer > .entry img, .card.drawer > .entry .file-preview { border-radius: 8px; max-height: 9rem; object-fit: cover; }
+
+/* --- dice: a rule where an even die would stand ------------------------- */
+.dist { position: relative; }
+.dist::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: var(--exp, 50%);
+  border-top: 1.5px dashed var(--ink-3); opacity: .7; pointer-events: none;
+}
+
+/* --- Setup: machines as plates on the cold open; Forge dice-shaped ------ */
+details.machines[open] .which-body { display: grid; grid-template-columns: 1fr; gap: var(--s2); }
+details.machines[open] .which-row {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--s2);
+  padding: .7rem .8rem; border: 1px solid var(--rule); border-radius: 14px; background: var(--paper);
+  border-left: 4px solid var(--accent);
+}
+details.machines[open] .which-row:nth-of-type(3) { border-left-color: var(--sum); }
+.die-btn {
+  min-width: 46px; min-height: 46px; padding: 0 .4rem; border-radius: 10px;
+  clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+  font-family: var(--mono); font-size: .72rem; padding-top: .45rem;
+}
+.die-btn[data-d="100"] { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+
+/* --- prep takes the screen --------------------------------------------- */
+body.in-prep .tab-bar { display: none; }
+body.in-prep .action-bar-mount { bottom: env(safe-area-inset-bottom); }
+body.in-prep .screen { padding-bottom: calc(var(--actionbar-h) + 2rem + env(safe-area-inset-bottom)); }
+body.in-prep #screen h1::before { width: 110px; height: 110px; }
+@media (min-width: 900px) {
+  body.in-prep .app-header, body.in-prep .action-bar-mount { margin-left: 0; left: 0; }
+  body.in-prep .screen { margin-left: auto; margin-right: auto; max-width: 720px; display: block; }
+}
+
+/* --- rules: the letter index stays; matches are marked ----------------- */
+.az-rail { position: sticky; top: calc(var(--hdr-h) + 4px); z-index: 4; background: var(--paper-2); padding: .2rem 0; }
+mark { background: color-mix(in srgb, var(--accent) 28%, transparent); color: inherit; border-radius: 3px; padding: 0 .1em; }
+
+/* --- the guide: how far down you are ----------------------------------- */
+.read-progress { position: fixed; left: 0; right: 0; top: var(--hdr-h); height: 3px; z-index: 35; pointer-events: none; }
+.read-progress::before { content: ""; display: block; height: 100%; width: var(--read, 0%); background: var(--accent); transition: width .1s linear; }
+@media (min-width: 900px) { .read-progress { left: var(--rail-w); } }
+.tut-part > summary::after, .card.tut-part::before { opacity: .9; }
+
+/* --- fleurons between chapters and between Setup cards ----------------- */
+.jchapter::after { content: "❧"; position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); color: var(--rule-2); font-size: 1.1rem; }
+.jchapter { position: sticky; }
+body[data-tab="more"] #screen > .card + .card::before {
+  content: "✦ ✦ ✦"; display: block; text-align: center; color: var(--rule-2); letter-spacing: .6em;
+  margin: -1.6rem 0 .9rem; font-size: .7rem;
+}
+
+/* --- candlelight warms the sheets and the dice tray -------------------- */
+:root[data-theme="candle"] body.in-room #screen { background: radial-gradient(90% 40% at 50% 0%, rgba(232, 180, 86, .10), transparent 70%), var(--paper-2); }
+:root[data-theme="candle"] .result-head .dice { box-shadow: inset 0 1px 3px rgba(0, 0, 0, .4), 0 0 24px -6px rgba(232, 180, 86, .45); }
+
+@media (prefers-reduced-motion: reduce) {
+  body.in-room #screen.turn { animation: none !important; }
+  .table-tiles .tile, .tile-art, .btn { transition: none !important; }
+}
+.section-nav button[data-k][aria-current="true"] { color: var(--paper-2); }
+details.machines[open] .which-row:nth-of-type(3) { border-left-color: var(--accent); }
+details.machines[open] .which-row[data-book="sum"] { border-left-color: var(--sum); }
+details.machines[open] .which-row[data-book="gum"] { border-left-color: var(--gum); }
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 640px) {
+  body[data-tab="play"] .screen { grid-auto-flow: row dense; }
+  body[data-tab="play"] .screen > .table-kicker { grid-row: 1; }
+  body[data-tab="play"] .screen > .track-card { grid-row: 2 / span 12; }
+}
+.card > .entry.person.no-portrait, .card > .entry.person[data-kind="protagonist"] { padding-left: 3.3rem; }

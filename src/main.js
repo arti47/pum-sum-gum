@@ -5,8 +5,8 @@ import { toast, registerUndo, registerExplainState, registerCue, registerLongPre
 import { cue } from "./feel.js";
 import * as store from "./store.js";
 import { applyTheme, Settings } from "./settings.js";
-import { registerScreen, go, renderTabs, render, openHelp } from "./router.js";
-import { renderPlay } from "./sheet.js";
+import { registerScreen, go, renderTabs, render, openHelp, registerHeaderTap, installRoomSwipe, installQuickFind } from "./router.js";
+import { renderPlay, openTrackSheet } from "./sheet.js";
 import { renderOracles } from "./oracles.js";
 import { renderScene } from "./scene.js";
 import { renderJournal } from "./journal.js";
@@ -44,6 +44,9 @@ registerScreen("more", renderMore);
 
 $("#btn-home").addEventListener("click", () => go("more", "home"));
 $("#btn-help").addEventListener("click", openHelp);
+registerHeaderTap(openTrackSheet);
+installRoomSwipe();
+installQuickFind();
 
 // Follow the system theme live while the app is set to "system".
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);

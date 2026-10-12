@@ -508,7 +508,7 @@ Appearance: theme follows the system unless you override it, and a text-size sli
 
 The library. One game holds many plot sheets — one per scope — and finished ones stay as a record. Home lets you switch scope, edit or delete one, add a new one, switch or archive whole games, and prepare another.
 
-> **Watch out.** Danger zone, at the foot of Settings and out of the thumb's resting arc: Delete the current game, and Erase everything. Both confirm and both name exactly what is lost.
+> **Watch out.** Danger zone, at the foot of Settings and out of the thumb's resting arc: Delete the current game, Clear the journal, and Erase everything. Each confirms and names exactly what is lost.
 
 ---
 
@@ -733,6 +733,11 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 
 - ◈ Home (top left) — jumps to Setup → Home from anywhere.
 - ? Help on this screen — raises the screen's folded help as a sheet over it; hidden on a screen that has none.
+- In play, the drawn track in the header is a button: tap it on any screen for the whole plot track as a sheet, with Close.
+- On a keyboard, Ctrl+K (⌘K on a Mac) opens Find a page — every page by its name; type to narrow it, Enter opens the first, Close puts it away.
+- Inside Ask or Scene, swipe sideways to turn to the next page of the room — the next oracle, or the other half of the scene. On a wide screen the rooms open as a panel from the right.
+- In the journal, swipe an entry left to open its tools, the same ones the ⋯ opens.
+- While a game is being prepared the tabs step aside; Back, Next and Cancel are the way round.
 - Theme lives in Setup → Settings → Appearance — it cycles system → light → dark → candle, a warm black paper with gold ink.
 - The persistent plot header — scope name, current section, crossed/total, and the drawn track. Hidden on Setup; compacted in landscape, where it drops the drawn track and keeps the count.
 - Tabs: Table · Story · Setup. Ask and Scene are rooms off the Table, so the Table stays lit while you are in them. A dot on Table means a scene is open, a beat is waiting, or the scope has finished.
@@ -818,7 +823,7 @@ Files
 
 Dice
 
-- Distribution per die size, and Clear the journal.
+- Distribution per die size, each chart ruled where an even die would stand.
 
 ### Setup
 
@@ -873,7 +878,7 @@ Tutorial — this document. Settings — see Part 2.
 - Optional rules: Disruption die · Volatile situation · Game Unfolding Machine (GUM v2.2) · Enrich descriptive and story oracles · Show the “What this does” notes expanded.
 - Appearance: Theme · Text size — N%, which the label carries as you drag it · Sound and vibration.
 - About the books, including what they do not contain.
-- Danger zone: Delete the current game · Erase everything.
+- Danger zone: Delete the current game · Clear the journal · Erase everything.
 
 ### Every dialog, by name
 

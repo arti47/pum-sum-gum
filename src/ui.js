@@ -364,7 +364,7 @@ export function resultCard({ kind, answer, second, question = "", dice = [], str
   const card = el("div", { class: `result${fresh ? " fresh" : ""}`, role: "group", "aria-label": kind, "data-variant": variant });
   // Settled on a timer, so a card never stays mid-tumble (see router's page turn).
   if (fresh) setTimeout(() => card.classList.remove("fresh"), 800);
-  if (fresh && dice.length && cueFn) cueFn("roll");
+  if (fresh && dice.length && cueFn) cueFn(variant === "slip" ? "roll-sum" : "roll");
   const head = el("div", { class: "result-head" },
     el("span", { class: "result-kind", text: kind })
   );
@@ -389,8 +389,13 @@ export function resultCard({ kind, answer, second, question = "", dice = [], str
   if (actions.length) {
     const foot = el("div", { class: "result-foot" });
     for (const a of actions) {
+      // Each action carries its mark — ↻ re-roll, ✎ note, ✕ put away — drawn
+      // beside its words, so the foot reads at a glance.
+      const act = /^re-?roll/i.test(a.label) ? "reroll" : /note/i.test(a.label) ? "note"
+        : /^dismiss$/i.test(a.label) ? "dismiss" : /enrich/i.test(a.label) ? "enrich" : null;
       add(foot, el("button", {
         class: `btn small ${a.primary ? "primary" : ""}`.trim(),
+        "data-act": act,
         onclick: a.onClick,
       }, a.label));
     }
