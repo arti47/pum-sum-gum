@@ -776,6 +776,7 @@ function renderSettings(host) {
     // Moved here from the Dice page, which only reads the record: a page you
     // read should not end on a red button that erases what it shows.
     if (game.journal.length) {
+      add(danger, el("p", { class: "muted", style: "margin:.6rem 0 .2rem", text: "The journal is this game's record — every roll, note and scene, in order." }));
       add(danger, el("button", {
         class: "btn danger wide", style: "margin-top:.4rem",
         onclick: () => confirmModal({
