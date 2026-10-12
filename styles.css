@@ -2266,3 +2266,307 @@ details.machines > summary { font-family: var(--serif); font-weight: 700; }
 .nodes-edit .slot-row .node-idx{flex:0 0 2.6rem}
 .nodes-edit .slot-row input{flex:1;min-width:0;min-height:40px}
 .nodes-edit .cite{margin:0 0 .2rem}
+
+/* =====================================================================
+   Phase 26 — one surface, three books, one face.
+   Presentation only: no word, rule or roll is changed here.
+   ===================================================================== */
+
+/* --- a display face for titles: IM FELL English, OFL (fonts/OFL.txt) --- */
+@font-face {
+  font-family: "IM Fell English"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("fonts/im-fell-english.woff2") format("woff2");
+}
+:root {
+  --display: "IM Fell English", var(--serif);
+  /* An 8pt rhythm: every gap on a screen is one of these. */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  /* The three books, each with its own ink. PUM keeps the machine orange. */
+  --pum: var(--accent-text);
+  --sum: #2b6a66;     /* teal ink — 5.6 on paper */
+  --gum: #7d5d16;     /* brass ink — 5.3 on paper */
+  --sum-soft: #dcebe8;
+  --gum-soft: #f1e5c6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --sum: #6cc3b9; --gum: #d8b35f; --sum-soft: #17302e; --gum-soft: #33290f; }
+}
+:root[data-theme="dark"] { --sum: #6cc3b9; --gum: #d8b35f; --sum-soft: #17302e; --gum-soft: #33290f; }
+:root[data-theme="candle"] { --sum: #93c9b3; --gum: #e8c46b; --sum-soft: #1e2a20; --gum-soft: #3a2a12; }
+
+#screen h1, .modal h2, .cover h2, .tile-label, .wz-ask-q, .solo-card h2, .card-head h2 {
+  font-family: var(--display); font-weight: 400; letter-spacing: .005em;
+}
+#screen h1 { font-size: 2rem; line-height: 1.1; }
+.card-head h2 { font-size: 1.32rem; }
+.tile-label { font-size: 1.45rem; }
+
+/* --- no card inside a card: one paper level, one raised sheet ---------- */
+.card .card { border: 0; box-shadow: none; background: transparent; padding: 0; margin: var(--s3) 0 0; }
+.card { margin-bottom: var(--s4); }
+
+/* --- the header: scope, track, help. The theme lives in Settings. ------ */
+.app-header { gap: var(--s2); }
+
+/* --- the next move docked to the tabs: one surface at the foot --------- */
+.action-bar-mount { bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); }
+.action-bar {
+  width: 100%; max-width: none; margin: 0; border-radius: 18px 18px 0 0;
+  border: 1px solid var(--rule); border-bottom: 0;
+  padding: .45rem .75rem .45rem 1rem;
+  background: var(--paper-2);
+  box-shadow: 0 -10px 24px -16px rgba(27, 33, 48, .35);
+}
+.action-bar .btn.primary { min-height: 46px; padding-inline: 1.3rem; font-size: 1rem; box-shadow: var(--press), 0 6px 14px -8px var(--accent); }
+.action-bar .ab-ctx { white-space: normal; }
+body.has-actionbar .tab-bar { border-top-color: transparent; }
+@media (min-width: 900px) {
+  .action-bar { max-width: 1000px; margin: 0 auto; }
+}
+
+/* --- help rises as a sheet; at the foot it is one quiet line ----------- */
+details.help-drawer:not(.as-sheet) { background: none; border: 0; box-shadow: none; padding: 0; margin-top: var(--s5); }
+details.help-drawer:not(.as-sheet) > summary.help-head {
+  justify-content: center; color: var(--ink-3); font-size: .78rem; min-height: 44px;
+  border-top: 1px dashed var(--rule-2);
+}
+details.help-drawer:not(.as-sheet) > summary.help-head::after { display: none; }
+details.help-drawer.as-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; margin: 0;
+  max-height: 78vh; overflow: auto; padding: .4rem 1rem 1.4rem;
+  background: var(--paper-2); border: 1px solid var(--rule); border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 0 0 100vmax rgba(15, 17, 22, .42), 0 -12px 30px -12px rgba(0, 0, 0, .4);
+  animation: rise .26s cubic-bezier(.2, .8, .3, 1);
+}
+details.help-drawer.as-sheet > summary.help-head { position: sticky; top: -.4rem; background: var(--paper-2); z-index: 1; padding-top: 1.1rem; }
+details.help-drawer.as-sheet > summary.help-head::before {
+  content: ""; position: absolute; top: .35rem; left: 50%; width: 42px; height: 5px; margin-left: -21px;
+  border-radius: 3px; background: var(--rule-2);
+}
+@media (min-width: 900px) { details.help-drawer.as-sheet { left: calc(var(--rail-w) + 1rem); right: 1rem; max-width: 760px; margin: 0 auto; } }
+@keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* --- Ask and Scene: a sheet risen over the Table ------------------------ */
+body.in-room #screen {
+  margin-top: 10px; padding-top: .3rem;
+  background: var(--paper-2);
+  border: 1px solid var(--rule); border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -14px 30px -18px rgba(27, 33, 48, .45);
+  min-height: calc(100vh - var(--hdr-h) - 10px);
+}
+body.in-room #screen.turn { animation: rise .28s cubic-bezier(.2, .8, .3, 1) both; }
+body.in-room #screen .card { background: var(--paper); }
+body.in-room .section-nav { background: var(--paper-2); }
+.table-back { position: relative; padding-top: 14px; }
+.room-grip {
+  position: absolute; top: 2px; left: 50%; width: 46px; height: 22px; margin-left: -23px;
+  cursor: grab; touch-action: none;
+}
+.room-grip::before { content: ""; position: absolute; top: 4px; left: 2px; right: 2px; height: 5px; border-radius: 3px; background: var(--rule-2); }
+.table-back .btn.ghost { padding-left: 0; }
+.book-tag { letter-spacing: .12em; }
+body[data-tab="scene"] .table-back .book-tag, body[data-tab="scene"] h1 + .lede { color: var(--sum); }
+body[data-tab="scene"] .section-nav button[aria-current="true"]::after { background: var(--sum); }
+body[data-tab="scene"] .arc-path li.done::before, body[data-tab="scene"] .arc-path li.here::before { background: var(--sum); border-color: var(--sum); }
+
+/* The coach, in a room, is a ribbon — one line, the move beside it. */
+.coach-strip {
+  display: flex; align-items: center; gap: var(--s2); padding: .45rem .1rem .45rem .7rem !important;
+  border: 0 !important; border-left: 3px solid var(--accent) !important; border-radius: 0 !important;
+  background: none !important; box-shadow: none !important; margin: 0 0 var(--s3) !important;
+}
+.coach-strip::before { display: none !important; }
+.coach-strip p { flex: 1; margin: 0; font-size: .86rem; line-height: 1.3; color: var(--ink-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.coach-strip p strong { color: var(--ink); }
+.coach-strip .btn { flex: none; width: auto; margin: 0; }
+body[data-tab="scene"] .coach-strip { border-left-color: var(--sum) !important; }
+
+/* --- the Table ----------------------------------------------------------- */
+.track-card .card-head .cite { display: flex; gap: .5rem; align-items: baseline; }
+.track-boxes { width: fit-content; max-width: 100%; }
+.box-by { font-family: var(--serif); font-size: 1.05rem; border-left: 3px solid var(--accent); padding-left: .6rem; }
+
+.table-tiles { gap: var(--s2); }
+.table-tiles .tile { padding: .8rem .35rem .7rem; gap: .25rem; }
+.tile-book { display: flex; flex-direction: column; align-items: center; gap: .15rem; text-transform: none; letter-spacing: 0; }
+.tile-book b {
+  font-family: var(--sans); font-size: .62rem; font-weight: 800; letter-spacing: .14em;
+  padding: .1rem .45rem; border-radius: 999px; color: var(--pum); background: var(--accent-soft);
+}
+.tile-book[data-book="sum"] b { color: var(--sum); background: var(--sum-soft); }
+.tile-book span { font-family: var(--serif); font-size: .82rem; color: var(--ink-2); white-space: nowrap; }
+.tile-scene .tile-art { background: var(--sum); }
+.tile-scene { border-top: 3px solid var(--sum); }
+.tile-ask, .tile-beat { border-top: 3px solid var(--accent); }
+
+.drawer-chips { gap: 0; border-bottom: 1px solid var(--rule); justify-content: center; margin: var(--s4) 0; }
+.drawer-chips .chip {
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+  font-family: var(--sans); font-size: .82rem; font-weight: 700; color: var(--ink-2);
+  padding: .55rem .9rem; position: relative;
+}
+.drawer-chips .chip::before {
+  content: ""; display: inline-block; width: 18px; height: 18px; margin-right: .35rem; vertical-align: -4px;
+  background: currentColor; -webkit-mask: var(--chip-art) center / contain no-repeat; mask: var(--chip-art) center / contain no-repeat;
+}
+.drawer-chip[data-d="nodes"] { --chip-art: var(--art-list); }
+.drawer-chip[data-d="cast"]  { --chip-art: var(--art-busts); }
+.drawer-chip[data-d="files"] { --chip-art: var(--art-folder); }
+.drawer-chips .chip:hover { color: var(--accent-text); }
+.drawer-chips .chip:hover::after { content: ""; position: absolute; left: .6rem; right: .6rem; bottom: -1px; height: 2px; background: var(--accent); }
+
+.table-ledger { display: none; }
+@media (min-width: 1200px) {
+  body[data-tab="play"] .screen { max-width: 1240px; grid-template-columns: minmax(0, 1fr) 300px; gap: 0 1.5rem;
+    margin-left: calc(var(--rail-w) + max(0px, (100vw - var(--rail-w) - 1240px) / 2)); }
+  body[data-tab="play"] .screen > * { grid-column: 1; }
+  body[data-tab="play"] .screen > .table-ledger {
+    display: block; grid-column: 2; grid-row: 1 / span 30; position: sticky; top: calc(var(--hdr-h) + 1rem);
+    background: var(--paper-2); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem;
+  }
+  .table-ledger ol { list-style: none; margin: .4rem 0 .8rem; padding: 0; }
+  .table-ledger li { display: grid; gap: .1rem; padding: .45rem 0; border-bottom: 1px solid var(--rule); }
+  .table-ledger .tl-kind { font-family: var(--sans); font-size: .64rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--pum); }
+  .table-ledger li[data-kind="scene"] .tl-kind, .table-ledger li[data-kind="sum"] .tl-kind { color: var(--sum); }
+  .table-ledger li[data-kind="gum"] .tl-kind { color: var(--gum); }
+  .table-ledger .tl-title { font-family: var(--serif); font-size: .95rem; }
+}
+
+/* --- results: the card turns face up; the dice land in a tray ---------- */
+.result.fresh .result-body { animation: faceup .42s cubic-bezier(.2, .8, .3, 1) both; transform-origin: 50% 0; }
+@keyframes faceup { from { transform: perspective(700px) rotateX(-70deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.result-head .dice {
+  padding: .35rem .55rem; border-radius: 14px;
+  background: radial-gradient(120% 140% at 30% 20%, color-mix(in srgb, var(--paper-sunk) 70%, var(--accent-soft)), var(--paper-sunk));
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .14);
+}
+.result[data-variant="slip"] .result-head .dice { background: radial-gradient(120% 140% at 30% 20%, var(--sum-soft), var(--paper-sunk)); }
+
+/* --- the journal: a compact ledger ------------------------------------- */
+.entry.jentry { padding-top: .45rem; padding-bottom: .45rem; }
+.entry.jentry .entry-head { gap: .4rem; }
+.entry.jentry .entry-kind { font-size: .6rem; letter-spacing: .14em; color: var(--pum); }
+.entry.jentry[data-kind="scene"] .entry-kind, .entry.jentry[data-kind="sum"] .entry-kind { color: var(--sum); }
+.entry.jentry[data-kind="gum"] .entry-kind { color: var(--gum); }
+.entry.jentry[data-kind="scene"]::before, .entry.jentry[data-kind="sum"]::before { border-color: var(--sum); }
+.entry.jentry[data-kind="gum"]::before { border-color: var(--gum); }
+.entry.jentry .entry-title { font-size: 1rem; line-height: 1.3; }
+.entry.jentry .entry-dice { display: inline-flex; margin: .1rem 0 0; transform: none; }
+.entry.jentry .entry-dice .die { transform: scale(.62); margin-right: -.7rem; }
+details.entry-tools > summary { opacity: .55; min-width: 36px; min-height: 36px; font-size: 1rem; }
+details.entry-tools > summary:hover, details.entry-tools[open] > summary { opacity: 1; }
+h3.jday, .jchapter {
+  position: sticky; top: var(--hdr-h); z-index: 5;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.jchapter { top: calc(var(--hdr-h) + 30px); }
+details.jrun { margin: .1rem 0 .1rem .95rem; border-left: 2px dotted var(--rule-2); }
+details.jrun > summary {
+  list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: .5rem;
+  min-height: 40px; padding: .4rem .6rem; font-family: var(--serif); font-size: 1rem;
+}
+details.jrun > summary::-webkit-details-marker { display: none; }
+details.jrun > summary::before { content: "▸"; color: var(--ink-3); font-size: .8rem; transition: transform .15s; }
+details.jrun[open] > summary::before { transform: rotate(90deg); }
+.jrun-n { font-family: var(--sans); font-size: .74rem; font-weight: 800; color: var(--accent-ink); background: var(--accent); padding: .05rem .45rem; border-radius: 999px; }
+
+/* --- plot nodes: each written node one tap ---------------------------- */
+.node-card .card-head { align-items: center; gap: .5rem; }
+.node-card .card-head h3 { flex: 1; }
+.node-card .node-tools { justify-content: space-between; }
+.node-row .node-txt { flex: 1; text-align: left; justify-content: flex-start; min-height: 44px; padding: .25rem .4rem; }
+.node-row .node-txt:not(.blank)::after { content: "›"; font-size: 1.2rem; }
+.modal.node-menu h2 { font-size: 1.3rem; }
+
+/* --- Ask: one line of registers; the oracles in a grid ----------------- */
+.reg-row.seg-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.reg-row .btn { padding-inline: .3rem; font-size: .8rem; }
+body[data-tab="oracles"] .section-nav { flex-wrap: wrap; justify-content: center; overflow: visible; row-gap: 0; }
+body[data-tab="oracles"] .section-nav::before, body[data-tab="oracles"] .section-nav::after { display: none; }
+.ask-thread { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: var(--s2); }
+.ask-thread li {
+  display: grid; gap: .15rem; padding: .5rem .75rem; max-width: 88%;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 14px 14px 14px 4px;
+}
+.ask-thread .at-q { font-family: var(--serif); font-style: italic; color: var(--ink-2); font-size: .92rem; }
+.ask-thread .at-a { font-family: var(--sans); font-weight: 700; font-size: .86rem; }
+
+/* --- Scene: moves as a flat grid, no card in a card -------------------- */
+.play-steps .tile { border: 0 !important; box-shadow: none !important; background: none !important; padding: 0 !important; }
+.play-tile { border-radius: 14px; }
+.play-steps li[data-move="intervene"] .play-tile, .play-steps li[data-move="table"] .play-tile,
+.play-steps li[data-move="close"] .play-tile { border-top: 3px solid var(--sum); }
+.play-steps li[data-move="oracle"] .play-tile, .play-steps li[data-move="beat"] .play-tile { border-top: 3px solid var(--accent); }
+
+/* --- Setup: a shelf of games; settings with an index ------------------- */
+.shelf { display: flex; gap: var(--s3); overflow-x: auto; scroll-snap-type: x mandatory; padding: .4rem .1rem .8rem; margin: 0 -.1rem; }
+.shelf .entry.book {
+  flex: 0 0 150px; scroll-snap-align: start; min-height: 190px; border: 0; margin: 0;
+  display: flex; flex-direction: column; padding: .9rem .75rem .7rem 1rem; position: relative;
+  background: linear-gradient(90deg, rgba(0,0,0,.14) 0 6px, transparent 6px), var(--paper-sunk);
+  border-radius: 4px 12px 12px 4px; box-shadow: var(--lift);
+}
+.shelf .entry.book.open { background: linear-gradient(90deg, rgba(0,0,0,.18) 0 6px, transparent 6px), var(--accent-soft); outline: 2px solid var(--accent); }
+.shelf .entry.book.archived { opacity: .6; }
+.shelf .entry.book .entry-head { flex-direction: column; align-items: flex-start; }
+.shelf .entry.book .entry-title { font-family: var(--display); font-size: 1.2rem; line-height: 1.15; }
+.shelf .entry.book .btn-row { margin-top: auto !important; flex-wrap: wrap; }
+.cover-actions { justify-content: flex-end; margin-top: var(--s2); }
+
+.set-jump { display: flex; flex-wrap: wrap; gap: var(--s2); margin: 0 0 var(--s4); }
+.set-jump .chip::before, .set-card > h2::before {
+  content: ""; display: inline-block; width: 18px; height: 18px; margin-right: .4rem; vertical-align: -3px;
+  background: currentColor; -webkit-mask: var(--set-art) center / contain no-repeat; mask: var(--set-art) center / contain no-repeat;
+}
+.set-card > h2::before { width: 26px; height: 26px; vertical-align: -6px; color: var(--ink-2); }
+[data-ico="data"]   { --set-art: var(--art-folder); }
+[data-ico="rules"]  { --set-art: var(--art-scales); }
+[data-ico="look"]   { --set-art: var(--art-quill); }
+[data-ico="about"]  { --set-art: var(--art-library); }
+[data-ico="danger"] { --set-art: var(--art-swords); }
+.set-card { scroll-margin-top: calc(var(--hdr-h) + 12px); }
+
+/* --- tab icons engraved like the rest of the sheet --------------------- */
+.ti[data-tab="play"]    { --ico: var(--art-play); }
+.ti[data-tab="journal"] { --ico: var(--art-journal); }
+.ti[data-tab="more"]    { --ico: var(--art-settings); }
+.tab-bar button .ti::before { width: 26px; height: 26px; }
+
+/* --- candlelight: the flame moves a little ----------------------------- */
+:root[data-theme="candle"] body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background: radial-gradient(70% 50% at 50% 8%, rgba(232, 180, 86, .10), transparent 70%),
+              radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, .45));
+  animation: flicker 7s ease-in-out infinite;
+}
+@keyframes flicker { 0%, 100% { opacity: .85; } 40% { opacity: 1; } 55% { opacity: .78; } 70% { opacity: .95; } }
+
+@media (prefers-reduced-motion: reduce) {
+  body.in-room #screen.turn, details.help-drawer.as-sheet, .result.fresh .result-body,
+  :root[data-theme="candle"] body::after { animation: none !important; }
+}
+#screen h1.sr-only::before, #screen h1.sr-only::after { display: none; }
+#screen h1.sr-only { position: absolute !important; }
+.reg-row .btn { font-size: .74rem; letter-spacing: 0; white-space: nowrap; overflow-wrap: normal; padding-inline: .2rem; }
+.reg-row .btn::before { display: none !important; }
+.node-row .node-txt.blank::after { content: none !important; }
+@media (max-width: 479px) {
+  .action-bar:has(> .btn:not(.primary)) .ab-ctx { display: none; }
+  .action-bar:has(> .btn:not(.primary)) > .btn:first-of-type { margin-left: auto; }
+}
+.action-bar .ab-ctx { overflow-wrap: normal; word-break: normal; }
+.set-jump .chip { flex: 0 0 auto; width: auto; min-height: 40px; padding: .3rem .8rem; border-radius: 999px; font-family: var(--sans); font-size: .82rem; font-weight: 600; }
+@media (min-width: 900px) {
+  .action-bar-mount { bottom: 0; }
+  .action-bar { max-width: 1000px; margin: 0 auto; }
+  body[data-tab="play"] .action-bar { max-width: 1240px; }
+}
+h3.jday, .jchapter { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.tile-book b { background: transparent; box-shadow: inset 0 0 0 1px currentColor; }
+.tile-book[data-book="sum"] b { background: transparent; }
+.table-kicker { margin: .2rem 0 .5rem; font-family: var(--sans); font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); text-align: center; }
+details.entry-tools > summary { min-width: 40px; min-height: 40px; }

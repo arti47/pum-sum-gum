@@ -333,8 +333,13 @@ export function whichBody(here = null) {
 }
 
 // Ask and Scene are rooms off the Table: a way back, and the book you are in.
+// The grip at the top of the sheet: drag it down to go back.
 export function tableBack(book) {
-  return el("div", { class: "table-back" },
+  const grip = el("span", { class: "room-grip", "aria-hidden": "true" });
+  let y0 = null;
+  grip.addEventListener("pointerdown", (e) => { y0 = e.clientY; grip.setPointerCapture(e.pointerId); });
+  grip.addEventListener("pointerup", (e) => { if (y0 !== null && e.clientY - y0 > 50) go("play", "track"); y0 = null; });
+  return el("div", { class: "table-back" }, grip,
     el("button", { class: "btn small ghost", onclick: () => go("play", "track") }, "← Back to the Table"),
     el("span", { class: "book-tag", text: book }));
 }

@@ -102,11 +102,32 @@ function renderEntries(host, game) {
   let lastDay = "";
   let lastScene = null;
   let liveShown = false;
+  let lastTs = "";
+  // A run of the same roll, back to back, reads as one line that opens: five
+  // "Modified proposal" entries in a row are one fact about the session, and
+  // each still opens to its own dice.
+  let run = null;
+  const plain = (e) => !e.note && !e.pick && !(e.attachments || []).length && e.id !== waiting;
+  const runKey = (e) => `${e.kind}|${e.title}|${e.sceneId || ""}|${fmtDay(e.ts)}`;
+  const flush = () => {
+    if (!run) return;
+    if (run.items.length < 3) { for (const x of run.items) add(host, x); }
+    else {
+      add(host, el("details", { class: "jrun" },
+        el("summary", null,
+          el("span", { class: "jrun-title", text: run.title }),
+          el("span", { class: "jrun-n", text: `×${run.items.length}` })),
+        ...run.items));
+    }
+    run = null;
+  };
   for (const e of page) {
+    if (!run || !plain(e) || runKey(e) !== run.key) flush();
     const day = fmtDay(e.ts);
     if (day !== lastDay) {
       lastDay = day;
       lastScene = null;
+      flush();
       add(host, el("h3", { class: "jday", text: day }));
     }
     if (e.sceneId && e.sceneId !== lastScene) {
@@ -115,6 +136,7 @@ function renderEntries(host, game) {
       // The chapter of the scene still being played leads back to it.
       const live = !liveShown && scope && scope.openScene && scope.openScene.id === e.sceneId;
       if (live) liveShown = true;
+      flush();
       add(host, el("div", { class: "jchapter" },
         el("span", { class: "jchapter-n", text: `Scene ${n}` }),
         openers.get(e.sceneId) ? el("span", { class: "jchapter-open", text: openers.get(e.sceneId) }) : null,
@@ -122,13 +144,20 @@ function renderEntries(host, game) {
     } else if (!e.sceneId) {
       lastScene = null;
     }
-    const entry = entryEl(e);
+    // The same minute twice in a row is said once.
+    const ts = fmtTime(e.ts);
+    const entry = entryEl(e, ts !== lastTs);
+    lastTs = ts;
     // A beat still waiting to be judged leads back to its card.
     if (waiting && e.id === waiting) {
       add(entry, el("button", { class: "btn small", onclick: () => go("play", "track") }, "Go to the beat"));
     }
-    add(host, entry);
+    if (plain(e)) {
+      if (!run) run = { key: runKey(e), title: e.title || e.kind, items: [] };
+      run.items.push(entry);
+    } else add(host, entry);
   }
+  flush();
   if (all.length > shown) {
     add(host, el("button", {
       class: "btn wide",
@@ -167,14 +196,14 @@ function renderEntries(host, game) {
   });
 }
 
-function entryEl(e) {
+function entryEl(e, withTime = true) {
   const wrap = el("div", {
     class: `entry jentry${(e.attachments || []).length ? " has-attach" : ""}`,
     "data-kind": e.kind,
   });
   add(wrap, el("div", { class: "entry-head" },
     el("span", { class: "entry-kind", text: e.kind }),
-    el("span", { class: "entry-ts", text: fmtTime(e.ts) })
+    withTime ? el("span", { class: "entry-ts", text: fmtTime(e.ts) }) : null
   ));
   if (e.title) add(wrap, el("div", { class: "entry-title", text: e.title }));
   if (e.detail) add(wrap, el("div", { class: "entry-detail", text: e.detail }));

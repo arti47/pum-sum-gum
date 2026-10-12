@@ -4,7 +4,7 @@ import { $ } from "./core.js";
 import { toast, registerUndo, registerExplainState, registerCue, registerLongPress } from "./ui.js";
 import { cue } from "./feel.js";
 import * as store from "./store.js";
-import { applyTheme, cycleTheme, Settings } from "./settings.js";
+import { applyTheme, Settings } from "./settings.js";
 import { registerScreen, go, renderTabs, render, openHelp } from "./router.js";
 import { renderPlay } from "./sheet.js";
 import { renderOracles } from "./oracles.js";
@@ -41,11 +41,6 @@ registerScreen("oracles", renderOracles);
 registerScreen("scene", renderScene);
 registerScreen("journal", renderJournal);
 registerScreen("more", renderMore);
-
-$("#btn-theme").addEventListener("click", () => {
-  const next = cycleTheme();
-  toast(`Theme: ${next}`);
-});
 
 $("#btn-home").addEventListener("click", () => go("more", "home"));
 $("#btn-help").addEventListener("click", openHelp);

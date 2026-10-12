@@ -2183,3 +2183,11 @@ screenshot of the Table's drawer. Every slot opened its own dialog. *Fix:* the d
 every printed list with a box per slot (+ Another slot up to capacity); Save writes every changed
 box in one transaction, so one Undo reverts it. Story → Plot nodes → **Edit all nodes** opens the
 same form.
+
+**F-108 · UX/UI audit, 390×844 in both themes.** Measured per screen: Table 1,392px / 29
+buttons with the scope name three times; journal 72 buttons with identical runs and repeated
+timestamps; plot nodes three controls per row; Ask's registers wrapping mid-word; Scene nesting
+cards three deep; Home's primary printed twice; Settings one 2,500px column. *Fix:* rooms as risen
+sheets, the next move docked, help as a sheet, one title per screen, run-folding in the journal,
+one-tap node rows, flat scene moves, a shelf of games, a settings index, a display face and an ink
+per book. Presentation only; every rule, roll and table unchanged.
