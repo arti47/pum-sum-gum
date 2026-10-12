@@ -2598,7 +2598,7 @@ body.in-room[data-tab="scene"] #screen { background: color-mix(in srgb, var(--pa
 body.in-room[data-tab="oracles"] #screen { background: color-mix(in srgb, var(--paper-2) 90%, var(--accent-soft)); }
 @media (min-width: 900px) {
   body.in-room .screen {
-    grid-template-columns: 1fr; max-width: 760px;
+    max-width: min(1000px, calc(100vw - var(--rail-w) - 2rem));
     margin-left: auto; margin-right: 0; margin-top: 0;
     border-radius: 24px 0 0 0; border-right: 0;
     box-shadow: -18px 0 40px -24px rgba(27, 33, 48, .5);
@@ -2756,3 +2756,17 @@ details.machines[open] .which-row[data-book="gum"] { border-left-color: var(--gu
   body[data-tab="play"] .screen > .track-card { grid-row: 2 / span 12; }
 }
 .card > .entry.person.no-portrait, .card > .entry.person[data-kind="protagonist"] { padding-left: 3.3rem; }
+/* The room rises without fading — a fading screen measures as low contrast
+   mid-flight, and a sideways slide widens the page while it moves. */
+@keyframes room-rise { from { transform: translateY(36px); } to { transform: none; } }
+body.in-room #screen.turn { animation: room-rise .26s cubic-bezier(.2, .8, .3, 1) both; }
+@media (min-width: 900px) { body.in-room #screen.turn { animation: room-rise .26s cubic-bezier(.2, .8, .3, 1) both; } }
+@media (prefers-reduced-motion: reduce) { body.in-room #screen.turn { animation: none !important; } }
+/* Room tints as plain colours (a color-mix() is reported in a colour space the
+   contrast gate cannot read, and plain tokens theme cleanly anyway). */
+:root { --room-pum: #fef7ed; --room-sum: #f9f8ef; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --room-pum: #1d1e26; --room-sum: #191f27; } }
+:root[data-theme="dark"] { --room-pum: #1d1e26; --room-sum: #191f27; }
+:root[data-theme="candle"] { --room-pum: var(--paper-2); --room-sum: var(--paper-2); }
+body.in-room[data-tab="scene"] #screen { background-color: var(--room-sum); }
+body.in-room[data-tab="oracles"] #screen { background-color: var(--room-pum); }
