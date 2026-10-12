@@ -11,7 +11,7 @@ import { Settings } from "./settings.js";
 import { openRule } from "./screens.js";
 import { DESCRIPTIVE, STORY, QUANTIFIERS } from "../data-pum-oracles.js";
 import { NO_TASK_RESOLUTION, ORACLE_HINTS } from "../data-guidance.js";
-import { setOpenBeat } from "./sheet.js";
+import { setOpenBeat, keepCard } from "./sheet.js";
 import { registerClearer } from "./viewstate.js";
 import { coachStrip, tableBack } from "./coach.js";
 
@@ -258,6 +258,7 @@ function renderLast() {
     }
     add(wrap, resultCard({
       variant: "seal",
+      onKeep: keepCard(last.entryId),
       kind: "Yes or No · bias",
       question: result.question,
       answer: "Two answers — you pick",
@@ -290,6 +291,7 @@ function renderLast() {
 
   add(wrap, resultCard({
       variant: "seal",
+    onKeep: keepCard(last.entryId),
     kind, answer, second,
     question: result.question,
     dice: result.dice,

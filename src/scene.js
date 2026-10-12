@@ -6,6 +6,7 @@ import { explain, actionBar, resultCard, toast, modal, promptModal, emptyState, 
 import * as store from "./store.js";
 import { rollSum, journalRoll, diceText } from "./roller.js";
 import { sumTable } from "./rules.js";
+import { keepCard } from "./sheet.js";
 import { sectionNav, render, go } from "./router.js";
 import { openRule } from "./screens.js";
 import { SUM_TABLES, SUM_SECTIONS, BIAS_NOTE } from "../data-sum.js";
@@ -206,6 +207,7 @@ function closeSceneFlow(open) {
   const r = rollSum({ tableId: "scene-closure", bias });
   last = { result: r, tableId: "scene-closure" };
   const scene = store.transact("Close the scene", () => closeAndRecord(r));
+  { const g = store.activeGame(); if (g && g.journal[0]) last.entryId = g.journal[0].id; }
   const mins = scene ? Math.max(1, Math.round((Date.now() - scene.openedAt) / 60000)) : 0;
   announce("Scene closed: " + r.answer);
   modal({
@@ -252,6 +254,9 @@ function fire(tableId, after) {
   const r = rollSum({ tableId, bias });
   last = { result: r, tableId };
   if (after) after(r);
+  // The boundary roll's own journal entry, written just now, is the card.
+  const g = store.activeGame();
+  if (after && g && g.journal[0]) last.entryId = g.journal[0].id;
   announce(r.answer);
   render();
 }
@@ -291,6 +296,7 @@ function renderLast() {
   const { result } = last;
   return resultCard({
     variant: "slip",
+    onKeep: keepCard(last.entryId),
     kind: `${result.table.name} · d${result.table.die}${result.bias !== "none" ? " · bias " + result.bias : ""}`,
     answer: result.answer,
     second: result.table.lead,
@@ -300,8 +306,8 @@ function renderLast() {
         label: "Re-roll",
         onClick: () => {
           const r = rollSum({ tableId: last.tableId, bias });
-          journalRoll(r, { kind: "sum", title: `${r.table.name} — re-rolled: ${r.answer}`, detail: diceText(r.dice) });
-          last = { result: r, tableId: last.tableId };
+          const entry = journalRoll(r, { kind: "sum", title: `${r.table.name} — re-rolled: ${r.answer}`, detail: diceText(r.dice) });
+          last = { result: r, tableId: last.tableId, entryId: entry && entry.id };
           render();
         },
       },
@@ -366,8 +372,8 @@ function renderTables(host) {
 
 function rollTable(t) {
   const r = rollSum({ tableId: t.id, bias });
-  last = { result: r, tableId: t.id };
-  journalRoll(r, { kind: "sum", title: `${t.name} — ${r.answer}`, detail: diceText(r.dice) });
+  const entry = journalRoll(r, { kind: "sum", title: `${t.name} — ${r.answer}`, detail: diceText(r.dice) });
+  last = { result: r, tableId: t.id, entryId: entry && entry.id };
   announce(r.answer);
   render();
 }

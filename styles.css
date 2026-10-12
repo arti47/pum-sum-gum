@@ -2770,3 +2770,249 @@ body.in-room #screen.turn { animation: room-rise .26s cubic-bezier(.2, .8, .3, 1
 :root[data-theme="candle"] { --room-pum: var(--paper-2); --room-sum: var(--paper-2); }
 body.in-room[data-tab="scene"] #screen { background-color: var(--room-sum); }
 body.in-room[data-tab="oracles"] #screen { background-color: var(--room-pum); }
+
+/* =====================================================================
+   Phase 28 — the card table. The page is green baize inside a wooden rim;
+   everything you read sits on a card. Two token sets: the felt's (light ink
+   on green) on the body, and the card's (dark ink on cream) on every surface
+   that is a card. No word, rule or roll changes here.
+   ===================================================================== */
+:root {
+  --felt: #1c4f34; --felt-deep: #123825; --felt-hi: #2a6a46;
+  --felt-ink: #f4eedb; --felt-ink-2: #dbe4d4; --felt-ink-3: #bccdb9; --felt-accent: #ffb48e;
+  --felt-rule: rgba(244, 238, 219, .22); --felt-rule-2: rgba(244, 238, 219, .38);
+  --rim: #5b3a20; --rim-hi: #7b5130; --rim-ink: #f6e8cc; --brass: #d8b15e;
+  /* the card */
+  --c-paper: #f1e9d4; --c-paper-2: #fbf6e8; --c-sunk: #e6dcc3;
+  --c-ink: #1d2230; --c-ink-2: #454e66; --c-ink-3: #5b6379;
+  --c-rule: #d8cdb1; --c-rule-2: #bfb193;
+  --c-accent-text: #a8452a; --c-accent-soft: #f6dccf;
+  --c-sum: #26625e; --c-gum: #745614; --c-sum-soft: #d9e8e4; --c-gum-soft: #efe2c1;
+  /* deck backs */
+  --back-pum: #7a2a1a; --back-sum: #1e4e4a; --back-ink: #f6ead0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --felt: #143a26; --felt-deep: #0b2517; --felt-hi: #1d4f33;
+    --c-paper: #232730; --c-paper-2: #2a2f39; --c-sunk: #1b1f27;
+    --c-ink: #ece5d6; --c-ink-2: #c3bba9; --c-ink-3: #a59f90;
+    --c-rule: #3b4150; --c-rule-2: #4f5668;
+    --c-accent-text: #f4875f; --c-accent-soft: #3d2820;
+    --c-sum: #6cc3b9; --c-gum: #d8b35f; --c-sum-soft: #183230; --c-gum-soft: #352a10;
+  }
+}
+:root[data-theme="dark"] {
+  --felt: #143a26; --felt-deep: #0b2517; --felt-hi: #1d4f33;
+  --c-paper: #232730; --c-paper-2: #2a2f39; --c-sunk: #1b1f27;
+  --c-ink: #ece5d6; --c-ink-2: #c3bba9; --c-ink-3: #a59f90;
+  --c-rule: #3b4150; --c-rule-2: #4f5668;
+  --c-accent-text: #f4875f; --c-accent-soft: #3d2820;
+  --c-sum: #6cc3b9; --c-gum: #d8b35f; --c-sum-soft: #183230; --c-gum-soft: #352a10;
+}
+:root[data-theme="candle"] {
+  --felt: #173a28; --felt-deep: #0d2418; --felt-hi: #22503a;
+  --c-paper: #231a10; --c-paper-2: #2b2014; --c-sunk: #1a130b;
+  --c-ink: #f3e3c3; --c-ink-2: #d9c6a0; --c-ink-3: #b9a57f;
+  --c-rule: #4a3922; --c-rule-2: #64502f;
+  --c-accent-text: #e8b456; --c-accent-soft: #3a2a12;
+  --c-sum: #93c9b3; --c-gum: #e8c46b; --c-sum-soft: #1e2a20; --c-gum-soft: #3a2a12;
+}
+
+/* the felt: page-level tokens */
+body {
+  --paper: var(--felt); --paper-2: var(--felt); --paper-sunk: var(--felt-deep);
+  --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); --ink-3: var(--felt-ink-3);
+  --rule: var(--felt-rule); --rule-2: var(--felt-rule-2);
+  --accent-text: var(--felt-accent); --accent-soft: rgba(255, 180, 142, .16);
+  --sum: #8fd6cc; --gum: #ecc875;
+  background-color: var(--felt) !important;
+  background-image:
+    radial-gradient(120% 70% at 50% 18%, var(--felt-hi), transparent 70%),
+    radial-gradient(140% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, .38)) !important;
+  background-attachment: fixed;
+  color: var(--felt-ink);
+}
+body::before { opacity: .09 !important; mix-blend-mode: overlay; }
+
+/* the card: every surface you read from */
+.card, .modal, .result, .entry.jentry, .hand-card, .drawer-item, .cover,
+details.help-drawer.as-sheet, .ask-thread li, .shelf .entry.book, .card-read,
+.btn, .chip, input, textarea, select, .section-nav ~ .section-nav button, .explain ~ .section-nav button,
+.qf-item, .which-row, .entry.person, .card.drawer > .entry {
+  --paper: var(--c-paper); --paper-2: var(--c-paper-2); --paper-sunk: var(--c-sunk);
+  --ink: var(--c-ink); --ink-2: var(--c-ink-2); --ink-3: var(--c-ink-3);
+  --rule: var(--c-rule); --rule-2: var(--c-rule-2);
+  --accent-text: var(--c-accent-text); --accent-soft: var(--c-accent-soft);
+  --sum: var(--c-sum); --gum: var(--c-gum); --sum-soft: var(--c-sum-soft); --gum-soft: var(--c-gum-soft);
+  color: var(--ink);
+}
+.card { background: var(--c-paper-2); border: 0; border-radius: 14px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 10px 24px -12px rgba(0, 0, 0, .55), 0 2px 4px rgba(0, 0, 0, .25); }
+.btn:not(.primary):not(.danger) { background: var(--c-paper-2); }
+.btn.ghost { background: transparent; color: var(--felt-ink); --ink: var(--felt-ink); }
+.card .btn.ghost, .modal .btn.ghost, .result .btn.ghost, .entry.jentry .btn.ghost, .cover .btn.ghost { color: var(--c-ink); --ink: var(--c-ink); }
+
+/* --- the rim: header and the table edge ------------------------------- */
+.app-header {
+  --ink: var(--rim-ink); --ink-2: var(--rim-ink); --ink-3: #e3cfa9; --rule: rgba(0, 0, 0, .3);
+  background: linear-gradient(180deg, var(--rim-hi), var(--rim)) !important;
+  border-bottom: 2px solid #3b2512 !important; box-shadow: 0 3px 10px rgba(0, 0, 0, .45) !important; color: var(--rim-ink);
+}
+.app-header .ph-name, .app-header .brand-name { color: var(--rim-ink); }
+.app-header .ph-count, .app-header .ph-sec { color: #f0d9ad; }
+.ph-mini i { background: rgba(0, 0, 0, .35) !important; border-color: rgba(246, 232, 204, .5) !important; }
+.ph-mini i.on { background: var(--brass) !important; border-color: var(--brass) !important; }
+.hdr-btn { color: var(--rim-ink); }
+.tab-bar {
+  --ink-3: #ecdcb8; --accent-text: #ffe2a6;
+  background: linear-gradient(0deg, #3f2814, var(--rim)) !important; border-top: 2px solid #2c1a0b !important;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, .4);
+}
+.tab-bar button { color: #ecdcb8; }
+.tab-bar button[aria-current="page"] { color: #ffe2a6; }
+.tab-bar button[aria-current="page"] .ti { background: rgba(216, 177, 94, .22); }
+.tab-bar button[aria-current="page"]::before { background: var(--brass); }
+.action-bar {
+  --paper-2: var(--rim); --ink-3: #ecdcb8; --rule: #2c1a0b;
+  background: linear-gradient(180deg, var(--rim-hi), var(--rim)) !important; border-color: #3b2512 !important;
+  color: var(--rim-ink);
+}
+.action-bar .ab-ctx { color: #ecdcb8; }
+.action-bar .btn.primary { background: var(--brass); border-color: #b48f3e; color: #22170a; }
+@media (min-width: 900px) {
+  .tab-bar { background: linear-gradient(90deg, #3f2814, var(--rim)) !important; border-right: 2px solid #2c1a0b !important; }
+  .tab-bar::before { color: var(--rim-ink); border-color: rgba(0, 0, 0, .3); }
+}
+
+/* --- the Table: the track as a board on the felt ---------------------- */
+.track-card {
+  --paper: var(--felt); --paper-2: var(--felt); --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); --ink-3: var(--felt-ink-3);
+  --rule: var(--felt-rule); --rule-2: var(--felt-rule-2); --accent-text: var(--felt-accent);
+  background: rgba(0, 0, 0, .12) !important; box-shadow: inset 0 0 0 1px var(--felt-rule), inset 0 2px 14px rgba(0, 0, 0, .35) !important;
+  color: var(--felt-ink);
+}
+.track-card .card-head h2 { color: var(--felt-ink); }
+.track-box { background: #f4eedb !important; color: #2b2b2b !important; border-color: #c9b98f !important;
+  box-shadow: 0 3px 0 #a8946a, 0 6px 10px rgba(0, 0, 0, .35) !important; }
+.track-box.crossed { background: radial-gradient(circle at 35% 30%, #f08a62, #c6492a) !important; color: #fff6e6 !important; border-color: #8e2f18 !important; box-shadow: 0 3px 0 #7b2611, 0 6px 10px rgba(0, 0, 0, .35) !important; }
+.track-box.next { box-shadow: 0 3px 0 #a8946a, 0 0 0 5px rgba(255, 180, 142, .35) !important; color: #a8452a !important; }
+.track-boxes::before { border-top-color: rgba(244, 238, 219, .35) !important; }
+.track-sec::before { background: var(--felt-ink-2) !important; }
+.track-sec.current::before { background: var(--felt-accent) !important; }
+.table-kicker { color: var(--felt-ink-3); }
+
+/* --- the three decks -------------------------------------------------- */
+.table-tiles { gap: .9rem; margin: 1.4rem 0 1rem; }
+.table-tiles .tile {
+  --ink: var(--back-ink); --ink-2: var(--back-ink); --ink-3: #e6d3ad;
+  min-height: 150px; border: 0 !important; border-radius: 12px; color: var(--back-ink);
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .06) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, .06) 0 2px, transparent 2px 9px),
+    var(--back-pum) !important;
+  box-shadow:
+    inset 0 0 0 3px var(--back-pum), inset 0 0 0 4.5px rgba(246, 234, 208, .75),
+    3px 3px 0 -1px #e9dfc6, 3px 3px 0 0 rgba(0, 0, 0, .3),
+    6px 6px 0 -1px #e9dfc6, 6px 6px 0 0 rgba(0, 0, 0, .3),
+    0 14px 22px -8px rgba(0, 0, 0, .6) !important;
+}
+.table-tiles .tile-scene {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .06) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, .06) 0 2px, transparent 2px 9px),
+    var(--back-sum) !important;
+  box-shadow:
+    inset 0 0 0 3px var(--back-sum), inset 0 0 0 4.5px rgba(246, 234, 208, .75),
+    3px 3px 0 -1px #e9dfc6, 3px 3px 0 0 rgba(0, 0, 0, .3),
+    6px 6px 0 -1px #e9dfc6, 6px 6px 0 0 rgba(0, 0, 0, .3),
+    0 14px 22px -8px rgba(0, 0, 0, .6) !important;
+}
+.table-tiles .tile .tile-art { background: var(--back-ink) !important; width: 58px; height: 58px; }
+.table-tiles .tile-label { color: var(--back-ink); font-size: 1.55rem; }
+.tile-book b { color: var(--back-ink) !important; box-shadow: inset 0 0 0 1px rgba(246, 234, 208, .7) !important; background: transparent !important; }
+.tile-book span { color: #f0e2c2 !important; }
+.table-tiles .tile:active { transform: translate(3px, 3px); }
+.table-tiles .tile .badge { box-shadow: 0 0 0 2px var(--back-ink); }
+
+/* --- results are dealt onto the felt --------------------------------- */
+.result {
+  background: var(--c-paper-2) !important; border-radius: 14px !important; border: 0 !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 18px 30px -14px rgba(0, 0, 0, .7), 0 3px 6px rgba(0, 0, 0, .3) !important;
+}
+.result.fresh { animation: deal .48s cubic-bezier(.2, .8, .25, 1) both; }
+@keyframes deal {
+  from { transform: translate(-30px, -140px) rotate(-14deg) scale(.82); }
+  70% { transform: translate(0, 6px) rotate(1.5deg); }
+  to { transform: none; }
+}
+.result-foot .btn[data-act="keep"]::before { content: "⇡"; }
+.result-foot .btn[data-act="keep"] { background: var(--c-accent-soft); }
+
+/* --- the hand -------------------------------------------------------- */
+.hand { margin: 1.2rem 0 .6rem; text-align: center; }
+.hand-label { margin: 0 0 .4rem; font-family: var(--sans); font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--felt-ink-2); }
+.hand-cards { display: flex; justify-content: center; padding: 10px 0 18px; }
+.hand-card {
+  --mid: calc((var(--n) - 1) / 2);
+  flex: 0 0 96px; height: 128px; margin: 0 -18px; padding: .55rem .5rem; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: .25rem; font: inherit;
+  background: var(--c-paper-2); border: 1px solid var(--c-rule); border-radius: 10px;
+  box-shadow: 0 8px 16px -6px rgba(0, 0, 0, .6);
+  transform: rotate(calc((var(--i) - var(--mid)) * 5deg)) translateY(calc(var(--i) - var(--mid)) * 0px);
+  transform-origin: 50% 120%; transition: transform .15s ease;
+}
+.hand-card:hover, .hand-card:focus-visible { transform: rotate(calc((var(--i) - var(--mid)) * 5deg)) translateY(-14px); z-index: 2; }
+.hc-kind { font-family: var(--sans); font-size: .58rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent-text); }
+.hand-card[data-kind="sum"] .hc-kind, .hand-card[data-kind="scene"] .hc-kind { color: var(--c-sum); }
+.hc-title { font-family: var(--serif); font-size: .82rem; line-height: 1.2; color: var(--c-ink); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; }
+
+/* --- page-level type on the felt ------------------------------------- */
+#screen h1 { color: var(--felt-ink); text-shadow: 0 2px 0 rgba(0, 0, 0, .3); }
+#screen h1::before { background: var(--felt-ink-2) !important; }
+#screen > .lede, #screen > p { color: var(--felt-ink-2); }
+.section-nav { background: transparent !important; border-bottom-color: var(--felt-rule) !important; }
+.section-nav button { color: var(--felt-ink-2); }
+.section-nav button[aria-current="true"] { color: var(--felt-ink); }
+.section-nav button[aria-current="true"]::after { background: var(--brass) !important; }
+.section-nav ~ .section-nav button[aria-current="true"], .explain ~ .section-nav button[aria-current="true"] {
+  background: var(--brass) !important; border-color: var(--brass) !important; color: #22170a !important;
+}
+h3.jday, .jchapter { background: var(--felt) !important; color: var(--felt-ink); }
+.drawer-chips { border-bottom-color: var(--felt-rule); }
+.drawer-chips .chip { --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); background: transparent !important; color: var(--felt-ink-2) !important; }
+
+/* --- rooms: the deck tray, not a paper sheet ------------------------- */
+body.in-room #screen, body.in-room[data-tab="scene"] #screen, body.in-room[data-tab="oracles"] #screen {
+  background: rgba(0, 0, 0, .14) !important; background-color: var(--felt-deep) !important;
+  border: 0 !important; box-shadow: inset 0 3px 18px rgba(0, 0, 0, .45) !important;
+}
+body.in-room #screen .card { background: var(--c-paper-2); }
+body.in-room #screen::before { display: none; }
+
+/* --- the journal as a box of index cards ---------------------------- */
+.entry.jentry { background: var(--c-paper-2); border-radius: 10px; margin: .35rem 0; padding: .55rem .8rem .55rem 1rem !important;
+  box-shadow: 0 6px 12px -8px rgba(0, 0, 0, .6); border-left: 4px solid var(--c-accent-text); }
+.entry.jentry::before, .entry.jentry::after { display: none !important; }
+.entry.jentry[data-kind="scene"], .entry.jentry[data-kind="sum"] { border-left-color: var(--c-sum); }
+.entry.jentry[data-kind="gum"] { border-left-color: var(--c-gum); }
+.entry.jentry[data-kind="note"] { border-left-color: var(--c-ink-3); }
+details.jrun { border-left-color: var(--felt-rule-2); }
+details.jrun > summary { color: var(--felt-ink); }
+
+/* --- setup: the game box --------------------------------------------- */
+.cover { border: 6px double var(--c-rule-2) !important; background: var(--c-paper-2) !important; }
+.modal { background: var(--c-paper-2) !important; }
+details.help-drawer:not(.as-sheet) > summary.help-head { color: var(--felt-ink-3); border-top-color: var(--felt-rule-2); }
+.explain { --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); --ink-3: var(--felt-ink-3); }
+details.help-drawer.as-sheet .explain { --ink: var(--c-ink); --ink-2: var(--c-ink-2); --ink-3: var(--c-ink-3); --accent-text: var(--c-accent-text); }
+
+@media (prefers-reduced-motion: reduce) { .result.fresh { animation: none !important; } .hand-card { transition: none; } }
+.toast { background: #1d2230 !important; color: #f4eedb !important; }
+.toast .btn { --ink: #1d2230; }
+.btn.ghost:not(.primary):not(.danger) { background: transparent; color: var(--felt-ink); }
+.card .btn.ghost:not(.primary):not(.danger), .modal .btn.ghost:not(.primary):not(.danger), .result .btn.ghost:not(.primary):not(.danger),
+.entry.jentry .btn.ghost:not(.primary):not(.danger), .cover .btn.ghost:not(.primary):not(.danger),
+.entry.person .btn.ghost:not(.primary):not(.danger), .entry.book .btn.ghost:not(.primary):not(.danger) { color: var(--c-ink); }
+.coach-strip { --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); --ink-3: var(--felt-ink-3); color: var(--felt-ink-2); }
+.coach-strip p strong { color: var(--felt-ink); }
+h3.jday, .jchapter { position: static !important; }

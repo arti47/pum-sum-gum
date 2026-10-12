@@ -2203,3 +2203,8 @@ the same" after two successful deploys. Cache-first fetches served the old files
 waited behind a toast whose reload ran before it took control. *Fix:* network-first with
 `no-cache` revalidation and the cache as offline fallback; `skipWaiting` on install; reload only
 after `controllerchange`. Offline boot verified in a browser.
+
+**F-111 · Two restyles read as no change.** Reported: "I want a radical change in the interface."
+Phases 26–27 kept the paper sheet's structure. *Fix:* the card table — felt page, wooden rim,
+every reading surface a card via a scoped token set, decks for the three machines, dealt results,
+and a hand of kept cards (`journal[].hand`). Presentation and one stored flag; no rule touched.

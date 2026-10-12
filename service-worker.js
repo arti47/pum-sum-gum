@@ -1,6 +1,6 @@
 // Network-first for everything, with the versioned cache as the offline fallback, so a
 // deploy reaches an open or installed app on its next load. Bump CACHE_VERSION on ANY shipped-file change.
-const CACHE_VERSION = "um-v66";
+const CACHE_VERSION = "um-v67";
 
 const APP_SHELL = [
   "./",

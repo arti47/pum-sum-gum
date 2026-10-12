@@ -733,6 +733,7 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 
 - ◈ Home (top left) — jumps to Setup → Home from anywhere.
 - ? Help on this screen — raises the screen's folded help as a sheet over it; hidden on a screen that has none.
+- The whole app is a card table: green baize inside a wooden rim, the header and the tabs are the rim, everything you read sits on a card, and Ask, Beat and Scene are three decks you draw from.
 - In play, the drawn track in the header is a button: tap it on any screen for the whole plot track as a sheet, with Close.
 - On a keyboard, Ctrl+K (⌘K on a Mac) opens Find a page — every page by its name; type to narrow it, Enter opens the first, Close puts it away.
 - Inside Ask or Scene, swipe sideways to turn to the next page of the room — the next oracle, or the other half of the scene. On a wide screen the rooms open as a panel from the right.
@@ -742,7 +743,8 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 - The persistent plot header — scope name, current section, crossed/total, and the drawn track. Hidden on Setup; compacted in landscape, where it drops the drawn track and keeps the count.
 - Tabs: Table · Story · Setup. Ask and Scene are rooms off the Table, so the Table stays lit while you are in them. A dot on Table means a scene is open, a beat is waiting, or the scope has finished.
 - The next move floats as an orange pill above the tabs — the same move the Table's card names.
-- Swipe a result card: left re-rolls, right dismisses, up notes it — the same as its buttons, which stay.
+- Swipe a result card: left re-rolls, right dismisses, up keeps it in your hand (or notes it, on a card that cannot be kept) — the same as its buttons, which stay.
+- Your hand: an oracle answer, a SUM roll or a beat can be kept with Keep in hand. Kept cards fan out under the three decks on the Table; tap one to read it again, then Put it back or Close. A kept card is the same journal entry, flagged — nothing is copied and the journal keeps it either way.
 - Press and hold a machine button (Ask · Beat · Scene) or a beat call to read the rule it follows.
 - With no game, the Table, Scene, Ask and the Story each offer Prepare a game and Read the first-session walkthrough.
 - Simple view — on for a first game: the strips show the pages a first game needs and end with Show everything; Yes or No has no bias box. It switches itself off once a first storyline's ending is written, and Settings → Appearance turns it back on.
@@ -773,7 +775,7 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 - Scene closed dialog — Open the next scene · Back to the plot sheet · Write it down · Undo.
 - Roll a table — Exploring · Fighting · Discovering · Meeting someone; the same Rule of Bias row; each table a row with its die and Roll, its result beneath, and the whole table readable in a fold; the first pinned as the primary.
 - Meeting someone — the twelve character tables grouped by depth, and Go to the cast →.
-- Every result card: Re-roll · Dismiss.
+- Every result card: Keep in hand · Re-roll · Dismiss.
 - Results arrive as objects: an oracle answer pressed in as a seal, a beat as a ruled index card, a SUM roll as a slip torn from the pad, the dice drawn large. The words and dice are the same on all three.
 
 ### Ask
@@ -783,7 +785,7 @@ Functions this scenario used: Customized sheet · pre-drawn track, sections adde
 - Yes or No — the three registers as one row (the chosen one says who it is for), an “I have a bias” checkbox outside simple view, Ask.
 - Granular — three registers, seven likelihood bands, Ask.
 - Descriptive · Story · Quantifiers — one button per oracle.
-- Result card: Re-roll · Note it · Dismiss; Enrich it when a descriptive or story answer has no d100 word yet; on a bias roll, two answer chips to choose between.
+- Result card: Keep in hand · Re-roll · Note it · Dismiss; Enrich it when a descriptive or story answer has no d100 word yet; on a bias roll, two answer chips to choose between.
 - Does this call for a beat? — It said yes — random prompt · It said no — modified proposal.
 - Disruption die — the card under an answer when the setting is on: reports the d10 and offers Roll the random prompt / Roll the modified proposal.
 
