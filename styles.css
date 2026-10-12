@@ -3016,3 +3016,7 @@ details.help-drawer.as-sheet .explain { --ink: var(--c-ink); --ink-2: var(--c-in
 .coach-strip { --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); --ink-3: var(--felt-ink-3); color: var(--felt-ink-2); }
 .coach-strip p strong { color: var(--felt-ink); }
 h3.jday, .jchapter { position: static !important; }
+.btn[aria-pressed="true"]:not(.primary):not(.danger) { background: var(--c-ink); color: var(--c-paper-2); border-color: var(--c-ink); }
+/* Glossary chips sit on the felt in a note; on a card or the help sheet they take the card's ink. */
+.chip.term { --ink: var(--felt-ink); --ink-2: var(--felt-ink-2); --accent-text: var(--felt-accent); color: var(--felt-ink); background: transparent !important; }
+.card .chip.term, .modal .chip.term, details.help-drawer.as-sheet .chip.term { --ink: var(--c-ink); --ink-2: var(--c-ink-2); --accent-text: var(--c-accent-text); color: var(--c-ink); }
