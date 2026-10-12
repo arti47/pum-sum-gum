@@ -84,6 +84,7 @@ function renderTrack(host, scope) {
   // needs on one screen, and nothing a turn of play does not.
   // The header already carries the scope's name and track, so the page's own
   // title is for assistive tech only; the sheet's name rides on the track card.
+  add(host, el("p", { class: "table-kicker", text: sheet ? sheet.name : "" }));
   add(host, el("h1", { class: "table-title sr-only", text: scope.name }));
   const game = store.activeGame();
   const newcomer = !!game && !game.journal.some((e) => e.kind === "track");
@@ -342,8 +343,7 @@ function trackCard(scope) {
   const here = currentSection(scope);
   add(card, el("div", { class: "card-head" },
     el("h2", { text: total ? "Plot track" : "No plot track" }),
-    el("span", { class: "cite" }, sheet ? el("span", { class: "track-sheet", text: sheet.name }) : null,
-      total ? `${done}/${total}` : "no track")
+    el("span", { class: "cite", text: total ? `${done}/${total}` : "no track" })
   ));
 
   if (!total) {
@@ -1224,7 +1224,9 @@ function nodeMenu(scope, cat, i, text) {
   modal({
     title: text,
     className: "node-menu",
-    body: el("p", { class: "muted", text: `${categoryName(scope, cat.id)} · slot ${fmtRange(...slotRange(i))}` }),
+    body: el("div", null,
+      el("p", { text: "Invoke brings this node in deliberately as a beat, with no die rolled (PUM p.9). Edit changes or removes it." }),
+      el("p", { class: "cite", text: `${categoryName(scope, cat.id)} · slot ${fmtRange(...slotRange(i))}` })),
     actions: [
       { label: "Invoke", primary: true, onClick: () => { closeModal(); invokeDeliberately(scope, cat, i, text); return true; } },
       { label: "Edit", onClick: () => { closeModal(); editSlotDialog(scope, cat, i, text); return true; } },

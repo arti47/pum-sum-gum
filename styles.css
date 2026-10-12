@@ -2386,7 +2386,6 @@ body[data-tab="scene"] .coach-strip { border-left-color: var(--sum) !important; 
 
 /* --- the Table ----------------------------------------------------------- */
 .track-card .card-head .cite { display: flex; gap: .5rem; align-items: baseline; }
-.track-sheet { font-family: var(--sans); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
 .track-boxes { width: fit-content; max-width: 100%; }
 .box-by { font-family: var(--serif); font-size: 1.05rem; border-left: 3px solid var(--accent); padding-left: .6rem; }
 
@@ -2569,3 +2568,4 @@ body[data-tab="oracles"] .section-nav::before, body[data-tab="oracles"] .section
 h3.jday, .jchapter { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
 .tile-book b { background: transparent; box-shadow: inset 0 0 0 1px currentColor; }
 .tile-book[data-book="sum"] b { background: transparent; }
+.table-kicker { margin: .2rem 0 .5rem; font-family: var(--sans); font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); text-align: center; }

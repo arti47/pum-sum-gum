@@ -698,7 +698,7 @@ const REFERENCE = [
     title: "Table",
     blocks: [
       { bullets: [
-        "The scope's name rides in the header; the Table opens on the plot track drawn as a road, the sheet's name in its corner: each act a landmark engraving, each box a milestone, a token standing on the next one. A crossed box opens to say which beat crossed it.",
+        "The scope's name rides in the header; the Table opens on the sheet's name, then the plot track drawn as a road: each act a landmark engraving, each box a milestone, a token standing on the next one. A crossed box opens to say which beat crossed it.",
         "The card in the middle says where you are — a heading, one sentence, Show me the steps. While a scene waits for its beat, the two calls sit right under it; while a beat is waiting to be judged, the beat card takes its place.",
         "The floating button — the coach's next move: Write the starting point · Open a scene · Random prompt / Proposal while a scene waits for its beat · Back to the scene · Write how it ended · Start the next plot sheet.",
         "On a wide screen (1200px and up), the latest eight journal entries sit beside the Table, with Open the journal beneath them.",
